@@ -15,10 +15,35 @@ model User {
   name     String    @default("")
   email    String    @unique @default("")
   password Password?
+  Map      HexMap[]
 }
 
 model Password {
   hash   String
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model HexMap {
+  id        String @id @default(cuid())
+  name      String @default("")
+  creatorId String
+  creator   User   @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+  cells Cell[]
+}
+
+enum CellType {
+  PLAYER
+}
+
+model Cell {
+  x    Int
+  y    Int
+  type CellType
+
+  mapId String @unique
+  Map   HexMap @relation(fields: [mapId], references: [id])
+
+  @@id([mapId, x, y])
 }
