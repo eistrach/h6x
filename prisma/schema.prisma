@@ -11,11 +11,13 @@ datasource db {
 }
 
 model User {
-  id       String    @id @default(cuid())
-  name     String    @default("")
-  email    String    @unique @default("")
-  password Password?
-  Map      HexMap[]
+  id           String    @id @default(cuid())
+  name         String    @default("")
+  email        String    @unique @default("")
+  password     Password?
+  createdMaps  HexMap[]
+  players      Player[]
+  createdGames Game[]
 }
 
 model Password {
@@ -31,6 +33,7 @@ model HexMap {
   creator   User   @relation(fields: [creatorId], references: [id], onDelete: Cascade)
 
   cells Cell[]
+  games Game[]
 }
 
 enum CellType {
@@ -38,12 +41,87 @@ enum CellType {
 }
 
 model Cell {
+  id   String   @id @default(cuid())
   x    Int
   y    Int
   type CellType
 
   mapId String
-  Map   HexMap @relation(fields: [mapId], references: [id])
+  map   HexMap @relation(fields: [mapId], references: [id])
 
-  @@id([mapId, x, y])
+  gameCells GameCell[]
+
+  @@index([mapId, x, y])
+}
+
+model Player {
+  id       String @id @default(cuid())
+  userId   String @unique
+  user     User   @relation(fields: [userId], references: [id])
+  position Int
+
+  game   Game   @relation(fields: [gameId], references: [id])
+  gameId String
+
+  money           Int        @default(150)
+  executedActions Action[]
+  cells           GameCell[]
+}
+
+model Game {
+  id String @id @default(cuid())
+
+  map   HexMap @relation(fields: [mapId], references: [id])
+  mapId String
+
+  creatorId String
+  creator   User   @relation(fields: [creatorId], references: [id])
+
+  phase GamePhase @default(LOBBY)
+
+  players         Player[]
+  executedActions Action[]
+  turn            Int        @default(0)
+  cells           GameCell[]
+}
+
+enum GamePhase {
+  LOBBY
+  PREPARATION
+  PLAYING
+}
+
+model GameCell {
+  cell   Cell   @relation(fields: [cellId], references: [id])
+  cellId String
+
+  gameId String
+  game   Game   @relation(fields: [gameId], references: [id])
+
+  playerId String
+  player   Player @relation(fields: [playerId], references: [id])
+
+  attackUnits Int @default(1)
+
+  @@id([gameId, cellId])
+}
+
+enum ActionType {
+  ATTACK
+  BUY
+}
+
+model Action {
+  id String @id @default(cuid())
+
+  turn Int
+  type ActionType
+
+  args Json
+
+  playerId String
+  player   Player @relation(fields: [playerId], references: [id])
+
+  gameId String
+  game   Game   @relation(fields: [gameId], references: [id])
 }

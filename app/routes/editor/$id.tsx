@@ -1,12 +1,10 @@
 import { Cell } from "@prisma/client";
 import { ActionFunction, LoaderFunction, redirect } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
-import { composeEventHandlers } from "@remix-run/react/components";
 import { useState } from "react";
-import useMightyMouse from "react-hook-mighty-mouse";
 import { badRequest, notFound, unauthorized } from "remix-utils";
 import MapView from "~/components/MapView";
-import { Cell as GridCell, CellType, Grid, layoutGrid } from "~/core/grid";
+import { Cell as GridCell, CellType, Grid } from "~/core/grid";
 import { getMap, HexMap, updateCells } from "~/models/map.server";
 import { requireUserId } from "~/session.server";
 

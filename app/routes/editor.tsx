@@ -4,7 +4,7 @@ import { Form, NavLink, Outlet, useLoaderData } from "@remix-run/react";
 import { badRequest } from "remix-utils";
 
 import { createMap, getMapsForUser } from "~/models/map.server";
-import { requireUserId } from "~/session.server";
+import { requireUser, requireUserId } from "~/session.server";
 
 export const action: ActionFunction = async ({ request }) => {
   const userId = await requireUserId(request);
@@ -22,8 +22,8 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const userId = await requireUserId(request);
-  return getMapsForUser(userId);
+  const { id } = await requireUser(request);
+  return getMapsForUser(id);
 };
 
 export default function Editor() {
