@@ -1,3 +1,5 @@
+import { useHover } from "@use-gesture/react";
+import clsx from "clsx";
 import {
   Cell,
   CellType,
@@ -10,17 +12,25 @@ const corners = Cell().corners();
 
 type HexCellProps = {
   cell: CellType;
-  onClick?: (cell: CellType) => void;
+  fill: boolean;
+  onSelect?: (cell: CellType) => void;
 };
 
-export default function HexView({ cell, onClick }: HexCellProps) {
+export default function HexCellView({ cell, fill, onSelect }: HexCellProps) {
   const { x, y } = cell.toPoint();
+  const bindHover = useHover(({ pressed, down }) => {
+    (pressed || down) && onSelect?.(cell);
+  });
 
   return (
     <g
-      onClick={() => onClick?.(cell)}
+      {...bindHover()}
+      onClick={() => onSelect?.(cell)}
       transform={`translate(${x + SVG_OFFSET_X}, ${y + SVG_OFFSET_Y})`}
-      className="transition duration-300 cursor-pointer fill-transparent hover:fill-black"
+      className={clsx("transithion duration-300 cursor-pointer ", {
+        "fill-transparent hover:fill-slate-500": !fill,
+        "fill-slate-700": fill,
+      })}
     >
       <polygon
         stroke="#000000"

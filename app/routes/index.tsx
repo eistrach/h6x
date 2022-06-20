@@ -13,9 +13,5 @@ export const loader: LoaderFunction = async () => {
 
 export default function Index() {
   const { cells } = useLoaderData<{ cells: CellType[] }>();
-  return (
-    <div className="flex">
-      <MapView cells={cells} />
-    </div>
-  );
+  return <div className="flex"></div>;
 }

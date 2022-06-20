@@ -29,6 +29,18 @@ export async function createMap(creatorId: string, name: string) {
   });
 }
 
+export async function updateCells(mapId: string, cells: Cell[]) {
+  await prisma.cell.deleteMany({
+    where: {
+      mapId,
+    },
+  });
+
+  await prisma.cell.createMany({
+    data: cells,
+  });
+}
+
 export type HexMap = PrismaHexMap & {
   cells: Cell[];
 };

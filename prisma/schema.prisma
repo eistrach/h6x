@@ -42,7 +42,7 @@ model Cell {
   y    Int
   type CellType
 
-  mapId String @unique
+  mapId String
   Map   HexMap @relation(fields: [mapId], references: [id])
 
   @@id([mapId, x, y])
