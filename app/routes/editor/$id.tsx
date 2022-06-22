@@ -1,7 +1,7 @@
 import { Cell } from "@prisma/client";
 import { ActionFunction, LoaderFunction } from "@remix-run/node";
-import { Form, useLoaderData } from "@remix-run/react";
-import { useState } from "react";
+import { Form, useLoaderData, useParams } from "@remix-run/react";
+import { useEffect, useState } from "react";
 import { UnpackData } from "remix-domains";
 import MapView from "~/components/MapView";
 import { executeAction, executeLoader } from "~/domain/index.server";
@@ -55,11 +55,14 @@ export const ListInput = ({
 };
 
 export default function EditorDetailPage() {
+  const { id } = useParams();
   const map = useLoaderData<LoaderData>();
   const [cells, setCells] = useState<Cell[]>(map.cells);
   const [selectedTool, setSelectedTool] = useState<Tool>("add");
 
-  console.log(cells);
+  useEffect(() => {
+    setCells(map.cells);
+  }, [id]);
 
   const onClick = (cell: MathCell) => {
     const newCell = {
