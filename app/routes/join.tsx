@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { getUserId, createUserSession } from "~/session.server";
 
-import { createUser, getUserByEmail, verifyLogin } from "~/models/user.server";
+import { createUser, getUserByEmail, verifyLogin } from "~/domain/user.server";
 import { validateEmail } from "~/utils";
 import {
   LoaderFunction,

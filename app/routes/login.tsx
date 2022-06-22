@@ -8,7 +8,7 @@ import {
 import { useSearchParams, useActionData, Form, Link } from "@remix-run/react";
 import * as React from "react";
 
-import { verifyLogin } from "~/models/user.server";
+import { verifyLogin } from "~/domain/user.server";
 import { createUserSession, getUserId } from "~/session.server";
 import { validateEmail } from "~/utils";
 

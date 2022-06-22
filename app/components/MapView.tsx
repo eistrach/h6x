@@ -1,15 +1,13 @@
 import { Cell } from "@prisma/client";
-import { CellType, Grid, layoutGrid, SVG_SIZE } from "~/core/grid";
-import HexView from "./HexView";
+import { MathCell, asMathGrid, layoutGrid, SVG_SIZE } from "~/lib/grid";
+import HexView from "./CellView";
 
 type HexMapProps = {
   cells: Cell[];
-  onSelect?: (cell: CellType) => void;
+  onSelect?: (cell: MathCell) => void;
 };
 
 export default function MapView({ cells, onSelect }: HexMapProps) {
-  const grid = Grid(...layoutGrid);
-
   function isFilled(x: number, y: number) {
     return !!cells.find((cell) => cell.x === x && cell.y === y);
   }
@@ -21,7 +19,7 @@ export default function MapView({ cells, onSelect }: HexMapProps) {
       preserveAspectRatio="xMidYMid"
     >
       <g>
-        {grid.map((cell) => (
+        {layoutGrid.map((cell) => (
           <HexView
             onSelect={onSelect}
             fill={isFilled(cell.x, cell.y)}

@@ -1,33 +1,28 @@
-import { HexMap } from "@prisma/client";
-import { ActionFunction, LoaderFunction, redirect } from "@remix-run/node";
+import { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { Form, NavLink, Outlet, useLoaderData } from "@remix-run/react";
-import { badRequest } from "remix-utils";
+import { UnpackData } from "remix-domains";
+import { executeAction, executeLoader } from "~/domain/index.server";
 
-import { createMap, getMapsForUser } from "~/models/map.server";
-import { requireUser, requireUserId } from "~/session.server";
+import { createMap, getMapsForUser } from "~/domain/map.server";
+import { requireUser } from "~/session.server";
 
-export const action: ActionFunction = async ({ request }) => {
-  const userId = await requireUserId(request);
-  const formData = await request.formData();
-
-  const name = formData.get("name");
-
-  if (!name || typeof name !== "string" || !name.length) {
-    throw badRequest({ message: "name missing" });
-  }
-
-  await createMap(userId, name);
-
-  return redirect(`/editor`);
+export const action: ActionFunction = (args) => {
+  return executeAction(createMap, args, {
+    environmentFunction: requireUser,
+    redirectTo: (map) => `/editor/${map.id}`,
+  });
 };
 
-export const loader: LoaderFunction = async ({ request }) => {
-  const { id } = await requireUser(request);
-  return getMapsForUser(id);
+const getLoaderData = getMapsForUser;
+type LoaderData = UnpackData<typeof getLoaderData>;
+export const loader: LoaderFunction = (args) => {
+  return executeLoader(getLoaderData, args, {
+    environmentFunction: requireUser,
+  });
 };
 
 export default function Editor() {
-  const grids = useLoaderData<HexMap[]>();
+  const grids = useLoaderData<LoaderData>();
   return (
     <div className="flex flex-col  md:flex-row m-4 gap-8">
       <div className="flex flex-col gap-2">

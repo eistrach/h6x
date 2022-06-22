@@ -1,4 +1,3 @@
-import { getMap } from "./map.server";
 import { prisma } from "~/db.server";
 
 export async function getGame(id: string) {
@@ -22,7 +21,7 @@ export async function requireGame(id: string) {
   return game;
 }
 
-export async function createGame(creatorId: string, mapId: string) {
+/*export async function createGame(creatorId: string, mapId: string) {
   const map = await getMap(mapId);
 
   if (!map) {
@@ -52,7 +51,9 @@ export async function addPlayer(id: string, userId: string) {
     throw new Error("User is already in the game");
   }
 
-  // check if game already started
+  if (game.phase !== "LOBBY") {
+    throw new Error("Game is already started");
+  }
 
   return await prisma.game.update({
     where: { id },
@@ -118,3 +119,5 @@ export async function startGame(id: string) {
 }
 
 // executeAction, endTurn, endGame
+
+*/

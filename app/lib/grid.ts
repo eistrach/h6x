@@ -13,16 +13,18 @@ export const SVG_OFFSET_Y = SVG_SIZE / 2 - HEX_HEIGHT / 2;
 
 export const GRID_RADIUS = 9;
 
-export type CellType = Hex<{
+export type MathCell = Hex<{
   size: number;
 }>;
 
-export type GridType = HoneyGrid<CellType>;
+export type MathGrid = HoneyGrid<MathCell>;
 
-export const Cell = extendHex({
+export const asMathCell = extendHex({
   size: HEX_RADIUS,
 });
 
-export const Grid = defineGrid(Cell);
+export const asMathGrid = defineGrid(asMathCell);
 
-export const layoutGrid = Grid.hexagon({ radius: GRID_RADIUS });
+export const layoutGrid = asMathGrid.hexagon({ radius: GRID_RADIUS });
+
+export const cellCorners = asMathCell().corners();

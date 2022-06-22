@@ -23,8 +23,11 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-hook-mighty-mouse": "^1.4.31",
+    "remix-domains": "^0.3.0",
     "remix-utils": "^3.3.0",
-    "tiny-invariant": "^1.2.0"
+    "superjson-remix": "^0.1.2",
+    "tiny-invariant": "^1.2.0",
+    "zod": "^3.17.3"
   },
   "devDependencies": {
     "@faker-js/faker": "^7.2.0",

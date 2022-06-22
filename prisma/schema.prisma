@@ -34,6 +34,8 @@ model HexMap {
 
   cells Cell[]
   games Game[]
+
+  @@index([creatorId])
 }
 
 enum CellType {
@@ -54,18 +56,10 @@ model Cell {
   @@index([mapId, x, y])
 }
 
-model Player {
-  id       String @id @default(cuid())
-  userId   String @unique
-  user     User   @relation(fields: [userId], references: [id])
-  position Int
-
-  game   Game   @relation(fields: [gameId], references: [id])
-  gameId String
-
-  money           Int        @default(150)
-  executedActions Action[]
-  cells           GameCell[]
+enum GamePhase {
+  LOBBY
+  PREPARATION
+  PLAYING
 }
 
 model Game {
@@ -85,12 +79,6 @@ model Game {
   cells           GameCell[]
 }
 
-enum GamePhase {
-  LOBBY
-  PREPARATION
-  PLAYING
-}
-
 model GameCell {
   cell   Cell   @relation(fields: [cellId], references: [id])
   cellId String
@@ -104,6 +92,20 @@ model GameCell {
   attackUnits Int @default(1)
 
   @@id([gameId, cellId])
+}
+
+model Player {
+  id       String @id @default(cuid())
+  userId   String @unique
+  user     User   @relation(fields: [userId], references: [id])
+  position Int
+
+  game   Game   @relation(fields: [gameId], references: [id])
+  gameId String
+
+  money           Int        @default(150)
+  executedActions Action[]
+  cells           GameCell[]
 }
 
 enum ActionType {

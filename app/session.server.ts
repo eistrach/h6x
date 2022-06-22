@@ -1,8 +1,12 @@
-import { createCookieSessionStorage, redirect } from "@remix-run/node";
+import {
+  createCookieSessionStorage,
+  DataFunctionArgs,
+  redirect,
+} from "@remix-run/node";
 import invariant from "tiny-invariant";
 
-import type { User } from "~/models/user.server";
-import { getUserById } from "~/models/user.server";
+import type { User } from "~/domain/user.server";
+import { getUserById } from "~/domain/user.server";
 
 invariant(process.env.SESSION_SECRET, "SESSION_SECRET must be set");
 
@@ -53,7 +57,7 @@ export async function requireUserId(
   return userId;
 }
 
-export async function requireUser(request: Request) {
+export async function requireUser({ request }: DataFunctionArgs) {
   const userId = await requireUserId(request);
 
   const user = await getUserById(userId);

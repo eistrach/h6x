@@ -1,22 +1,21 @@
 import { useHover } from "@use-gesture/react";
 import clsx from "clsx";
 import {
-  Cell,
-  CellType,
+  asMathCell,
+  MathCell,
   HEX_STROKE_WIDTH,
   SVG_OFFSET_X,
   SVG_OFFSET_Y,
-} from "~/core/grid";
+  cellCorners,
+} from "~/lib/grid";
 
-const corners = Cell().corners();
-
-type HexCellProps = {
-  cell: CellType;
+type CellViewProps = {
+  cell: MathCell;
   fill: boolean;
-  onSelect?: (cell: CellType) => void;
+  onSelect?: (cell: MathCell) => void;
 };
 
-export default function HexCellView({ cell, fill, onSelect }: HexCellProps) {
+export default function CellView({ cell, fill, onSelect }: CellViewProps) {
   const { x, y } = cell.toPoint();
   const bindHover = useHover(({ pressed, down }) => {
     (pressed || down) && onSelect?.(cell);
@@ -35,7 +34,9 @@ export default function HexCellView({ cell, fill, onSelect }: HexCellProps) {
       <polygon
         stroke="#000000"
         strokeWidth={HEX_STROKE_WIDTH}
-        points={corners.map((corner) => `${corner.x},${corner.y}`).join(" ")}
+        points={cellCorners
+          .map((corner) => `${corner.x},${corner.y}`)
+          .join(" ")}
       />
     </g>
   );

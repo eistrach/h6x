@@ -1,81 +1,67 @@
 import { Cell } from "@prisma/client";
-import { ActionFunction, LoaderFunction, redirect } from "@remix-run/node";
+import { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
 import { useState } from "react";
-import { badRequest, notFound, unauthorized } from "remix-utils";
+import { UnpackData } from "remix-domains";
 import MapView from "~/components/MapView";
-import { Cell as GridCell, CellType, Grid } from "~/core/grid";
-import { getMap, HexMap, updateCells } from "~/models/map.server";
-import { requireUserId } from "~/session.server";
+import { executeAction, executeLoader } from "~/domain/index.server";
 
-function validateCells(cells: Cell[]) {
-  const gridCells = cells.map((cell) => GridCell(cell.x, cell.y));
-  const grid = Grid(gridCells);
-  const queue = [grid[0]];
-  const checkedCells = [] as CellType[];
+import { getMapForUser, updateMap } from "~/domain/map.server";
+import { MathCell } from "~/lib/grid";
+import { requireUser } from "~/session.server";
 
-  while (queue.length > 0) {
-    const cell = queue.pop()!;
-    if (checkedCells.find((c) => c.x === cell.x && c.y === cell.y)) {
-      continue;
-    }
-
-    checkedCells.push(cell);
-    const neighbors = grid.neighborsOf(cell).filter((c) => !!c);
-    queue.push(...neighbors);
-  }
-
-  return checkedCells.length === gridCells.length;
-}
-
-export const action: ActionFunction = async ({ request }) => {
-  const formData = await request.formData();
-
-  const id = formData.get("id");
-
-  if (!id || typeof id !== "string" || !id.length) {
-    throw badRequest({ message: "id missing" });
-  }
-
-  const cellsString = formData.get("cells");
-
-  if (!cellsString || typeof cellsString !== "string") {
-    throw badRequest({ message: "cells missing" });
-  }
-
-  const cells = JSON.parse(cellsString) as Cell[];
-
-  if (!validateCells(cells)) {
-    throw badRequest({ message: "map invalid" });
-  }
-
-  updateCells(id, cells);
-
-  return redirect(`/editor/${id}`);
+export const action: ActionFunction = (args) => {
+  return executeAction(updateMap, args, {
+    environmentFunction: requireUser,
+    redirectTo: (mapId) => `/editor/${mapId}`,
+  });
 };
 
-export const loader: LoaderFunction = async ({ request, params }) => {
-  const userId = await requireUserId(request);
-  const map = await getMap(params.id!);
-
-  if (!map) {
-    throw notFound({ message: "Map not found" });
-  }
-
-  if (map.creatorId !== userId) {
-    throw unauthorized({ message: "Unauthorized" });
-  }
-  return map;
+const getLoaderData = getMapForUser;
+type LoaderData = UnpackData<typeof getLoaderData>;
+export const loader: LoaderFunction = (args) => {
+  return executeLoader(getLoaderData, args, {
+    inputFunction: (args) => args.params.id,
+    environmentFunction: requireUser,
+  });
 };
 
 export type Tool = "add" | "remove";
 
+export const ListInput = ({
+  name,
+  value,
+}: {
+  name: string;
+  value: object[];
+}) => {
+  return (
+    <>
+      {value.flatMap((obj, index) =>
+        Object.keys(obj).map((key) => {
+          const resolvedName = `${name}[${index}][${key}]`;
+          return (
+            <input
+              type="hidden"
+              key={resolvedName}
+              name={resolvedName}
+              value={(obj as any)[key]}
+            />
+          );
+        })
+      )}
+    </>
+  );
+};
+
 export default function EditorDetailPage() {
-  const map = useLoaderData<HexMap>();
+  const map = useLoaderData<LoaderData>();
   const [cells, setCells] = useState<Cell[]>(map.cells);
   const [selectedTool, setSelectedTool] = useState<Tool>("add");
 
-  const onClick = (cell: CellType) => {
+  console.log(cells);
+
+  const onClick = (cell: MathCell) => {
     const newCell = {
       x: cell.x,
       y: cell.y,
@@ -103,7 +89,7 @@ export default function EditorDetailPage() {
       <MapView onSelect={onClick} cells={cells} />
       <Form method="post">
         <input type="hidden" name="id" value={map.id} />
-        <input type="hidden" name="cells" value={JSON.stringify(cells)} />
+        <ListInput name="cells" value={cells} />
         <button type="submit">Save</button>
       </Form>
       <div onChange={(evt: any) => setSelectedTool(evt.target.value)}>
