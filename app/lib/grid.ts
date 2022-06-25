@@ -1,3 +1,4 @@
+import { Cell } from "@prisma/client";
 import { defineGrid, Hex, Grid as HoneyGrid, extendHex } from "honeycomb-grid";
 
 export const SVG_SCALE = 36;
@@ -28,3 +29,46 @@ export const asMathGrid = defineGrid(asMathCell);
 export const layoutGrid = asMathGrid.hexagon({ radius: GRID_RADIUS });
 
 export const cellCorners = asMathCell().corners();
+
+export function compareCell(c1: Point, c2: Point) {
+  return c1.x === c2.x && c1.y === c2.y;
+}
+
+export function cellInGrid(cell: Point, grid: Point[]) {
+  return !!grid.find((c) => compareCell(c, cell));
+}
+
+export const getAllCellsInArea = (
+  cell: Point,
+  cells: Omit<Cell, "id">[],
+  fill: boolean = false
+) => {
+  const gridCells = cells.map((cell) => asMathCell(cell.x, cell.y));
+
+  const startingCell = asMathCell(cell.x, cell.y);
+
+  const queue = [startingCell];
+
+  const checkedCells = [] as MathCell[];
+
+  while (queue.length > 0) {
+    const cell = queue.pop()!;
+    if (cellInGrid(cell, checkedCells)) {
+      continue;
+    }
+
+    checkedCells.push(cell);
+    const neighbors = !fill
+      ? layoutGrid
+          .neighborsOf(cell)
+          .filter((c) => !!c && cellInGrid(c, gridCells))
+      : layoutGrid
+          .neighborsOf(cell)
+          .filter((c) => !!c && !cellInGrid(c, gridCells));
+    queue.push(...neighbors);
+  }
+
+  return checkedCells;
+};
+
+export type Point = { x: number; y: number };

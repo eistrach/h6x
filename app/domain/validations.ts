@@ -1,3 +1,4 @@
+import { cellInGrid, layoutGrid } from "./../lib/grid";
 import { Cell } from "@prisma/client";
 import { asMathCell, asMathGrid, MathCell } from "~/lib/grid";
 
@@ -9,7 +10,7 @@ export const validateCellConnections = (cells: Omit<Cell, "id">[]) => {
 
   while (queue.length > 0) {
     const cell = queue.pop()!;
-    if (checkedCells.find((c) => c.x === cell.x && c.y === cell.y)) {
+    if (cellInGrid(cell, checkedCells)) {
       continue;
     }
 

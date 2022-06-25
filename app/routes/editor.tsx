@@ -1,27 +1,19 @@
-import { ActionFunction, LoaderFunction } from "@remix-run/node";
-import { Form, NavLink, Outlet, useLoaderData } from "@remix-run/react";
-import { UnpackData } from "remix-domains";
-import { executeAction, executeLoader } from "~/domain/index.server";
+import {
+  Form,
+  NavLink,
+  Outlet,
+  useLoaderData,
+  useLocation,
+} from "@remix-run/react";
+import { EditorLoaderData as LoaderData } from "../api/editor.server";
 
-import { createMap, getMapsForUser } from "~/domain/map.server";
-import { requireUser } from "~/session.server";
-
-export const action: ActionFunction = (args) => {
-  return executeAction(createMap, args, {
-    environmentFunction: requireUser,
-    redirectTo: (map) => `/editor/${map.id}`,
-  });
-};
-
-const getLoaderData = getMapsForUser;
-type LoaderData = UnpackData<typeof getLoaderData>;
-export const loader: LoaderFunction = (args) => {
-  return executeLoader(getLoaderData, args, {
-    environmentFunction: requireUser,
-  });
-};
+export {
+  editorAction as action,
+  editorLoader as loader,
+} from "../api/editor.server";
 
 export default function Editor() {
+  let location = useLocation();
   const grids = useLoaderData<LoaderData>();
   return (
     <div className="flex flex-col  md:flex-row m-4 gap-8">
@@ -40,7 +32,7 @@ export default function Editor() {
         </Form>
       </div>
       <div className="mx-auto">
-        <Outlet />
+        <Outlet key={location.pathname} />
       </div>
     </div>
   );

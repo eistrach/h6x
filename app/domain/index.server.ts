@@ -1,73 +1,79 @@
 import { DataFunctionArgs, json, redirect } from "@remix-run/node";
-import { DomainFunction, inputFromForm } from "remix-domains";
+import { Params } from "@remix-run/react";
+import {
+  DomainFunction,
+  inputFromForm,
+  makeDomainFunction,
+} from "remix-domains";
+import { z } from "zod";
 
-export const executeAction = <T>(
-  domainFunction: DomainFunction<T>,
-  dataFunctionArgs: DataFunctionArgs,
-  args?: {
-    redirectTo?: string | ((data: T) => string);
-    environmentFunction?: (args: DataFunctionArgs) => Promise<unknown>;
-  }
-) => {
-  const { environmentFunction, redirectTo } = {
-    environmentFunction: () => {},
-    redirectTo: ".",
+import { getUser } from "~/session.server";
+import { User } from "./user.server";
+
+async function createContext(args: DataFunctionArgs) {
+  return {
     ...args,
+    user: await getUser(args.request),
   };
-  const actionFunction = async (args: DataFunctionArgs) => {
-    const [input, environment] = await Promise.all([
-      inputFromForm(args.request),
-      environmentFunction(args),
-    ]);
+}
 
-    console.log(input);
+export function assertUser(
+  ctx: Context
+): asserts ctx is Context & { user: User } {
+  if (!ctx.user) {
+    throw new Error("User is not logged in");
+  }
+}
 
-    const result = await domainFunction(
-      input === undefined ? null : input,
-      environment
-    );
+export function param(ctx: Context, name: string): string {
+  const param = ctx.params[name];
+  if (!param) {
+    throw new Error(`Missing parameter ${name}`);
+  }
+  return param;
+}
+
+export type Context = Awaited<ReturnType<typeof createContext>>;
+
+export function createAction<Schema extends z.ZodTypeAny, Output>(
+  schema: Schema,
+  handler: (data: z.infer<Schema>, ctx: Context) => Promise<Output>
+) {
+  return async (args: DataFunctionArgs) => {
+    const ctx = await createContext(args);
+    const domainFunction = makeDomainFunction(schema)((data) => {
+      return handler(data, ctx);
+    });
+
+    const input = await inputFromForm(args.request);
+    const result = await domainFunction(input);
 
     if (!result.success) {
+      console.error("Error during mutation", result);
       return result;
     }
-    const resolvedRedirectUrl =
-      typeof redirectTo === "string" ? redirectTo : redirectTo(result.data);
 
-    return redirect(resolvedRedirectUrl);
+    return result.data;
   };
-  return actionFunction(dataFunctionArgs);
-};
+}
 
-export const executeLoader = <T>(
-  domainFunction: DomainFunction<T>,
-  dataFunctionArgs: DataFunctionArgs,
+export function createLoader<Output>(
+  handler: (ctx: Context) => Promise<Output>
+) {
+  return async (args: DataFunctionArgs) => {
+    const ctx = await createContext(args);
+    const domainFunction = makeDomainFunction(z.null())((data) => {
+      return handler(ctx);
+    });
 
-  args?: {
-    inputFunction?: (args: DataFunctionArgs) => Promise<unknown> | unknown;
-    environmentFunction?: (args: DataFunctionArgs) => Promise<unknown>;
-  }
-) => {
-  const { inputFunction, environmentFunction } = {
-    inputFunction: () => {},
-    environmentFunction: () => {},
-    ...args,
-  };
-  const loaderFuntion = async (args: DataFunctionArgs) => {
-    const [input, environment] = await Promise.all([
-      inputFunction(args),
-      environmentFunction(args),
-    ]);
-
-    const result = await domainFunction(
-      input === undefined ? null : input,
-      environment
-    );
+    //const input = await inputFromForm(args.request);
+    const result = await domainFunction(null);
 
     if (!result.success) {
       console.debug(result);
       throw new Response("Not found", { status: 404 });
     }
-    return json<T>(result.data);
+
+    return result.data;
   };
-  return loaderFuntion(dataFunctionArgs);
-};
+}

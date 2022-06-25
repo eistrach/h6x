@@ -1,3 +1,4 @@
+import { Cell } from "@prisma/client";
 import { makeDomainFunction } from "remix-domains";
 import { prisma } from "~/db.server";
 import {
@@ -9,7 +10,7 @@ import {
 } from "./schemas";
 import { validateCellConnections } from "./validations";
 
-export const getMapForId = makeDomainFunction(IdSchema)((id) => {
+export const getMapForId = (id: string) => {
   return prisma.hexMap.findUnique({
     where: {
       id,
@@ -18,22 +19,17 @@ export const getMapForId = makeDomainFunction(IdSchema)((id) => {
       cells: true,
     },
   });
-});
-export const getMapsForUser = makeDomainFunction(
-  NullSchema,
-  RequireUserSchema
-)((_, { id: creatorId }) => {
+};
+
+export const getMapsForUser = (creatorId: string) => {
   return prisma.hexMap.findMany({
     where: {
       creatorId,
     },
   });
-});
+};
 
-export const getMapForUser = makeDomainFunction(
-  IdSchema,
-  RequireUserSchema
-)(async (id, { id: creatorId }) => {
+export const getMapForUser = async (id: string, creatorId: string) => {
   const map = await prisma.hexMap.findFirst({
     where: {
       id,
@@ -49,24 +45,21 @@ export const getMapForUser = makeDomainFunction(
   }
 
   return map;
-});
+};
 
-export const createMap = makeDomainFunction(
-  CreateMapSchema,
-  RequireUserSchema
-)(async ({ name }, { id: creatorId }) => {
+export const createMap = async (name: string, creatorId: string) => {
   return prisma.hexMap.create({
     data: {
       creatorId,
       name,
     },
   });
-});
+};
 
-export const updateMap = makeDomainFunction(
-  UpdateMapSchema,
-  RequireUserSchema
-)(async ({ id, cells }, { id: creatorId }) => {
+export const updateMap = async (
+  { id, cells }: { id: string; cells: Omit<Cell, "id">[] },
+  creatorId: string
+) => {
   if (!(await isMapCreator(id, creatorId))) {
     throw new Error("You are not the creator of this map");
   }
@@ -77,7 +70,7 @@ export const updateMap = makeDomainFunction(
 
   await prisma.cell.deleteMany({
     where: {
-      id,
+      mapId: id,
     },
   });
 
@@ -86,7 +79,7 @@ export const updateMap = makeDomainFunction(
   });
 
   return id;
-});
+};
 
 export async function isMapCreator(mapId: string, userId: string) {
   return !!prisma.hexMap.count({

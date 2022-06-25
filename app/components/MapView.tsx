@@ -3,7 +3,7 @@ import { MathCell, asMathGrid, layoutGrid, SVG_SIZE } from "~/lib/grid";
 import HexView from "./CellView";
 
 type HexMapProps = {
-  cells: Cell[];
+  cells: Omit<Cell, "id">[];
   onSelect?: (cell: MathCell) => void;
 };
 

@@ -15,24 +15,37 @@
 	// 	],
 	// 	"description": "Log output to console"
 	// }
-	"Create Domain Function": {
-		"prefix": "cdf",
+	"Create action and loader": {
+		"prefix": "create-al",
 		"body": [
-			"export const $1 = makeDomainFunction(",
-			"  $2",
-			")(($3) => {",
-			"  $0",
-			"});"
+			"import { redirect } from \"@remix-run/node\";",
+			"import { z } from \"zod\";",
+			"import { createAction, createLoader } from \"~/domain/index.server\";",
+			"",
+			"const Schema = z.object({$0});",
+			"export const $1Action = createAction(Schema, async ({}, ctx) => {",
+			"  return redirect(``);",
+			"});",
+			"",
+			"export const $1Loader = createLoader(async (ctx) => {});",
+			"",
+			"export type ${1/(.*)/${1:/capitalize}/}LoaderData = Awaited<ReturnType<typeof $1Loader>>;",
+			""
 		],
-		"description": "Create Domain Function"
+		"description": "Create action and loader"
 	},
-	"Create Loader Function": {
-		"prefix": "clf",
+	"Import action and loader": {
+		"prefix": "import-al",
 		"body": [
-			"const getLoaderData = $1;",
-			"type LoaderData = UnpackData<typeof getLoaderData>;",
-			"export const loader = createLoaderFunction(getLoaderData, {$0});"
+			"",
+			"import { ${1/(.*)/${1:/capitalize}/}LoaderData as LoaderData } from \"~/api/$2\"",
+			"export {",
+			"  $1Action as action,",
+			"  $1Loader as loader,",
+			"} from \"~/api/$2\";",
+			"",
+			"$0"
 		],
-		"description": "Create Loader Function"
+		"description": "Import action and loader"
 	}
 }
