@@ -57,7 +57,7 @@ export async function requireUserId(
   return userId;
 }
 
-export async function requireUser({ request }: DataFunctionArgs) {
+export async function requireUser(request: Request) {
   const userId = await requireUserId(request);
 
   const user = await getUserById(userId);

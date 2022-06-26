@@ -1,13 +1,5 @@
 import { Cell } from "@prisma/client";
-import { makeDomainFunction } from "remix-domains";
 import { prisma } from "~/db.server";
-import {
-  CreateMapSchema,
-  IdSchema,
-  NullSchema,
-  RequireUserSchema,
-  UpdateMapSchema,
-} from "./schemas";
 import { validateCellConnections } from "./validations";
 
 export const getMapForId = (id: string) => {
@@ -41,7 +33,7 @@ export const getMapForUser = async (id: string, creatorId: string) => {
   });
 
   if (!map) {
-    throw new Error("Map not found or user is not the creator");
+    return null;
   }
 
   return map;
@@ -62,10 +54,6 @@ export const updateMap = async (
 ) => {
   if (!(await isMapCreator(id, creatorId))) {
     throw new Error("You are not the creator of this map");
-  }
-
-  if (!validateCellConnections(cells)) {
-    throw new Error("Cells are not connected");
   }
 
   await prisma.cell.deleteMany({

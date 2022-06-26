@@ -5,12 +5,34 @@ import {
   useLoaderData,
   useLocation,
 } from "@remix-run/react";
-import { EditorLoaderData as LoaderData } from "../api/editor.server";
+import { redirect } from "@remix-run/node";
+import { z } from "zod";
+import { createMap, getMapsForUser } from "~/domain/map.server";
+import type { ActionArgs, LoaderArgs, UnpackData } from "~/lib/utils";
+import { validateForm } from "~/lib/utils.server";
+import { requireUser } from "~/session.server";
 
-export {
-  editorAction as action,
-  editorLoader as loader,
-} from "../api/editor.server";
+const Schema = z.object({ name: z.string().min(1) });
+export const action = async ({ request }: ActionArgs) => {
+  const [user, result] = await Promise.all([
+    requireUser(request),
+    validateForm(request, Schema),
+  ]);
+
+  if (!result.success) {
+    return result;
+  }
+
+  const map = await createMap(result.data.name, user.id);
+  return redirect(`/editor/${map.id}`);
+};
+
+export const loader = async ({ request }: LoaderArgs) => {
+  const user = await requireUser(request);
+  return getMapsForUser(user.id);
+};
+
+type LoaderData = UnpackData<typeof loader>;
 
 export default function Editor() {
   let location = useLocation();

@@ -1,49 +1,68 @@
-import { Cell } from "@prisma/client";
-import { Form, useLoaderData, useParams } from "@remix-run/react";
-import { useEffect, useState } from "react";
+import { Cell, CellType } from "@prisma/client";
+import { Form, useActionData, useLoaderData } from "@remix-run/react";
+import { useState } from "react";
 import MapView from "~/components/MapView";
-
 import { cellInGrid, getAllCellsInArea, MathCell, Point } from "~/lib/grid";
 
-import { EditorDetailLoaderData as LoaderData } from "~/api/editor/$id.server";
-import { getAppDependencies } from "@remix-run/dev/compiler/dependencies";
 import { RadioGroup } from "@headlessui/react";
+import { redirect } from "@remix-run/node";
+import { z } from "zod";
+import { ErrorResult, requireParam, validateForm } from "~/lib/utils.server";
+import { getMapForUser, updateMap } from "~/domain/map.server";
+import { requireUser } from "~/session.server";
+import { notFound } from "remix-utils";
+import { ActionArgs, LoaderArgs, UnpackData } from "~/lib/utils";
+import { validateCellConnections } from "~/domain/validations";
 
-export {
-  editorDetailAction as action,
-  editorDetailLoader as loader,
-} from "~/api/editor/$id.server";
+const Schema = z.object({
+  id: z.string().min(1),
+  cells: z.preprocess(
+    (arg) => JSON.parse(arg as any),
+    z
+      .object({
+        x: z.preprocess(Number, z.number()),
+        y: z.preprocess(Number, z.number()),
+        type: z.nativeEnum(CellType),
+        mapId: z.string().min(1),
+      })
+      .array()
+      .refine(validateCellConnections, "Invalid cell connections")
+  ),
+});
+export const action = async ({ request }: ActionArgs) => {
+  const [user, result] = await Promise.all([
+    requireUser(request),
+    validateForm(request, Schema),
+  ]);
+
+  if (!result.success) {
+    return result;
+  }
+
+  await updateMap(result.data, user.id);
+  return redirect(`/editor/${result.data.id}`);
+};
+
+export const loader = async ({ request, params }: LoaderArgs) => {
+  const user = await requireUser(request);
+  const mapId = requireParam(params, "id");
+
+  const map = await getMapForUser(mapId, user.id);
+
+  if (!map) {
+    return notFound(`Map with id ${mapId} not found`);
+  }
+
+  return map;
+};
+
+type LoaderData = UnpackData<typeof loader>;
 
 export type Tool = "add" | "remove";
 
-export const ListInput = ({
-  name,
-  value,
-}: {
-  name: string;
-  value: object[];
-}) => {
-  return (
-    <>
-      {value.flatMap((obj, index) =>
-        Object.keys(obj).map((key) => {
-          const resolvedName = `${name}[${index}][${key}]`;
-          return (
-            <input
-              type="hidden"
-              key={resolvedName}
-              name={resolvedName}
-              value={(obj as any)[key]}
-            />
-          );
-        })
-      )}
-    </>
-  );
-};
-
 export default function EditorDetailPage() {
   const map = useLoaderData<LoaderData>();
+  const result = useActionData<ErrorResult | null>();
   const [cells, setCells] = useState<Omit<Cell, "id">[]>(map.cells);
   const [selectedTool, setSelectedTool] = useState<Tool>("add");
   const [isFill, setIsFill] = useState(false);
@@ -80,6 +99,14 @@ export default function EditorDetailPage() {
 
   return (
     <div>
+      {!!result && (
+        <div>
+          <div>Errors: </div>
+          <div>
+            <pre>{JSON.stringify(result.errors, null, 2)}</pre>
+          </div>
+        </div>
+      )}
       <MapView onSelect={onClick} cells={cells} />
       <Form method="post">
         <input type="hidden" name="id" value={map.id} />
