@@ -11,24 +11,22 @@ datasource db {
 }
 
 model User {
-  id           String    @id @default(cuid())
-  name         String    @default("")
-  email        String    @unique @default("")
-  password     Password?
+  id String @id @default(cuid())
+
+  username String @unique
+  email    String @unique
+
+  displayName String
+  avatarUrl   String?
+
   createdMaps  HexMap[]
   players      Player[]
   createdGames Game[]
 }
 
-model Password {
-  hash   String
-  userId String @unique
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
 model HexMap {
   id        String @id @default(cuid())
-  name      String @default("")
+  name      String
   creatorId String
   creator   User   @relation(fields: [creatorId], references: [id], onDelete: Cascade)
 

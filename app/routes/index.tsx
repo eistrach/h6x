@@ -1,3 +1,5 @@
-export default function Index() {
-  return <div className="flex">Index</div>;
-}
+import { redirect } from "@remix-run/node";
+
+export const loader = async () => {
+  return redirect("/login");
+};

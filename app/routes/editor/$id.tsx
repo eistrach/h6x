@@ -7,7 +7,7 @@ import { cellInGrid, getAllCellsInArea, MathCell, Point } from "~/lib/grid";
 import { RadioGroup } from "@headlessui/react";
 import { redirect } from "@remix-run/node";
 import { z } from "zod";
-import { ErrorResult, requireParam, validateForm } from "~/lib/utils.server";
+import { ErrorResult, requireParam, validateForm } from "~/utils.server";
 import { getMapForUser, updateMap } from "~/domain/map.server";
 import { requireUser } from "~/session.server";
 import { notFound } from "remix-utils";

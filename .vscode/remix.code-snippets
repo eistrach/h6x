@@ -15,37 +15,4 @@
 	// 	],
 	// 	"description": "Log output to console"
 	// }
-	"Create action and loader": {
-		"prefix": "create-al",
-		"body": [
-			"import { redirect } from \"@remix-run/node\";",
-			"import { z } from \"zod\";",
-			"import { createAction, createLoader } from \"~/domain/index.server\";",
-			"",
-			"const Schema = z.object({$0});",
-			"export const $1Action = createAction(Schema, async ({}, ctx) => {",
-			"  return redirect(``);",
-			"});",
-			"",
-			"export const $1Loader = createLoader(async (ctx) => {});",
-			"",
-			"export type ${1/(.*)/${1:/capitalize}/}LoaderData = Awaited<ReturnType<typeof $1Loader>>;",
-			""
-		],
-		"description": "Create action and loader"
-	},
-	"Import action and loader": {
-		"prefix": "import-al",
-		"body": [
-			"",
-			"import { ${1/(.*)/${1:/capitalize}/}LoaderData as LoaderData } from \"~/api/$2\"",
-			"export {",
-			"  $1Action as action,",
-			"  $1Loader as loader,",
-			"} from \"~/api/$2\";",
-			"",
-			"$0"
-		],
-		"description": "Import action and loader"
-	}
 }

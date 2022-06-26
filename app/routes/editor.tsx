@@ -9,7 +9,7 @@ import { redirect } from "@remix-run/node";
 import { z } from "zod";
 import { createMap, getMapsForUser } from "~/domain/map.server";
 import type { ActionArgs, LoaderArgs, UnpackData } from "~/lib/utils";
-import { validateForm } from "~/lib/utils.server";
+import { validateForm } from "~/utils.server";
 import { requireUser } from "~/session.server";
 
 const Schema = z.object({ name: z.string().min(1) });
