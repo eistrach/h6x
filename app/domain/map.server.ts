@@ -1,6 +1,9 @@
 import { Cell } from "@prisma/client";
 import { prisma } from "~/db.server";
-import { validateCellConnections } from "./validations";
+
+export const getMaps = () => {
+  return prisma.hexMap.findMany();
+};
 
 export const getMapForId = (id: string) => {
   return prisma.hexMap.findUnique({

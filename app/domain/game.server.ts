@@ -1,4 +1,18 @@
+import { getMapForId } from "./map.server";
 import { prisma } from "~/db.server";
+
+export async function getGamesForUser(userId: string) {
+  return prisma.player
+    .findMany({
+      where: {
+        userId,
+      },
+      include: {
+        game: true,
+      },
+    })
+    .then((players) => players.map((player) => player.game));
+}
 
 export async function getGame(id: string) {
   return prisma.game.findUnique({
@@ -21,8 +35,8 @@ export async function requireGame(id: string) {
   return game;
 }
 
-/*export async function createGame(creatorId: string, mapId: string) {
-  const map = await getMap(mapId);
+export async function createGame(creatorId: string, mapId: string) {
+  const map = await getMapForId(mapId);
 
   if (!map) {
     throw new Error("Map not found");
@@ -81,7 +95,7 @@ export async function startGame(id: string) {
     throw new Error("Game is already started");
   }
 
-  const map = await getMap(game.mapId);
+  const map = await getMapForId(game.mapId);
 
   const availableCells = map!.cells
     .filter((cell) => cell.type === "PLAYER")
@@ -119,5 +133,3 @@ export async function startGame(id: string) {
 }
 
 // executeAction, endTurn, endGame
-
-*/

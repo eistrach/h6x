@@ -11,7 +11,7 @@ import { ErrorResult, requireParam, validateForm } from "~/utils.server";
 import { getMapForUser, updateMap } from "~/domain/map.server";
 import { requireUser } from "~/session.server";
 import { notFound } from "remix-utils";
-import { ActionArgs, LoaderArgs, UnpackData } from "~/lib/utils";
+import { ActionArgs, LoaderArgs, UnpackData } from "~/utils";
 import { validateCellConnections } from "~/domain/validations";
 
 const Schema = z.object({

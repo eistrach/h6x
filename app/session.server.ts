@@ -1,14 +1,10 @@
 import { User } from "@prisma/client";
-import { createCookieSessionStorage, redirect } from "@remix-run/node";
+import { createCookieSessionStorage } from "@remix-run/node";
 import { Authenticator } from "remix-auth";
 import { DiscordStrategy } from "remix-auth-socials";
 import { z } from "zod";
 
-import {
-  createOrUpdateUser,
-  getUserByEmail,
-  getUserById,
-} from "~/domain/user.server";
+import { createOrUpdateUser, getUserById } from "~/domain/user.server";
 import { env } from "./environment.server";
 
 export const sessionStorage = createCookieSessionStorage({

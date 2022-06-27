@@ -1,12 +1,11 @@
 import { Form } from "@remix-run/react";
 import { SocialsProvider } from "remix-auth-socials";
-import { ActionArgs } from "~/lib/utils";
+import { ActionArgs, LoaderArgs } from "~/utils";
 import { authenticator } from "~/session.server";
-import { LoaderArgs } from "~/lib/utils";
 
 export const loader = async ({ request }: LoaderArgs) => {
   return await authenticator.isAuthenticated(request, {
-    successRedirect: "/editor",
+    successRedirect: "/games",
   });
 };
 

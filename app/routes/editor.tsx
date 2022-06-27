@@ -8,7 +8,7 @@ import {
 import { redirect } from "@remix-run/node";
 import { z } from "zod";
 import { createMap, getMapsForUser } from "~/domain/map.server";
-import type { ActionArgs, LoaderArgs, UnpackData } from "~/lib/utils";
+import type { ActionArgs, LoaderArgs, UnpackData } from "~/utils";
 import { validateForm } from "~/utils.server";
 import { requireUser } from "~/session.server";
 
@@ -27,16 +27,16 @@ export const action = async ({ request }: ActionArgs) => {
   return redirect(`/editor/${map.id}`);
 };
 
+type LoaderData = UnpackData<typeof getMapsForUser>;
 export const loader = async ({ request }: LoaderArgs) => {
   const user = await requireUser(request);
   return getMapsForUser(user.id);
 };
 
-type LoaderData = UnpackData<typeof loader>;
-
 export default function Editor() {
   let location = useLocation();
   const grids = useLoaderData<LoaderData>();
+
   return (
     <div className="flex flex-col  md:flex-row m-4 gap-8">
       <div className="flex flex-col gap-2">

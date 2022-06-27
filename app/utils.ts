@@ -1,5 +1,6 @@
 import { useMatches } from "@remix-run/react";
 import { useMemo } from "react";
+import type { DataFunctionArgs } from "@remix-run/node";
 
 import type { User } from "~/domain/user.server";
 
@@ -45,3 +46,11 @@ export function useUser(): User {
 export function validateEmail(email: unknown): email is string {
   return typeof email === "string" && email.length > 3 && email.includes("@");
 }
+
+export type UnpackData<F extends (...args: any) => any> = Exclude<
+  Awaited<ReturnType<F>>,
+  Response
+>;
+
+export type LoaderArgs = DataFunctionArgs;
+export type ActionArgs = DataFunctionArgs;
