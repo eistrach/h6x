@@ -9,8 +9,12 @@ import {
 } from "@remix-run/react";
 
 import styles from "./tailwind.css";
+import fontStyles from "./rubik.css";
 
-export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
+export const links: LinksFunction = () => [
+  { rel: "stylesheet", href: styles },
+  { rel: "stylesheet", href: fontStyles },
+];
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
@@ -25,7 +29,7 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="min-h-screen bg-yellow-50">
         <Outlet />
         <ScrollRestoration />
         <Scripts />

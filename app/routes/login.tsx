@@ -2,6 +2,9 @@ import { Form } from "@remix-run/react";
 import { SocialsProvider } from "remix-auth-socials";
 import { ActionArgs, LoaderArgs } from "~/utils";
 import { authenticator } from "~/session.server";
+import { Button, ButtonTheme } from "~/components/base/Button";
+import { DiscordIcon } from "~/components/icons/DiscordIcon";
+import { LogoIcon } from "~/components/icons/Logo";
 
 export const loader = async ({ request }: LoaderArgs) => {
   return await authenticator.isAuthenticated(request, {
@@ -15,8 +18,23 @@ export const action = async ({ request }: ActionArgs) => {
 
 const LoginPage = () => {
   return (
-    <Form method="post">
-      <button>Login</button>
+    <Form
+      method="post"
+      className="flex flex-col h-screen justify-around items-center"
+    >
+      <div className="flex gap-4 justify-start items-center">
+        <LogoIcon className="w-28" />
+        <span className="font-extrabold text-6xl">h6x</span>
+      </div>
+      <div>
+        <Button
+          theme={ButtonTheme.Discord}
+          type="submit"
+          LeftIcon={DiscordIcon}
+        >
+          Sign in with Discord
+        </Button>
+      </div>
     </Form>
   );
 };
