@@ -29,7 +29,14 @@ export async function getGamesForUser(userId: string) {
         },
       },
     })
-    .then((players) => players.map((player) => player.game));
+    .then((players) =>
+      players
+        .map((player) => player.game)
+        .filter(
+          (game, index, self) =>
+            index === self.findIndex((g) => g.id === game.id)
+        )
+    );
 }
 
 export async function getGame(id: string) {
