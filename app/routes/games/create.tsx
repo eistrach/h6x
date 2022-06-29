@@ -1,6 +1,7 @@
 import { Listbox } from "@headlessui/react";
 import { redirect } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
+import { motion } from "framer-motion";
 import { useState } from "react";
 import { z } from "zod";
 import { createGame } from "~/domain/game.server";
@@ -35,36 +36,39 @@ export const loader = async ({ request }: LoaderArgs) => {
 
 const CreateGamePage = () => {
   const maps = useLoaderData<LoaderData>();
-
-  console.log(typeof maps);
-
   const [selectedMapId, setSelectedMapId] = useState<string | null>(null);
 
   const getMapForId = (id: string | null) => {
-    return maps.find((map) => map.id === id);
+    return maps?.find((map) => map.id === id) || null;
   };
 
   return (
-    <Form method="post" className="flex flex-col  gap-2 ">
-      Create Map{" "}
-      <Listbox
-        name="selectedMapId"
-        value={selectedMapId}
-        onChange={setSelectedMapId}
-      >
-        <Listbox.Button>
-          {getMapForId(selectedMapId)?.name || "Select a map"}
-        </Listbox.Button>
-        <Listbox.Options>
-          {maps.map((map) => (
-            <Listbox.Option key={map.id} value={map.id}>
-              {map.name}
-            </Listbox.Option>
-          ))}
-        </Listbox.Options>
-      </Listbox>
-      <button type="submit">Submit</button>
-    </Form>
+    <motion.div
+      layoutId="createGame"
+      className="fixed z-50 left-0 right-0 top-1/2 bottom-0 bg-yellow-400 "
+    >
+      <Form method="post" className=" flex flex-col  gap-2 ">
+        Create Map{" "}
+        <Listbox
+          name="selectedMapId"
+          value={selectedMapId}
+          onChange={setSelectedMapId}
+        >
+          <Listbox.Button>
+            {getMapForId(selectedMapId)?.name || "Select a map"}
+          </Listbox.Button>
+          <Listbox.Options>
+            {maps &&
+              maps.map((map) => (
+                <Listbox.Option key={map.id} value={map.id}>
+                  {map.name}
+                </Listbox.Option>
+              ))}
+          </Listbox.Options>
+        </Listbox>
+        <button type="submit">Submit</button>
+      </Form>
+    </motion.div>
   );
 };
 

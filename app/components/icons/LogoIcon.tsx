@@ -12,17 +12,17 @@ export const LogoIcon = (props: React.ComponentProps<"svg">) => {
       <path
         d="M72.1132 11.6987L94.2265 50L72.1132 88.3013L27.8867 88.3013L5.7735 50L27.8867 11.6987L72.1132 11.6987Z"
         stroke="black"
-        stroke-width="10"
+        strokeWidth="10"
       />
       <path
         d="M156.113 61.6987L178.227 100L156.113 138.301L111.887 138.301L89.7735 100L111.887 61.6987L156.113 61.6987Z"
         stroke="black"
-        stroke-width="10"
+        strokeWidth="10"
       />
       <path
         d="M72.1133 111.699L94.2265 150L72.1133 188.301L27.8868 188.301L5.7735 150L27.8868 111.699L72.1133 111.699Z"
         stroke="black"
-        stroke-width="10"
+        strokeWidth="10"
       />
       <g filter="url(#filter0_d_4_2)">
         <path
@@ -38,9 +38,9 @@ export const LogoIcon = (props: React.ComponentProps<"svg">) => {
           width="94.0459"
           height="61.4372"
           filterUnits="userSpaceOnUse"
-          color-interpolation-filters="sRGB"
+          colorInterpolationFilters="sRGB"
         >
-          <feFlood flood-opacity="0" result="BackgroundImageFix" />
+          <feFlood floodOpacity="0" result="BackgroundImageFix" />
           <feColorMatrix
             in="SourceAlpha"
             type="matrix"

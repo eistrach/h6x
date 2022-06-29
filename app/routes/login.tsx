@@ -2,9 +2,10 @@ import { Form } from "@remix-run/react";
 import { SocialsProvider } from "remix-auth-socials";
 import { ActionArgs, LoaderArgs } from "~/utils";
 import { authenticator } from "~/session.server";
-import { Button, ButtonTheme } from "~/components/base/Button";
+import { Button } from "~/components/base/Button";
 import { DiscordIcon } from "~/components/icons/DiscordIcon";
-import { LogoIcon } from "~/components/icons/Logo";
+import { LogoIcon } from "~/components/icons/LogoIcon";
+import { InputTheme } from "~/components/base/InputTheme";
 
 export const loader = async ({ request }: LoaderArgs) => {
   return await authenticator.isAuthenticated(request, {
@@ -27,11 +28,7 @@ const LoginPage = () => {
         <span className="font-extrabold text-6xl">h6x</span>
       </div>
       <div>
-        <Button
-          theme={ButtonTheme.Discord}
-          type="submit"
-          LeftIcon={DiscordIcon}
-        >
+        <Button theme={InputTheme.Discord} type="submit" LeftIcon={DiscordIcon}>
           Sign in with Discord
         </Button>
       </div>

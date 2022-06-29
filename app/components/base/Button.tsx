@@ -1,24 +1,20 @@
 import clsx from "clsx";
 import { HTMLMotionProps, motion } from "framer-motion";
+import { InputTheme } from "./InputTheme";
 
 export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
   HTMLMotionProps<"button"> & {
     LeftIcon?: (props: React.ComponentProps<"svg">) => JSX.Element;
     RightIcon?: (props: React.ComponentProps<"svg">) => JSX.Element;
-    theme?: ButtonTheme;
+    theme?: InputTheme;
   };
-
-export enum ButtonTheme {
-  Primary = "bg-yellow-400 focus:ring-yellow-500 text-black",
-  Discord = "bg-indigo-600 focus:ring-indigo-500 text-white",
-}
 
 export const Button = ({
   children,
   LeftIcon,
   RightIcon,
   className,
-  theme = ButtonTheme.Primary,
+  theme = InputTheme.Primary,
   ...rest
 }: ButtonProps) => {
   return (
