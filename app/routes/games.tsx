@@ -23,13 +23,13 @@ const GamesPage = () => {
   const outlet = useOutlet();
   return (
     <div className="min-h-full h-full">
-      <ul className=" px-4 border-y-2 border-black py-4 flex flex-col  gap-4 max-h-[calc(100vh-8rem)] overflow-auto">
+      <ul className=" px-6 py-6 mb-16 flex flex-col gap-8 ">
         {games &&
           games.map((game) => <GameCard key={game.id} game={game}></GameCard>)}
       </ul>
       <AnimatePresence initial={false}>{outlet}</AnimatePresence>
 
-      <div className="flex bg-yellow-200 py-3 px-4 justify-between items-center">
+      <div className="fixed bottom-0 rounded-t-2xl backdrop-blur-sm left-0 right-0 flex bg-gray-200/50 py-3 px-4 justify-between items-center">
         <Link
           motionProps={{ layoutId: "openSettings" }}
           theme={InputTheme.OutlinedBlack}

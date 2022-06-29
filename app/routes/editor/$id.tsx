@@ -153,12 +153,12 @@ export default function EditorDetailPage() {
         <RadioGroup.Label>Tool</RadioGroup.Label>
         <RadioGroup.Option value="add">
           {({ checked }) => (
-            <span className={checked ? "bg-blue-200" : ""}>Add</span>
+            <span className={checked ? "bg-primary-200" : ""}>Add</span>
           )}
         </RadioGroup.Option>
         <RadioGroup.Option value="remove">
           {({ checked }) => (
-            <span className={checked ? "bg-blue-200" : ""}>Remove</span>
+            <span className={checked ? "bg-primary-200" : ""}>Remove</span>
           )}
         </RadioGroup.Option>
       </RadioGroup>

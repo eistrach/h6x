@@ -28,7 +28,7 @@ export const Link = ({
         initial={false}
         exit={{ opacity: 0 }}
         className={clsx(
-          "inline-flex items-center  border border-transparent text-sm font-semibold   focus:outline-none focus:ring-2 focus:ring-offset-2",
+          "inline-flex items-center text-sm font-semibold   focus:outline-none focus:ring-2 focus:ring-offset-2",
           theme
         )}
         {...motionProps}

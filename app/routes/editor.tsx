@@ -53,7 +53,7 @@ export default function Editor() {
           <button type="submit">Add</button>
         </Form>
       </div>
-      <div className="mx-auto">
+      <div>
         <Outlet key={location.pathname} />
       </div>
     </div>

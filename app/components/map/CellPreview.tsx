@@ -19,7 +19,6 @@ export default function CellPreview({ cell, className }: CellPreviewProps) {
       className={className}
     >
       <polygon
-        stroke="#000000"
         strokeWidth={HEX_STROKE_WIDTH}
         points={cellCorners
           .map((corner) => `${corner.x},${corner.y}`)

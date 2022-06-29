@@ -45,7 +45,7 @@ const CreateGamePage = () => {
   return (
     <motion.div
       layoutId="createGame"
-      className="fixed z-50 mt-4 left-4 right-4 top-16 bottom-3 shadow-2xl border-2 border-black bg-yellow-400 "
+      className="fixed z-50 mt-4 left-4 right-4 top-16 bottom-3 shadow-2xl border-2 border-black bg-primary-400 "
     >
       <Form method="post" className=" flex flex-col  gap-2 ">
         Create Map{" "}

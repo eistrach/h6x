@@ -14,7 +14,7 @@ const SettingsPage = () => {
   return (
     <motion.div
       layoutId="openSettings"
-      className="fixed z-50 left-4 right-4 top-16 mt-4 bottom-3 shadow-2xl border-2 border-black bg-yellow-200 "
+      className="fixed z-50 left-4 right-4 top-16 mt-4 bottom-3 shadow-2xl border-2 border-black bg-primary-200 "
     >
       <Form method="post" className=" flex flex-col  gap-2 ">
         Settings

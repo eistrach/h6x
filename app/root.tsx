@@ -13,6 +13,7 @@ import fontStyles from "./rubik.css";
 import { LogoIcon } from "./components/icons/LogoIcon";
 import { LoaderArgs, useOptionalUser } from "./utils";
 import { getUser } from "./session.server";
+import clsx from "clsx";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: styles },
@@ -33,14 +34,14 @@ export const loader = async ({ request }: LoaderArgs) => {
 export default function App() {
   const user = useOptionalUser();
   return (
-    <html lang="en">
+    <html lang="en" className="">
       <head>
         <Meta />
         <Links />
       </head>
-      <body className="h-full bg-yellow-50">
+      <body className="h-full bg-gray-100 overscroll-none">
         {user && (
-          <div className="h-16 bg-yellow-200 shadow-sm px-4 flex justify-between items-center">
+          <div className="fixed z-10 left-0 right-0 top-0 rounded-b-2xl backdrop-blur-sm h-16 bg-gray-200/50 px-4 flex justify-between items-center">
             <div className="  flex gap-1 justify-start items-center">
               <LogoIcon className="w-10 h-10" />
               <span className="font-extrabold text-2xl">h6x</span>
@@ -50,18 +51,24 @@ export default function App() {
                 <span className="font-bold  text-stone-900">
                   {user.displayName}
                 </span>
-                <span className="text-xs text-yellow-700">
+                <span className="text-xs text-gray-500">
                   #{user.username.split("#")[1]}
                 </span>
               </div>
               <img
-                className="w-10 h-10 border-2 border-black shadow-md rounded-full"
+                className="w-10 h-10 ring-white ring-2 shadow-md rounded-full"
                 src={user.avatarUrl || ""}
               ></img>
             </div>
           </div>
         )}
-        <Outlet />
+        <main
+          className={clsx("overscroll-auto h-full", {
+            "mt-16": !!user,
+          })}
+        >
+          <Outlet />
+        </main>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
