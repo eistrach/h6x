@@ -6,6 +6,7 @@ import { requireUser } from "~/session.server";
 import { LoaderArgs, UnpackData } from "~/utils";
 
 import { PlusIcon } from "@heroicons/react/solid";
+import GameCard from "~/components/game/GameCard";
 type LoaderData = UnpackData<typeof getGamesForUser>;
 
 export const loader = async ({ request }: LoaderArgs) => {
@@ -19,7 +20,10 @@ const GamesPage = () => {
   const outlet = useOutlet();
   return (
     <div className="relative min-h-screen">
-      <pre>{JSON.stringify(games, null, 2)}</pre>
+      <ul className="my-8 mx-4 flex flex-col gap-4 ">
+        {games &&
+          games.map((game) => <GameCard key={game.id} game={game}></GameCard>)}
+      </ul>
       <AnimatePresence initial={false}>{outlet}</AnimatePresence>
 
       <Link

@@ -8,7 +8,20 @@ export async function getGamesForUser(userId: string) {
         userId,
       },
       include: {
-        game: true,
+        game: {
+          include: {
+            map: {
+              include: {
+                cells: true,
+              },
+            },
+            players: {
+              include: {
+                user: true,
+              },
+            },
+          },
+        },
       },
     })
     .then((players) => players.map((player) => player.game));

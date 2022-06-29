@@ -52,5 +52,7 @@ export type UnpackData<F extends (...args: any) => any> = Exclude<
   Response
 >;
 
+export type UnpackArray<T> = T extends (infer U)[] ? U : T;
+
 export type LoaderArgs = DataFunctionArgs;
 export type ActionArgs = DataFunctionArgs;

@@ -71,4 +71,19 @@ export const getAllCellsInArea = (
   return checkedCells;
 };
 
+export const cellsToMathCells = (cells: Omit<Cell, "id">[]) => {
+  return cells.map((cell) => asMathCell(cell.x, cell.y));
+};
+
+export const cellsToPoints = (cells: Omit<Cell, "id">[]) => {
+  return cells.map(cellToPoint);
+};
+
+export const cellToPoint = (cell: Omit<Cell, "id">) => {
+  return {
+    x: cell.x,
+    y: cell.y,
+  };
+};
+
 export type Point = { x: number; y: number };
