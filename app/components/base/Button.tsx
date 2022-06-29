@@ -28,11 +28,24 @@ export const Button = ({
       {...rest}
     >
       {LeftIcon && (
-        <LeftIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
+        <LeftIcon
+          className={clsx("h-5 w-5", {
+            "-ml-1 mr-2": children || RightIcon,
+            "-ml-2 -mr-2": !(children || RightIcon),
+          })}
+          aria-hidden="true"
+        />
       )}
       {children}
       {RightIcon && (
-        <RightIcon className="-mr-1 ml-2 h-5 w-5" aria-hidden="true" />
+        <RightIcon
+          className={clsx("h-5 w-5", {
+            "-mr-1 ml-2": children,
+            "-ml-2 -mr-2": !(children || LeftIcon),
+            "-mr-1": !children && LeftIcon,
+          })}
+          aria-hidden="true"
+        />
       )}
     </motion.button>
   );
