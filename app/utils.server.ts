@@ -15,7 +15,6 @@ export type SuccessResult<Schema extends z.ZodTypeAny> = {
 export type ErrorResult = {
   success: false;
   errors: SchemaError[];
-  form: any;
 };
 
 export type ValidationResult<Schema extends z.ZodTypeAny> =
@@ -34,7 +33,6 @@ export const validateForm = async <Schema extends z.ZodTypeAny>(
     return {
       success: false,
       errors: formatSchemaErrors(result.error.issues),
-      form,
     };
   }
   return {
@@ -49,6 +47,13 @@ export function requireParam(params: Params, name: string): string {
     throw new Error(`Missing parameter ${name}`);
   }
   return param;
+}
+
+export function errorResult(path: string, message: string): ErrorResult {
+  return {
+    success: false,
+    errors: [{ path: [path], message }],
+  };
 }
 
 const formatSchemaErrors = (errors: z.ZodIssue[]): SchemaError[] =>

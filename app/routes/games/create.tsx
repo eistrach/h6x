@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { z } from "zod";
 import { createGame } from "~/domain/game.server";
-import { getMaps } from "~/domain/map.server";
+import { getPublishedMaps } from "~/domain/map.server";
 import { requireUser } from "~/session.server";
 import { ActionArgs, LoaderArgs, UnpackData } from "~/utils";
 import { validateForm } from "~/utils.server";
@@ -27,10 +27,10 @@ export const action = async ({ request }: ActionArgs) => {
   return redirect(`/games`);
 };
 
-type LoaderData = UnpackData<typeof getMaps>;
+type LoaderData = UnpackData<typeof getPublishedMaps>;
 export const loader = async ({ request }: LoaderArgs) => {
   const user = await requireUser(request);
-  const maps = await getMaps();
+  const maps = await getPublishedMaps();
   return maps;
 };
 

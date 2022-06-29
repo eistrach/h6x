@@ -30,6 +30,8 @@ model HexMap {
   creatorId String
   creator   User   @relation(fields: [creatorId], references: [id], onDelete: Cascade)
 
+  published Boolean @default(false)
+
   cells Cell[]
   games Game[]
 

@@ -1,8 +1,13 @@
 import { Cell } from "@prisma/client";
 import { prisma } from "~/db.server";
+import { validateCellConnections } from "./validations";
 
-export const getMaps = () => {
-  return prisma.hexMap.findMany();
+export const getPublishedMaps = () => {
+  return prisma.hexMap.findMany({
+    where: {
+      published: true,
+    },
+  });
 };
 
 export const getMapForId = (id: string) => {
@@ -59,24 +64,77 @@ export const updateMap = async (
     throw new Error("You are not the creator of this map");
   }
 
+  await updateCells(id, cells);
+
+  await prisma.hexMap.update({
+    where: {
+      id,
+    },
+    data: {
+      published: false,
+    },
+  });
+
+  return id;
+};
+
+export const toggleMapVisibility = async (
+  id: string,
+  creatorId: string,
+  cells: Omit<Cell, "id">[]
+) => {
+  if (!(await isMapCreator(id, creatorId))) {
+    throw new Error("You are not the creator of this map");
+  }
+
+  const isPublished = await isMapPublished(id);
+
+  if (!isPublished && !validateCellConnections(cells)) {
+    return null;
+  }
+
+  await updateCells(id, cells);
+
+  return prisma.hexMap.update({
+    where: {
+      id,
+    },
+    data: {
+      published: !isPublished,
+    },
+  });
+};
+
+export async function updateCells(mapId: string, cells: Omit<Cell, "id">[]) {
   await prisma.cell.deleteMany({
     where: {
-      mapId: id,
+      mapId,
     },
   });
 
   await prisma.cell.createMany({
     data: cells,
   });
-
-  return id;
-};
+}
 
 export async function isMapCreator(mapId: string, userId: string) {
-  return !!prisma.hexMap.count({
+  return !!(await prisma.hexMap.count({
     where: {
       id: mapId,
       creatorId: userId,
     },
-  });
+  }));
+}
+
+export async function isMapPublished(mapId: string) {
+  return (
+    await prisma.hexMap.findUnique({
+      where: {
+        id: mapId,
+      },
+      select: {
+        published: true,
+      },
+    })
+  )?.published;
 }
