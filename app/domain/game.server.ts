@@ -1,3 +1,5 @@
+import { badRequest } from "remix-utils";
+import { notFound } from "remix-utils";
 import { getMapForId } from "./map.server";
 import { prisma } from "~/db.server";
 
@@ -18,6 +20,9 @@ export async function getGamesForUser(userId: string) {
             players: {
               include: {
                 user: true,
+              },
+              orderBy: {
+                position: "asc",
               },
             },
           },
@@ -144,5 +149,37 @@ export async function startGame(id: string) {
     },
   });
 }
+
+export const joinGame = async (id: string, userId: string) => {
+  const game = await getGame(id);
+  if (!game) {
+    throw notFound("Game not found");
+  }
+  if (game?.phase !== "LOBBY") {
+    throw new Error("Game was already started");
+  }
+
+  if (game?.players.length >= 6) {
+    throw new Error("Game is already full");
+  }
+
+  return await prisma.game.update({
+    where: {
+      id,
+    },
+    data: {
+      players: {
+        create: [
+          {
+            userId,
+            position: game.players.length,
+          },
+        ],
+      },
+    },
+  });
+};
+
+export const canJoinGame = async (id: string) => {};
 
 // executeAction, endTurn, endGame

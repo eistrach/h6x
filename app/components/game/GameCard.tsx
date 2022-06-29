@@ -1,6 +1,6 @@
 import { PropsWithChildren } from "react";
 import { getGamesForUser } from "~/domain/game.server";
-import { UnpackArray, UnpackData } from "~/utils";
+import { copyTextToClipboard, UnpackArray, UnpackData } from "~/utils";
 import { Button } from "../base/Button";
 import GamePreview from "../map/GamePreview";
 import { ShareIcon } from "@heroicons/react/solid";
@@ -55,6 +55,9 @@ const GameCard = ({ game }: GameCardProps) => {
         >
           {game.phase === "LOBBY" && game.players.length < 6 && (
             <Button
+              onClick={() =>
+                copyTextToClipboard(`${window.location.href}/${game.id}/join`)
+              }
               theme={InputTheme.Outlined}
               className="rounded-sm text-gray-900"
               LeftIcon={ShareIcon}

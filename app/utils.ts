@@ -47,6 +47,15 @@ export function validateEmail(email: unknown): email is string {
   return typeof email === "string" && email.length > 3 && email.includes("@");
 }
 
+export async function copyTextToClipboard(text: string) {
+  console.log(text);
+  if ("clipboard" in navigator) {
+    return await navigator.clipboard.writeText(text);
+  } else {
+    return document.execCommand("copy", true, text);
+  }
+}
+
 export type UnpackData<F extends (...args: any) => any> = Exclude<
   Awaited<ReturnType<F>>,
   Response
