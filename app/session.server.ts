@@ -76,3 +76,15 @@ export async function requireUser(request: Request) {
 
   return user as User;
 }
+
+export async function getUser(request: Request) {
+  const userId = await authenticator.isAuthenticated(request);
+
+  if (!userId) {
+    return null;
+  }
+
+  const user = await getUserById(userId);
+
+  return user;
+}

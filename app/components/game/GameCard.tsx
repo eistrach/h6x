@@ -36,7 +36,7 @@ const GameCard = ({ game }: GameCardProps) => {
               ></li>
             ))}
             {game.players.map((player) => (
-              <li>
+              <li key={player.id}>
                 <img
                   className="w-9 h-9 ring ring-green-400 shadow-md rounded-full"
                   src={player.user.avatarUrl || ""}
@@ -57,7 +57,7 @@ const GameCard = ({ game }: GameCardProps) => {
         >
           {game.phase === "LOBBY" && game.players.length < 6 && (
             <Button
-              theme={InputTheme.Secondary}
+              theme={InputTheme.Outlined}
               className="rounded-sm text-gray-900"
               LeftIcon={ShareIcon}
             >

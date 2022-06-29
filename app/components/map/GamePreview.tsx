@@ -1,14 +1,6 @@
 import { Cell } from "@prisma/client";
-import {
-  MathCell,
-  asMathGrid,
-  layoutGrid,
-  SVG_SIZE,
-  cellsToPoints,
-  cellsToMathCells,
-} from "~/lib/grid";
+import { asMathGrid, SVG_SIZE, cellsToMathCells } from "~/lib/grid";
 import CellPreview from "./CellPreview";
-import CellView from "./CellView";
 
 type GamePreviewProps = {
   cells: Omit<Cell, "id">[];
