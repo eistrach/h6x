@@ -7,14 +7,24 @@ import { cellInGrid, getAllCellsInArea, MathCell, Point } from "~/lib/grid";
 import { RadioGroup } from "@headlessui/react";
 import { redirect } from "@remix-run/node";
 import { z } from "zod";
-import { ErrorResult, requireParam, validateForm } from "~/utils.server";
-import { getMapForUser, updateMap } from "~/domain/map.server";
+import {
+  errorResult,
+  ErrorResult,
+  requireParam,
+  validateForm,
+} from "~/utils.server";
+import {
+  getMapForUser,
+  toggleMapVisibility,
+  updateMap,
+} from "~/domain/map.server";
 import { requireUser } from "~/session.server";
-import { notFound } from "remix-utils";
+import { badRequest, notFound } from "remix-utils";
 import { ActionArgs, LoaderArgs, UnpackData } from "~/utils";
 import { validateCellConnections } from "~/domain/validations";
 
 const Schema = z.object({
+  _intent: z.enum(["togglePublished", "save"]),
   id: z.string().min(1),
   cells: z.preprocess(
     (arg) => JSON.parse(arg as any),
@@ -26,7 +36,7 @@ const Schema = z.object({
         mapId: z.string().min(1),
       })
       .array()
-      .refine(validateCellConnections, "Invalid cell connections")
+    //.refine(validateCellConnections, "Invalid cell connections")
   ),
 });
 export const action = async ({ request }: ActionArgs) => {
@@ -39,7 +49,23 @@ export const action = async ({ request }: ActionArgs) => {
     return result;
   }
 
-  await updateMap(result.data, user.id);
+  switch (result.data._intent) {
+    case "togglePublished":
+      const map = await toggleMapVisibility(
+        result.data.id,
+        user.id,
+        result.data.cells
+      );
+
+      if (!map) {
+        return errorResult("cells", "Invalid cell connections");
+      }
+      break;
+    case "save":
+      await updateMap(result.data, user.id);
+      break;
+  }
+
   return redirect(`/editor/${result.data.id}`);
 };
 
@@ -108,10 +134,20 @@ export default function EditorDetailPage() {
         </div>
       )}
       <MapView onSelect={onClick} cells={cells} />
+      <p>Published: {map.published.toString()}</p>
       <Form method="post">
         <input type="hidden" name="id" value={map.id} />
         <input type="hidden" name="cells" value={JSON.stringify(cells)} />
-        <button type="submit">Save</button>
+        <button name="_intent" value="save" type="submit">
+          Save
+        </button>
+      </Form>
+      <Form method="post">
+        <input type="hidden" name="id" value={map.id} />
+        <input type="hidden" name="cells" value={JSON.stringify(cells)} />
+        <button name="_intent" value="togglePublished" type="submit">
+          {map.published ? "Unpublish" : "Publish"}
+        </button>
       </Form>
       <RadioGroup value={selectedTool} onChange={setSelectedTool}>
         <RadioGroup.Label>Tool</RadioGroup.Label>
