@@ -22,6 +22,10 @@ import { requireUser } from "~/session.server";
 import { badRequest, notFound } from "remix-utils";
 import { ActionArgs, LoaderArgs, UnpackData } from "~/utils";
 import { validateCellConnections } from "~/domain/validations";
+import ToolSelection from "~/components/editor/ToolSelection";
+import TileSelection from "~/components/editor/TileSelection";
+import { Button } from "~/components/base/Button";
+import clsx from "clsx";
 
 const Schema = z.object({
   _intent: z.enum(["togglePublished", "save"]),
@@ -133,43 +137,43 @@ export default function EditorDetailPage() {
           </div>
         </div>
       )}
+      <div className="w-full bg-white p-4 flex justify-between items-center gap-4">
+        <Form method="post">
+          <input type="hidden" name="id" value={map.id} />
+          <input type="hidden" name="cells" value={JSON.stringify(cells)} />
+          <Button name="_intent" value="save" type="submit">
+            Save
+          </Button>
+        </Form>
+        <Form method="post">
+          <input type="hidden" name="id" value={map.id} />
+          <input type="hidden" name="cells" value={JSON.stringify(cells)} />
+          <div className="flex gap-2 justify-center items-center">
+            <p>Published:</p>
+            <button
+              name="_intent"
+              value="togglePublished"
+              type="submit"
+              className="relative inline-flex flex-shrink-0 h-6 w-11 rounded-full bg-gray-200 border-2 border-transparent cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+            >
+              <span
+                className={clsx(
+                  map.published
+                    ? "translate-x-5 bg-primary-400"
+                    : "translate-x-0 bg-white",
+                  "pointer-events-none inline-block h-5 w-5 rounded-full shadow transform ring-0 transition ease-in-out duration-200"
+                )}
+              />
+            </button>
+          </div>
+        </Form>
+      </div>
       <MapView onSelect={onClick} cells={cells} />
-      <p>Published: {map.published.toString()}</p>
-      <Form method="post">
-        <input type="hidden" name="id" value={map.id} />
-        <input type="hidden" name="cells" value={JSON.stringify(cells)} />
-        <button name="_intent" value="save" type="submit">
-          Save
-        </button>
-      </Form>
-      <Form method="post">
-        <input type="hidden" name="id" value={map.id} />
-        <input type="hidden" name="cells" value={JSON.stringify(cells)} />
-        <button name="_intent" value="togglePublished" type="submit">
-          {map.published ? "Unpublish" : "Publish"}
-        </button>
-      </Form>
-      <RadioGroup value={selectedTool} onChange={setSelectedTool}>
-        <RadioGroup.Label>Tool</RadioGroup.Label>
-        <RadioGroup.Option value="add">
-          {({ checked }) => (
-            <span className={checked ? "bg-primary-200" : ""}>Add</span>
-          )}
-        </RadioGroup.Option>
-        <RadioGroup.Option value="remove">
-          {({ checked }) => (
-            <span className={checked ? "bg-primary-200" : ""}>Remove</span>
-          )}
-        </RadioGroup.Option>
-      </RadioGroup>
-      <input
-        type="checkbox"
-        checked={isFill}
-        onChange={toggleFill}
-        name="fill"
-        className="ml-2"
-      />{" "}
-      Fill
+      <ToolSelection isFill={isFill} toggleFill={toggleFill} />
+      <TileSelection
+        selectedTool={selectedTool}
+        setSelectedTool={setSelectedTool}
+      />
     </div>
   );
 }
