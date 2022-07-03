@@ -37,6 +37,8 @@ authenticator.use(
       callbackURL: env.DISCORD_CALLBACK_URL,
     },
     async ({ profile }) => {
+      console.log(profile);
+
       const result = await schema.safeParseAsync(profile.__json);
 
       console.log(result);
