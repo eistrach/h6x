@@ -1,11 +1,10 @@
-import { layoutGrid } from "./grid";
+import { compareCell, layoutGrid, Point } from "./grid";
 import {
   DEFAULT_NEUTRAL_UNIT_ID,
   DEFAULT_PLAYER_UNIT_ID,
   START_MONEY,
 } from "./constants";
 import { Cell, Player } from "@prisma/client";
-import { Point } from "honeycomb-grid";
 import { v4 as uuid } from "uuid";
 import {
   getCellForPosition,
@@ -48,10 +47,10 @@ export const buyUnitDuringSetup: SetupActionFunction<{
 
   return {
     ...state,
-    player: {
+    players: updatePlayer(state, {
       ...player,
       money: player.money - unit.cost,
-    },
+    }),
     cells: updateCell(state.cells, {
       ...cell,
       unitId,
@@ -68,6 +67,7 @@ export const upgradeCellDuringSetup: SetupActionFunction<{
   const player = getPlayerForId(state, state.currentPlayerId);
   const cell = getCellForPosition(state.cells, position);
   const unit = getUnitForId(cell.unitId);
+
   assertSetupNotFinished(state);
   assertPlayerIsSender(player, senderId);
   assertPlayerCell(player, cell);
@@ -164,14 +164,22 @@ export const initializeSetup = (
   };
 };
 
-export const initializeGame = (
-  setup: SetupState[],
-  players: PlayerState[],
-  cells: CellState[]
-) => {
+export const initializeGame = (setup: SetupState[]) => {
+  const players = setup.map(
+    (setup) => setup.players.find((p) => p.id === setup.currentPlayerId)!
+  );
+
+  const playerCells = setup.flatMap((s) =>
+    s.cells.filter((c) => c.ownerId === s.currentPlayerId)
+  );
+
+  const otherCells = setup[0].cells.filter((c) =>
+    playerCells.some((pc) => !compareCell(pc.position, c.position))
+  );
+
   return {
     players: players,
-    cells,
+    cells: [...playerCells, ...otherCells],
     actions: setup.flatMap((s) => s.actions),
     currentPlayerId: players[0].id,
   };

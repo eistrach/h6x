@@ -7,18 +7,23 @@ import {
   SVG_OFFSET_X,
   SVG_OFFSET_Y,
   cellCorners,
+  HEX_HEIGHT,
+  HEX_WIDTH,
+  SVG_SCALE,
 } from "~/lib/grid";
 
 type PlayerCellProps = {
   cell: MathCell;
   playerCell: CellState;
   players: PlayerState[];
+  onClick: (cell: CellState, player: PlayerState) => void;
 };
 
 export default function PlayerCell({
   cell,
   playerCell,
   players,
+  onClick,
 }: PlayerCellProps) {
   const { x, y } = cell.toPoint();
 
@@ -27,6 +32,7 @@ export default function PlayerCell({
 
   return (
     <g
+      onClick={() => onClick(playerCell, player)}
       transform={`translate(${x + SVG_OFFSET_X}, ${y + SVG_OFFSET_Y})`}
       className={clsx("stroke-black", color.fill)}
     >
@@ -36,6 +42,17 @@ export default function PlayerCell({
           .map((corner) => `${corner.x},${corner.y}`)
           .join(" ")}
       />
+
+      <text
+        transform={`translate(${HEX_WIDTH / 2}, ${HEX_HEIGHT / 2 + 0.5})`}
+        dominantBaseline="middle"
+        textAnchor="middle"
+        className="fill-black"
+        fontSize="5"
+        strokeWidth=".3"
+      >
+        {playerCell.count}/{playerCell.unitId[0]}
+      </text>
     </g>
   );
 }

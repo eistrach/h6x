@@ -12,7 +12,7 @@ export type Unit = {
 
 // 5
 
-const units: Unit[] = [
+export const UNITS: Unit[] = [
   {
     id: "default",
     name: "Default",
@@ -75,5 +75,5 @@ const units: Unit[] = [
 ];
 
 export const getUnitForId = (id: string): Unit => {
-  return units.find((unit) => unit.id === id)!;
+  return UNITS.find((unit) => unit.id === id)!;
 };

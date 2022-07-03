@@ -3,7 +3,13 @@ import { useLoaderData, useMatches } from "@remix-run/react";
 import { z } from "zod";
 import GamePreview from "~/components/map/GamePreview";
 import GameView from "~/components/map/GameView";
-import { getGame, startSetupPhase } from "~/domain/game.server";
+import {
+  buyUnit,
+  endTurn,
+  getGame,
+  startSetupPhase,
+  upgradeUnit,
+} from "~/domain/game.server";
 import { PlayingState, SetupState } from "~/lib/game";
 import { requireUser } from "~/session.server";
 import { ActionArgs, LoaderArgs, UnpackData } from "~/utils";
@@ -18,34 +24,70 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     throw new Error(`Game ${gameId} not found`);
   }
 
+  console.log(game);
+
   switch (game.phase) {
     case "LOBBY":
       return redirect("/games");
     case "PREPARATION":
-      const setupState = game.players.find((p) => p.userId === user.id)!
-        .setupState as SetupState;
+      const { player } = game.players
+        .map((p) => ({ player: p, done: (p.setupState as SetupState).done }))
+        .find(({ player, done }) => player.userId === user.id && !done)!;
+
+      const setupState = player.setupState as SetupState;
 
       return {
         phase: "PREPARATION" as const,
         cells: game.map.cells,
         playerCells: setupState.cells,
         players: setupState.players,
+        playerId: setupState.currentPlayerId,
+        canTakeAction: !setupState.done,
       };
     case "PLAYING":
+      console.log("pp");
       const gameState = game.gameState as PlayingState;
+      const currentPlayer = gameState.players.find(
+        (p) => p.userId === user.id
+      )!;
       return {
         phase: "PLAYING" as const,
         cells: game.map.cells,
         playerCells: gameState.cells,
         players: gameState.players,
+        playerId: gameState.currentPlayerId,
+        canTakeAction: gameState.currentPlayerId === currentPlayer.id,
       };
   }
 };
 type LoaderData = UnpackData<typeof loader>;
 
-const Schema = z.object({
-  _intent: z.enum(["startGame"]),
-});
+const Schema = z.union([
+  z.object({
+    _intent: z.literal("startGame"),
+  }),
+  z.object({
+    _intent: z.literal("buyUnit"),
+    position: z.object({
+      x: z.preprocess(Number, z.number()),
+      y: z.preprocess(Number, z.number()),
+    }),
+    unitId: z.string().min(1),
+    playerId: z.string().min(1),
+  }),
+  z.object({
+    _intent: z.literal("upgradeUnit"),
+    position: z.object({
+      x: z.preprocess(Number, z.number()),
+      y: z.preprocess(Number, z.number()),
+    }),
+    playerId: z.string().min(1),
+  }),
+  z.object({
+    _intent: z.literal("endTurn"),
+    playerId: z.string().min(1),
+  }),
+]);
 export const action = async ({ request, params }: ActionArgs) => {
   const gameId = requireParam(params, "id");
   const user = await requireUser(request);
@@ -58,19 +100,37 @@ export const action = async ({ request, params }: ActionArgs) => {
   switch (result.data._intent) {
     case "startGame":
       await startSetupPhase(gameId);
-      return redirect(`/games/${gameId}`);
+      break;
+    case "buyUnit":
+      await buyUnit(
+        gameId,
+        result.data.playerId,
+        result.data.position,
+        result.data.unitId
+      );
+      break;
+    case "upgradeUnit":
+      await upgradeUnit(gameId, result.data.playerId, result.data.position);
+      break;
+    case "endTurn":
+      await endTurn(gameId, result.data.playerId);
+      break;
   }
+  return redirect(`/games/${gameId}`);
 };
 
 const GamePage = () => {
-  const { playerCells, cells, players } = useLoaderData<LoaderData>();
-  const matchingRoutes = useMatches();
-  console.log(matchingRoutes);
+  const { playerCells, cells, players, canTakeAction, playerId } =
+    useLoaderData<LoaderData>();
   return (
     <div>
-      <GameView players={players} playerCells={playerCells} cells={cells} />
-
-      <pre>{JSON.stringify({ playerCells }, null, 2)}</pre>
+      <GameView
+        players={players}
+        playerCells={playerCells}
+        cells={cells}
+        canTakeAction={canTakeAction}
+        playerId={playerId}
+      />
     </div>
   );
 };

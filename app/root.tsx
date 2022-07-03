@@ -10,7 +10,7 @@ import {
 
 import styles from "./tailwind.css";
 import fontStyles from "./rubik.css";
-import { LogoIcon } from "./components/icons/LogoIcon";
+import { LogoIcon } from "./components/map/icons/LogoIcon";
 import { LoaderArgs, useOptionalUser } from "./utils";
 import { getUser } from "./session.server";
 import clsx from "clsx";
