@@ -131,15 +131,13 @@ const GamePage = () => {
 
   useEffect(() => {
     if (error) {
-      console.log(error);
-
-      toast(error);
+      toast.error(error);
     }
   }, [error]);
 
   return (
     <div>
-      <Toaster />
+      <Toaster position="top-right" />
       <GameView
         players={players}
         playerCells={playerCells}
