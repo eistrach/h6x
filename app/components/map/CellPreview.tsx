@@ -7,12 +7,12 @@ import {
 } from "~/lib/grid";
 
 type CellPreviewProps = {
-  cell: MathCell;
+  cell?: MathCell;
   className?: string;
 };
 
 export default function CellPreview({ cell, className }: CellPreviewProps) {
-  const { x, y } = cell.toPoint();
+  const { x, y } = cell?.toPoint() || { x: 0, y: 0 };
   return (
     <g
       transform={`translate(${x + SVG_OFFSET_X}, ${y + SVG_OFFSET_Y})`}

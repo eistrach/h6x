@@ -185,17 +185,18 @@ export const endTurn: ActionFunction<{}> = (state, payload) => {
   assertCurrentPlayer(state, senderId);
   assertPlayerTurn(state, player);
 
-  const index = state.players.indexOf(player);
-  const nextPlayer = state.players[(index + 1) % state.players.length];
+  const [currentPlayer, ...next] = state.players;
+  const players = [...next, currentPlayer];
 
   return {
     ...state,
+    players,
     turn: state.turn + 1,
     cells: state.cells.map((cell) => ({
       ...cell,
       pendingMovePosition: undefined,
     })),
-    currentPlayerId: nextPlayer.id,
+    currentPlayerId: players[0].id,
     actions: [...state.actions, { name: "endTurn", payload }],
   };
 };

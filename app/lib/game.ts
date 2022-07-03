@@ -4,6 +4,7 @@ export type PlayerState = {
   id: string;
   userId: string;
   money: number;
+  index: number;
 };
 
 export type CellState = {
@@ -17,15 +18,15 @@ export type CellState = {
 export type GameState = {
   currentPlayerId: string;
   players: PlayerState[];
-  turn: number;
   cells: CellState[];
   actions: Action[];
 };
 
-export type SetupState = {
-  player: PlayerState;
-  cells: CellState[];
-  actions: Action[];
+export type PlayingState = GameState & {
+  turn: number;
+};
+
+export type SetupState = GameState & {
   done: boolean;
 };
 
@@ -35,9 +36,9 @@ export type Action = {
 };
 
 export type ActionFunction<T extends any> = (
-  state: GameState,
+  state: PlayingState,
   payload: T & { senderId: string }
-) => GameState;
+) => PlayingState;
 
 export type SetupActionFunction<T extends any> = (
   state: SetupState,
@@ -50,20 +51,20 @@ export const assertPlayerIsSender = (player: PlayerState, senderId: string) => {
   }
 };
 
-export const assertCurrentPlayer = (state: GameState, senderId: string) => {
+export const assertCurrentPlayer = (state: PlayingState, senderId: string) => {
   if (state.currentPlayerId !== senderId) {
     throw new Error("It is not the current player's turn");
   }
 };
 
-export const assertNothingPending = (state: GameState) => {
+export const assertNothingPending = (state: PlayingState) => {
   if (state.cells.some((cell) => !!cell.pendingMovePosition)) {
     throw new Error("There is a pending move");
   }
 };
 
 export const assertCellAction = (
-  state: GameState,
+  state: PlayingState,
   player: PlayerState,
   cell: CellState
 ) => {
@@ -77,7 +78,7 @@ export const assertPlayerHasMoney = (player: PlayerState, amount: number) => {
   }
 };
 
-export const assertPlayerTurn = (state: GameState, player: PlayerState) => {
+export const assertPlayerTurn = (state: PlayingState, player: PlayerState) => {
   if (state.currentPlayerId !== player.id) {
     throw new Error("Not your turn");
   }
@@ -106,7 +107,7 @@ export const getPlayerForId = (state: GameState, id: string) => {
 };
 
 export const getCurrentPlayer = (
-  state: GameState,
+  state: PlayingState,
   senderId: string
 ): PlayerState => {
   assertCurrentPlayer(state, senderId);

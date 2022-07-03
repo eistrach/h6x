@@ -8,6 +8,8 @@ import { PlayIcon } from "@heroicons/react/solid";
 import { InputTheme } from "../base/InputTheme";
 import { IconButton } from "../base/IconButton";
 import clsx from "clsx";
+import { IconLink } from "../base/IconLink";
+import { Form } from "@remix-run/react";
 
 export type GameCardProps = PropsWithChildren<{
   game: UnpackArray<UnpackData<typeof getGamesForUser>>;
@@ -66,12 +68,24 @@ const GameCard = ({ game }: GameCardProps) => {
             </Button>
           )}
 
-          {game.players.length > 1 && (
-            <IconButton
-              Icon={PlayIcon}
-              className="w-12 h-12 text-green-500"
-            ></IconButton>
-          )}
+          {game.players.length > 1 &&
+            (game.phase === "LOBBY" ? (
+              <Form method="post" action={`${game.id}`}>
+                <IconButton
+                  Icon={PlayIcon}
+                  className="w-12 h-12 text-green-500"
+                  type="submit"
+                  name="_intent"
+                  value="startGame"
+                />
+              </Form>
+            ) : (
+              <IconLink
+                to={game.id}
+                Icon={PlayIcon}
+                className="w-12 h-12 text-green-500"
+              />
+            ))}
         </div>
       </div>
     </li>

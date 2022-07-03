@@ -1,3 +1,4 @@
+import { PrismaClient } from "@prisma/client";
 import {
   initializeCells,
   initializePlayers,
@@ -45,7 +46,11 @@ export async function getGame(id: string) {
       id,
     },
     include: {
-      map: true,
+      map: {
+        include: {
+          cells: true,
+        },
+      },
       players: true,
     },
   });
@@ -85,9 +90,9 @@ export async function createGame(creatorId: string, mapId: string) {
 export async function joinGame(id: string, userId: string) {
   const game = await requireGame(id);
 
-  if (game.players.some((player) => player.userId === userId)) {
-    throw new Error("User is already in the game");
-  }
+  // if (game.players.some((player) => player.userId === userId)) {
+  //   throw new Error("User is already in the game");
+  // }
 
   if (game.phase !== "LOBBY") {
     throw new Error("Game is already started");
@@ -131,21 +136,31 @@ export async function startSetupPhase(id: string) {
   const cells = initializeCells(playerStates, map.cells);
 
   const setupStates = playerStates.map((player) =>
-    initializeSetup(player, cells)
+    initializeSetup(player.id, playerStates, cells)
   );
 
   const players = game.players.map((player) => ({
     ...player,
-    setupState: setupStates.find((state) => state.player.id === player.id)!,
+    setupState: setupStates.find(
+      (state) => state.currentPlayerId === player.id
+    )!,
   }));
 
-  return await prisma.game.update({
-    where: { id },
-    data: {
-      phase: "PREPARATION",
-      players: {
-        set: players,
+  return await prisma.$transaction(async (prisma) => {
+    await Promise.all(
+      players.map((p) =>
+        prisma.player.update({
+          where: { id: p.id },
+          data: p,
+        })
+      )
+    );
+
+    return await prisma.game.update({
+      where: { id },
+      data: {
+        phase: "PREPARATION",
       },
-    },
+    });
   });
 }

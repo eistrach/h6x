@@ -1,5 +1,9 @@
 import { layoutGrid } from "./grid";
-import { DEFAULT_NEUTRAL_UNIT_ID, START_MONEY } from "./constants";
+import {
+  DEFAULT_NEUTRAL_UNIT_ID,
+  DEFAULT_PLAYER_UNIT_ID,
+  START_MONEY,
+} from "./constants";
 import { Cell, Player } from "@prisma/client";
 import { Point } from "honeycomb-grid";
 import { v4 as uuid } from "uuid";
@@ -14,6 +18,8 @@ import {
   assertPlayerCell,
   CellState,
   PlayerState,
+  getPlayerForId,
+  updatePlayer,
 } from "./game";
 import { getUnitForId } from "./units";
 
@@ -28,7 +34,7 @@ export const buyUnitDuringSetup: SetupActionFunction<{
   position: Point;
 }> = (state, payload) => {
   const { senderId, unitId, position } = payload;
-  const player = state.player;
+  const player = getPlayerForId(state, state.currentPlayerId);
   const cell = getCellForPosition(state.cells, position);
   const unit = getUnitForId(unitId);
   assertSetupNotFinished(state);
@@ -59,7 +65,7 @@ export const upgradeCellDuringSetup: SetupActionFunction<{
   position: Point;
 }> = (state, payload) => {
   const { senderId, position } = payload;
-  const player = state.player;
+  const player = getPlayerForId(state, state.currentPlayerId);
   const cell = getCellForPosition(state.cells, position);
   const unit = getUnitForId(cell.unitId);
   assertSetupNotFinished(state);
@@ -73,10 +79,10 @@ export const upgradeCellDuringSetup: SetupActionFunction<{
 
   return {
     ...state,
-    players: {
+    players: updatePlayer(state, {
       ...player,
       money: player.money - unit.cost,
-    },
+    }),
     cells: updateCell(state.cells, {
       ...cell,
       count: cell.count + 1,
@@ -87,7 +93,7 @@ export const upgradeCellDuringSetup: SetupActionFunction<{
 
 export const endSetupTurn: SetupActionFunction<{}> = (state, payload) => {
   const { senderId } = payload;
-  const player = state.player;
+  const player = getPlayerForId(state, state.currentPlayerId);
   assertSetupNotFinished(state);
   assertPlayerIsSender(player, senderId);
 
@@ -99,11 +105,16 @@ export const endSetupTurn: SetupActionFunction<{}> = (state, payload) => {
 };
 
 export const initializePlayers = (players: Player[]) => {
-  return players.map((player) => ({
-    id: player.id,
-    userId: player.userId,
-    money: START_MONEY,
-  }));
+  return players
+    .map((value) => ({ value, sort: Math.random() }))
+    .sort((a, b) => a.sort - b.sort)
+    .map(({ value }) => value)
+    .map((player, index) => ({
+      id: player.id,
+      userId: player.userId,
+      money: START_MONEY,
+      index,
+    }));
 };
 
 export const initializeCells = (players: PlayerState[], mapCells: Cell[]) => {
@@ -120,7 +131,7 @@ export const initializeCells = (players: PlayerState[], mapCells: Cell[]) => {
     return cells.map((cell) => {
       return {
         position: { x: cell.x, y: cell.y },
-        unitId: DEFAULT_NEUTRAL_UNIT_ID,
+        unitId: DEFAULT_PLAYER_UNIT_ID,
         count: 1,
         ownerId: player.id,
       };
@@ -139,22 +150,27 @@ export const initializeCells = (players: PlayerState[], mapCells: Cell[]) => {
   return [...cells, ...neutralCells];
 };
 
-export const initializeSetup = (player: PlayerState, cells: CellState[]) => {
+export const initializeSetup = (
+  currentPlayerId: string,
+  players: PlayerState[],
+  cells: CellState[]
+) => {
   return {
-    player,
+    currentPlayerId,
+    players,
     cells,
     actions: [],
     done: false,
   };
 };
 
-export const initializeGame = (setup: SetupState[], cells: CellState[]) => {
-  const players = setup
-    .map((value) => ({ value: value.player, sort: Math.random() }))
-    .sort((a, b) => a.sort - b.sort)
-    .map(({ value }) => value);
+export const initializeGame = (
+  setup: SetupState[],
+  players: PlayerState[],
+  cells: CellState[]
+) => {
   return {
-    players,
+    players: players,
     cells,
     actions: setup.flatMap((s) => s.actions),
     currentPlayerId: players[0].id,
