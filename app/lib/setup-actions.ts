@@ -55,10 +55,9 @@ export const buyUnitDuringSetup: SetupActionFunction<{
   };
 };
 
-const upgradeCellDuringSetup: SetupActionFunction<{ position: Point }> = (
-  state,
-  payload
-) => {
+export const upgradeCellDuringSetup: SetupActionFunction<{
+  position: Point;
+}> = (state, payload) => {
   const { senderId, position } = payload;
   const player = state.player;
   const cell = getCellForPosition(state.cells, position);
@@ -86,7 +85,7 @@ const upgradeCellDuringSetup: SetupActionFunction<{ position: Point }> = (
   };
 };
 
-export const endTurn: SetupActionFunction<{}> = (state, payload) => {
+export const endSetupTurn: SetupActionFunction<{}> = (state, payload) => {
   const { senderId } = payload;
   const player = state.player;
   assertSetupNotFinished(state);
@@ -101,8 +100,8 @@ export const endTurn: SetupActionFunction<{}> = (state, payload) => {
 
 export const initializePlayers = (players: Player[]) => {
   return players.map((player) => ({
-    id: uuid(),
-    userId: player.id,
+    id: player.id,
+    userId: player.userId,
     money: START_MONEY,
   }));
 };

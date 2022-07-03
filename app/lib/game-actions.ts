@@ -1,4 +1,7 @@
 import { Point } from "honeycomb-grid";
+import { randomIntFromInterval } from "~/utils";
+import seedrandom from "seedrandom";
+
 import {
   assertNothingPending,
   getCurrentPlayer,
@@ -10,7 +13,10 @@ import {
   assertUnitNotEqual,
   assertCellAction,
   assertCellsAreNeighbours,
+  assertCurrentPlayer,
+  assertPlayerTurn,
 } from "./game";
+import { cellsAreNeighbors, cellsToPoints } from "./grid";
 import { getUnitForId } from "./units";
 
 export const buyUnit: ActionFunction<{
@@ -89,6 +95,7 @@ const upgradeCell: ActionFunction<{ position: Point }> = (state, payload) => {
   const cell = getCellForPosition(state.cells, position);
   const unit = getUnitForId(cell.unitId);
   assertNothingPending(state);
+
   assertCellAction(state, player, cell);
   assertPlayerHasMoney(player, unit.cost);
 
@@ -110,4 +117,85 @@ const upgradeCell: ActionFunction<{ position: Point }> = (state, payload) => {
   };
 };
 
+export const attack: ActionFunction<{
+  position: Point;
+  targetPosition: Point;
+  seed: string;
+}> = (state, payload) => {
+  const { senderId, position, targetPosition, seed } = payload;
+  const player = getCurrentPlayer(state, senderId);
+  const cell = getCellForPosition(state.cells, position);
+  const targetCell = getCellForPosition(state.cells, targetPosition);
+  assertNothingPending(state);
+  assertCurrentPlayer(state, senderId);
+  assertCellAction(state, player, cell);
+  assertCellsAreNeighbours(cell, targetCell);
 
+  if (cell.count <= 1) {
+    throw new Error("Not enough units to attack");
+  }
+
+  let attackerUnits = cell.count - 1;
+  let defenderUnits = targetCell.count;
+
+  const attackerUnit = getUnitForId(cell.unitId);
+  const defenderUnit = getUnitForId(targetCell.unitId);
+
+  const rng = seedrandom(seed);
+
+  while (attackerUnits > 0 && defenderUnits > 0) {
+    const attackerThrow = randomIntFromInterval(rng, 0, attackerUnit.attack);
+    const defenderThrow = randomIntFromInterval(rng, 0, defenderUnit.attack);
+
+    if (attackerThrow > defenderThrow) {
+      defenderUnits--;
+    } else {
+      attackerUnits--;
+    }
+  }
+
+  const cs = updateCell(state.cells, { ...cell, count: 1 });
+  const tc = updateCell(cs, {
+    ...targetCell,
+    count: attackerUnits,
+    pendingMovePosition: position,
+    unitId: cell.unitId,
+  });
+
+  const remainingTargetCellCount = state.cells.filter(
+    (c) => c.ownerId === targetCell.ownerId
+  ).length;
+
+  const players =
+    remainingTargetCellCount === 0
+      ? state.players.filter((p) => p.id !== targetCell.ownerId)
+      : state.players;
+
+  return {
+    ...state,
+    players,
+    cells: tc,
+    actions: [...state.actions, { name: "attack", payload }],
+  };
+};
+
+export const endTurn: ActionFunction<{}> = (state, payload) => {
+  const { senderId } = payload;
+  const player = getCurrentPlayer(state, senderId);
+  assertCurrentPlayer(state, senderId);
+  assertPlayerTurn(state, player);
+
+  const index = state.players.indexOf(player);
+  const nextPlayer = state.players[(index + 1) % state.players.length];
+
+  return {
+    ...state,
+    turn: state.turn + 1,
+    cells: state.cells.map((cell) => ({
+      ...cell,
+      pendingMovePosition: undefined,
+    })),
+    currentPlayerId: nextPlayer.id,
+    actions: [...state.actions, { name: "endTurn", payload }],
+  };
+};

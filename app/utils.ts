@@ -1,3 +1,4 @@
+import seedrandom from "seedrandom";
 import { useMatches } from "@remix-run/react";
 import { useMemo } from "react";
 import type { DataFunctionArgs } from "@remix-run/node";
@@ -54,6 +55,15 @@ export async function copyTextToClipboard(text: string) {
   } else {
     return document.execCommand("copy", true, text);
   }
+}
+
+export function randomIntFromInterval(
+  rng: seedrandom.PRNG,
+  min: number,
+  max: number
+) {
+  // min and max included
+  return Math.floor(rng() * (max - min + 1) + min);
 }
 
 export type UnpackData<F extends (...args: any) => any> = Exclude<
