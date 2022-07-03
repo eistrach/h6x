@@ -20,8 +20,8 @@ model User {
   avatarUrl   String?
 
   createdMaps  HexMap[]
-  players      Player[]
   createdGames Game[]
+  players      Player[]
 }
 
 model HexMap {
@@ -40,6 +40,7 @@ model HexMap {
 
 enum CellType {
   PLAYER
+  NEUTRAL
 }
 
 model Cell {
@@ -50,8 +51,6 @@ model Cell {
 
   mapId String
   map   HexMap @relation(fields: [mapId], references: [id])
-
-  gameCells GameCell[]
 
   @@index([mapId, x, y])
 }
@@ -69,61 +68,25 @@ model Game {
   mapId String
 
   creatorId String
-  creator   User   @relation(fields: [creatorId], references: [id])
+  creator   User   @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+  players Player[]
+
+  gameState Json?
 
   phase GamePhase @default(LOBBY)
 
-  players         Player[]
-  executedActions Action[]
-  turn            Int        @default(0)
-  cells           GameCell[]
-}
-
-model GameCell {
-  cell   Cell   @relation(fields: [cellId], references: [id])
-  cellId String
-
-  gameId String
-  game   Game   @relation(fields: [gameId], references: [id])
-
-  playerId String
-  player   Player @relation(fields: [playerId], references: [id])
-
-  attackUnits Int @default(1)
-
-  @@id([gameId, cellId])
 }
 
 model Player {
-  id       String @id @default(cuid())
-  userId   String
-  user     User   @relation(fields: [userId], references: [id])
-  position Int
-
-  game   Game   @relation(fields: [gameId], references: [id])
-  gameId String
-
-  money           Int        @default(150)
-  executedActions Action[]
-  cells           GameCell[]
-}
-
-enum ActionType {
-  ATTACK
-  BUY
-}
-
-model Action {
   id String @id @default(cuid())
 
-  turn Int
-  type ActionType
-
-  args Json
-
-  playerId String
-  player   Player @relation(fields: [playerId], references: [id])
+  lastSeenActionId Int?
+  setupState       Json?
 
   gameId String
   game   Game   @relation(fields: [gameId], references: [id])
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
 }

@@ -1,5 +1,8 @@
-import { badRequest } from "remix-utils";
-import { notFound } from "remix-utils";
+import {
+  initializeCells,
+  initializePlayers,
+  initializeSetup,
+} from "./../lib/setup-actions";
 import { getMapForId } from "./map.server";
 import { prisma } from "~/db.server";
 
@@ -20,9 +23,6 @@ export async function getGamesForUser(userId: string) {
             players: {
               include: {
                 user: true,
-              },
-              orderBy: {
-                position: "asc",
               },
             },
           },
@@ -75,7 +75,6 @@ export async function createGame(creatorId: string, mapId: string) {
         create: [
           {
             userId: creatorId,
-            position: 0,
           },
         ],
       },
@@ -83,7 +82,7 @@ export async function createGame(creatorId: string, mapId: string) {
   });
 }
 
-export async function addPlayer(id: string, userId: string) {
+export async function joinGame(id: string, userId: string) {
   const game = await requireGame(id);
 
   if (game.players.some((player) => player.userId === userId)) {
@@ -94,15 +93,17 @@ export async function addPlayer(id: string, userId: string) {
     throw new Error("Game is already started");
   }
 
+  if (game?.players.length >= 6) {
+    throw new Error("Game is already full");
+  }
+
   return await prisma.game.update({
     where: { id },
     data: {
       players: {
         create: [
-          ...game.players,
           {
             userId,
-            position: game.players.length,
           },
         ],
       },
@@ -110,7 +111,7 @@ export async function addPlayer(id: string, userId: string) {
   });
 }
 
-export async function startGame(id: string) {
+export async function startSetupPhase(id: string) {
   const game = await requireGame(id);
   if (game.players.length < 2) {
     throw new Error("Game needs at least 2 players");
@@ -122,71 +123,29 @@ export async function startGame(id: string) {
 
   const map = await getMapForId(game.mapId);
 
-  const availableCells = map!.cells
-    .filter((cell) => cell.type === "PLAYER")
-    .map((value) => ({ value, sort: Math.random() }))
-    .sort((a, b) => a.sort - b.sort)
-    .map(({ value }) => value);
+  if (!map) {
+    throw new Error("Map not found");
+  }
 
-  const playerCellCount = Math.floor(
-    availableCells.length / game.players.length
+  const playerStates = initializePlayers(game.players);
+  const cells = initializeCells(playerStates, map.cells);
+
+  const setupStates = playerStates.map((player) =>
+    initializeSetup(player, cells)
   );
 
-  const cells = game.players.flatMap((player) => {
-    const cells = availableCells.splice(0, playerCellCount);
-    return cells.map((cell) => {
-      return {
-        cellId: cell.id,
-        gameId: game.id,
-        playerId: player.id,
-      };
-    });
-  });
+  const players = game.players.map((player) => ({
+    ...player,
+    setupState: setupStates.find((state) => state.player.id === player.id)!,
+  }));
 
-  // use remaining available cells for dummy placement
-
-  prisma.game.update({
-    where: {
-      id,
-    },
+  return await prisma.game.update({
+    where: { id },
     data: {
-      cells: {
-        create: cells,
+      phase: "PREPARATION",
+      players: {
+        set: players,
       },
     },
   });
 }
-
-export const joinGame = async (id: string, userId: string) => {
-  const game = await getGame(id);
-  if (!game) {
-    throw notFound("Game not found");
-  }
-  if (game?.phase !== "LOBBY") {
-    throw new Error("Game was already started");
-  }
-
-  if (game?.players.length >= 6) {
-    throw new Error("Game is already full");
-  }
-
-  return await prisma.game.update({
-    where: {
-      id,
-    },
-    data: {
-      players: {
-        create: [
-          {
-            userId,
-            position: game.players.length,
-          },
-        ],
-      },
-    },
-  });
-};
-
-export const canJoinGame = async (id: string) => {};
-
-// executeAction, endTurn, endGame
