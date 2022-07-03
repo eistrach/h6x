@@ -1,5 +1,7 @@
 import { redirect } from "@remix-run/node";
-import { useLoaderData, useMatches } from "@remix-run/react";
+import { useActionData, useLoaderData, useMatches } from "@remix-run/react";
+import { useEffect } from "react";
+import toast, { Toaster } from "react-hot-toast";
 import { z } from "zod";
 import GamePreview from "~/components/map/GamePreview";
 import GameView from "~/components/map/GameView";
@@ -121,15 +123,24 @@ export const action = async ({ request, params }: ActionArgs) => {
     }
     return redirect(`/games/${gameId}`);
   } catch (err) {
-    return (err as any).toString();
+    return { error: (err as any).toString() };
   }
 };
 
 const GamePage = () => {
   const { playerCells, cells, players, canTakeAction, playerId } =
     useLoaderData<LoaderData>();
+  const { error } = useActionData() || {};
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
+
   return (
     <div>
+      <Toaster position="top-right" />
       <GameView
         players={players}
         playerCells={playerCells}
