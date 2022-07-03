@@ -15,7 +15,7 @@ export type Unit = {
 export const UNITS: Unit[] = [
   {
     id: "default",
-    name: "Default",
+    name: "Neutral",
     attack: 5,
     defense: 5,
     plunder: 0,

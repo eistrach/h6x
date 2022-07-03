@@ -12,6 +12,7 @@ import {
   HEX_WIDTH,
   SVG_SCALE,
 } from "~/lib/grid";
+import { getUnitForId } from "~/lib/units";
 
 type PlayerCellProps = {
   cell: MathCell;
@@ -56,7 +57,7 @@ export default function PlayerCell({
         fontSize="5"
         strokeWidth=".3"
       >
-        {playerCell.count}/{playerCell.unitId[0]}
+        {playerCell.count}/{getUnitForId(playerCell.unitId).name[0]}
       </text>
     </g>
   );
