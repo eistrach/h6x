@@ -144,7 +144,7 @@ export default function GameView({
                   </Button>
                 </Form>
               </div>
-              <div className="flex flex-row gap-2">
+              <div className="grid grid-cols-2 md:grid-cols-5  gap-2">
                 {UNITS.map((unit) => {
                   return (
                     <Form method="post">
