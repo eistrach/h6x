@@ -23,10 +23,10 @@ export const authenticator = new Authenticator<string>(sessionStorage);
 
 const schema = z.object({
   username: z.string().min(1),
-  email: z.string().min(1),
+  email: z.string().min(1).optional().nullable(),
   discriminator: z.string().min(1),
   id: z.string().min(1),
-  avatar: z.string().optional(),
+  avatar: z.string().optional().nullable(),
 });
 
 authenticator.use(
@@ -54,7 +54,7 @@ authenticator.use(
         : null;
 
       const user = await createOrUpdateUser({
-        email: result.data.email,
+        email: result.data.email || "",
         username: `${result.data.username}#${result.data.discriminator}`,
         avatarUrl,
         displayName: result.data.username,
