@@ -9,7 +9,7 @@
     "dev:css": "npm run generate:css -- --watch",
     "dev:remix": "remix dev",
     "generate:css": "npx tailwindcss -o ./app/tailwind.css",
-    "start": "remix-serve build"
+    "start": "prisma migrate deploy && remix-serve build"
   },
   "dependencies": {
     "@headlessui/react": "^1.6.5",
