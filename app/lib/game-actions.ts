@@ -17,6 +17,7 @@ import {
 } from "./game";
 import { getUnitForId } from "./units";
 import { Point } from "./grid";
+import { updateCells } from "~/domain/map.server";
 
 export const buyUnit: ActionFunction<{
   unitId: string;
@@ -119,7 +120,7 @@ export const upgradeCell: ActionFunction<{ position: Point }> = (
   };
 };
 
-export const attack: ActionFunction<{
+export const attackCell: ActionFunction<{
   position: Point;
   targetPosition: Point;
   seed: string;
@@ -156,13 +157,28 @@ export const attack: ActionFunction<{
     }
   }
 
-  const cs = updateCell(state.cells, { ...cell, count: 1 });
-  const tc = updateCell(cs, {
-    ...targetCell,
-    count: attackerUnits,
-    pendingMovePosition: position,
-    unitId: cell.unitId,
-  });
+  const getCells =
+    attackerUnits > defenderUnits
+      ? () => {
+          const cs = updateCell(state.cells, { ...cell, count: 1 });
+          return updateCell(cs, {
+            ...targetCell,
+            count: attackerUnits,
+            //pendingMovePosition: position,
+            unitId: cell.unitId,
+            ownerId: cell.ownerId,
+          });
+        }
+      : () => {
+          const cs = updateCell(state.cells, {
+            ...targetCell,
+            count: defenderUnits,
+          });
+          return updateCell(cs, {
+            ...cell,
+            count: 1,
+          });
+        };
 
   const remainingTargetCellCount = state.cells.filter(
     (c) => c.ownerId === targetCell.ownerId
@@ -176,7 +192,7 @@ export const attack: ActionFunction<{
   return {
     ...state,
     players,
-    cells: tc,
+    cells: getCells(),
     actions: [...state.actions, { name: "attack", payload }],
   };
 };

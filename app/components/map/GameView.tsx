@@ -1,5 +1,5 @@
 import { Cell } from "@prisma/client";
-import { Form } from "@remix-run/react";
+import { Form, useFetcher } from "@remix-run/react";
 import clsx from "clsx";
 import { useState } from "react";
 import { NEUTRAL_COLOR, PLAYER_COLORS } from "~/lib/constants";
@@ -11,6 +11,8 @@ import {
   compareCell,
   HEX_WIDTH,
   HEX_HEIGHT,
+  cellsAreNeighbors,
+  Point,
 } from "~/lib/grid";
 import { UNITS } from "~/lib/units";
 import { useUser } from "~/utils";
@@ -34,11 +36,36 @@ export default function GameView({
   playerId,
 }: GamePreviewProps) {
   const user = useUser();
+  const fetcher = useFetcher();
   const grid = asMathGrid(cellsToMathCells(cells));
-  const [selectedCell, setSelectedCell] = useState<CellState | null>();
+  const [selectedCellPosition, setSelectedCellPosition] =
+    useState<Point | null>();
+  const selectedCell = playerCells.find(
+    (c) => selectedCellPosition && compareCell(c.position, selectedCellPosition)
+  );
 
   const onClick = (cell: CellState, player: PlayerState) => {
-    setSelectedCell(cell);
+    if (
+      selectedCell?.ownerId === playerId &&
+      selectedCell.count > 1 &&
+      cellsAreNeighbors(selectedCell.position, cell.position) &&
+      !compareCell(selectedCell.position, cell.position) &&
+      selectedCell.ownerId !== cell.ownerId
+    ) {
+      fetcher.submit(
+        {
+          _intent: "attackUnit",
+          "position[x]": selectedCell.position.x.toString(),
+          "position[y]": selectedCell.position.y.toString(),
+          "target[x]": cell.position.x.toString(),
+          "target[y]": cell.position.y.toString(),
+          playerId: playerId,
+        },
+        { method: "post" }
+      );
+    } else {
+      setSelectedCellPosition(cell.position);
+    }
   };
 
   const currentPlayer = players.find((p) => p.id === playerId)!;

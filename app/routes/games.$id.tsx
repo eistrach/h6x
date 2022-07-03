@@ -6,6 +6,7 @@ import { z } from "zod";
 import GamePreview from "~/components/map/GamePreview";
 import GameView from "~/components/map/GameView";
 import {
+  attack,
   buy,
   buyUnitP,
   end,
@@ -88,6 +89,18 @@ const Schema = z.union([
     playerId: z.string().min(1),
   }),
   z.object({
+    _intent: z.literal("attackUnit"),
+    position: z.object({
+      x: z.preprocess(Number, z.number()),
+      y: z.preprocess(Number, z.number()),
+    }),
+    target: z.object({
+      x: z.preprocess(Number, z.number()),
+      y: z.preprocess(Number, z.number()),
+    }),
+    playerId: z.string().min(1),
+  }),
+  z.object({
     _intent: z.literal("endTurn"),
     playerId: z.string().min(1),
   }),
@@ -96,6 +109,8 @@ export const action = async ({ request, params }: ActionArgs) => {
   const gameId = requireParam(params, "id");
   const user = await requireUser(request);
   const result = await validateForm(request, Schema);
+
+  console.log(result);
 
   if (!result.success) {
     return result;
@@ -116,6 +131,15 @@ export const action = async ({ request, params }: ActionArgs) => {
         break;
       case "upgradeUnit":
         await upgrade(gameId, result.data.playerId, result.data.position);
+        break;
+      case "attackUnit":
+        await attack(
+          gameId,
+          result.data.playerId,
+          result.data.position,
+          result.data.target
+        );
+
         break;
       case "endTurn":
         await end(gameId, result.data.playerId);

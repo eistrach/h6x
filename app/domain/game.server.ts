@@ -1,6 +1,8 @@
-import { endTurn, upgradeCell } from "./../lib/game-actions";
+import { attackCell, endTurn, upgradeCell } from "./../lib/game-actions";
 import { GameState, PlayingState } from "./../lib/game";
 import { PrismaClient } from "@prisma/client";
+
+import { v4 as uuid } from "uuid";
 import {
   buyUnitDuringSetup,
   endSetupTurn,
@@ -429,5 +431,33 @@ export async function startGame(id: string) {
         gameState: initialGameState,
       },
     });
+  });
+}
+
+export async function attack(
+  id: string,
+  playerId: string,
+  position: Point,
+  targetPosition: Point
+) {
+  const game = await requireGame(id);
+  if (game.phase !== "PLAYING") {
+    throw new Error("Game is not started yet");
+  }
+
+  const gameState = game.gameState as PlayingState;
+
+  const newState = attackCell(gameState, {
+    seed: uuid(),
+    position,
+    targetPosition,
+    senderId: playerId,
+  });
+
+  return await prisma.game.update({
+    where: { id },
+    data: {
+      gameState: newState,
+    },
   });
 }

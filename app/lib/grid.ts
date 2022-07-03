@@ -87,9 +87,10 @@ export const cellToPoint = (cell: Omit<Cell, "id">) => {
 };
 
 export const cellsAreNeighbors = (c1: Point, c2: Point) => {
+  console.log(c1, c2, layoutGrid.neighborsOf(asMathCell(c1.x, c1.y)));
   return layoutGrid
     .neighborsOf(asMathCell(c1.x, c1.y))
-    .includes(asMathCell(c2.x, c2.y));
+    .some((c) => compareCell(c, c2));
 };
 
 export type Point = { x: number; y: number };
