@@ -1,9 +1,10 @@
 import seedrandom from "seedrandom";
 import { useMatches } from "@remix-run/react";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import type { DataFunctionArgs } from "@remix-run/node";
 
 import type { User } from "~/domain/user.server";
+import { useDataRefresh } from "remix-utils";
 
 /**
  * This base hook is used in other hooks to quickly search for specific data
@@ -64,6 +65,14 @@ export function randomIntFromInterval(
 ) {
   // min and max included
   return Math.floor(rng() * (max - min + 1) + min);
+}
+
+export function useDataRefreshOnInterval(intervalNumber: number) {
+  let { refresh } = useDataRefresh();
+  useEffect(() => {
+    let interval = setInterval(refresh, intervalNumber);
+    return () => clearInterval(interval);
+  }, [refresh]);
 }
 
 export type UnpackData<F extends (...args: any) => any> = Exclude<

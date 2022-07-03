@@ -18,7 +18,12 @@ import {
 } from "~/domain/game.server";
 import { PlayingState, SetupState } from "~/lib/game";
 import { requireUser } from "~/session.server";
-import { ActionArgs, LoaderArgs, UnpackData } from "~/utils";
+import {
+  ActionArgs,
+  LoaderArgs,
+  UnpackData,
+  useDataRefreshOnInterval,
+} from "~/utils";
 import { requireParam, validateForm } from "~/utils.server";
 
 export const loader = async ({ request, params }: LoaderArgs) => {
@@ -155,6 +160,7 @@ const GamePage = () => {
   const { playerCells, cells, players, canTakeAction, playerId } =
     useLoaderData<LoaderData>();
   const { error } = useActionData() || {};
+  useDataRefreshOnInterval(5000);
 
   useEffect(() => {
     if (error) {
