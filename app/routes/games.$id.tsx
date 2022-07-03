@@ -24,13 +24,12 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     throw new Error(`Game ${gameId} not found`);
   }
 
-  console.log(game);
-
   switch (game.phase) {
     case "LOBBY":
       return redirect("/games");
     case "PREPARATION":
-      const { player } = game.players
+      const { player } = [...game.players]
+        .sort((a, b) => a.id.localeCompare(b.id))
         .map((p) => ({ player: p, done: (p.setupState as SetupState).done }))
         .find(({ player, done }) => player.userId === user.id && !done)!;
 

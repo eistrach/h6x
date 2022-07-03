@@ -50,17 +50,19 @@ export default function GameView({
     <div className="">
       <div className="flex justify-between items-center p-4">
         <div className="flex gap-2">
-          {players.map((p) => {
-            const color = PLAYER_COLORS[p.index];
-            return (
-              <div
-                key={p.id}
-                className={clsx(color.bg, "py-1 px-2 text-black")}
-              >
-                ${p.money}
-              </div>
-            );
-          })}
+          {[...players]
+            .sort((p1, p2) => p2.index - p1.index)
+            .map((p) => {
+              const color = PLAYER_COLORS[p.index];
+              return (
+                <div
+                  key={p.id}
+                  className={clsx(color.bg, "py-1 px-2 text-black")}
+                >
+                  ${p.money}
+                </div>
+              );
+            })}
         </div>
         <div className={clsx(currentColor.bg, "p-4")}>{user.displayName}</div>
       </div>
