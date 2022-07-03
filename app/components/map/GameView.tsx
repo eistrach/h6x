@@ -83,7 +83,7 @@ export default function GameView({
               selectedCell && compareCell(selectedCell.position, cell);
             return (
               <PlayerCell
-                selected={isSelected}
+                selected={!!isSelected}
                 onClick={onClick}
                 key={cell.toString()}
                 cell={cell}

@@ -187,8 +187,20 @@ export const endTurn: ActionFunction<{}> = (state, payload) => {
   assertCurrentPlayer(state, senderId);
   assertPlayerTurn(state, player);
 
+  const playerCells = state.cells.filter((c) => c.ownerId === player.id);
+  const generatedMoney = playerCells.reduce((acc, cell) => {
+    const unit = getUnitForId(cell.unitId);
+    return acc + unit.income;
+  }, 0);
+
   const [currentPlayer, ...next] = state.players;
-  const players = [...next, currentPlayer];
+  const players = [
+    ...next,
+    {
+      ...currentPlayer,
+      money: currentPlayer.money + generatedMoney,
+    },
+  ];
 
   return {
     ...state,

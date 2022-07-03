@@ -97,8 +97,18 @@ export const endSetupTurn: SetupActionFunction<{}> = (state, payload) => {
   assertSetupNotFinished(state);
   assertPlayerIsSender(player, senderId);
 
+  const playerCells = state.cells.filter((c) => c.ownerId === player.id);
+  const generatedMoney = playerCells.reduce((acc, cell) => {
+    const unit = getUnitForId(cell.unitId);
+    return acc + unit.income;
+  }, 0);
+
   return {
     ...state,
+    players: updatePlayer(state, {
+      ...player,
+      money: player.money + generatedMoney,
+    }),
     done: true,
     actions: [...state.actions, { name: "endTurn", payload }],
   };
