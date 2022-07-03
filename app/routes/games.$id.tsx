@@ -96,26 +96,30 @@ export const action = async ({ request, params }: ActionArgs) => {
     return result;
   }
 
-  switch (result.data._intent) {
-    case "startGame":
-      await startSetupPhase(gameId);
-      break;
-    case "buyUnit":
-      await buyUnit(
-        gameId,
-        result.data.playerId,
-        result.data.position,
-        result.data.unitId
-      );
-      break;
-    case "upgradeUnit":
-      await upgradeUnit(gameId, result.data.playerId, result.data.position);
-      break;
-    case "endTurn":
-      await endTurn(gameId, result.data.playerId);
-      break;
+  try {
+    switch (result.data._intent) {
+      case "startGame":
+        await startSetupPhase(gameId);
+        break;
+      case "buyUnit":
+        await buyUnit(
+          gameId,
+          result.data.playerId,
+          result.data.position,
+          result.data.unitId
+        );
+        break;
+      case "upgradeUnit":
+        await upgradeUnit(gameId, result.data.playerId, result.data.position);
+        break;
+      case "endTurn":
+        await endTurn(gameId, result.data.playerId);
+        break;
+    }
+    return redirect(`/games/${gameId}`);
+  } catch (err) {
+    return (err as any).toString();
   }
-  return redirect(`/games/${gameId}`);
 };
 
 const GamePage = () => {
