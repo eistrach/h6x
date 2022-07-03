@@ -9,7 +9,7 @@ import { env } from "./environment.server";
 
 export const sessionStorage = createCookieSessionStorage({
   cookie: {
-    name: "_session",
+    name: "__session",
     httpOnly: true,
     maxAge: 60 * 60 * 24 * 30,
     path: "/",
