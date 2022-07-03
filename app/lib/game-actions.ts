@@ -1,4 +1,3 @@
-import { Point } from "honeycomb-grid";
 import { randomIntFromInterval } from "~/utils";
 import seedrandom from "seedrandom";
 
@@ -16,8 +15,8 @@ import {
   assertCurrentPlayer,
   assertPlayerTurn,
 } from "./game";
-import { cellsAreNeighbors, cellsToPoints } from "./grid";
 import { getUnitForId } from "./units";
+import { Point } from "./grid";
 
 export const buyUnit: ActionFunction<{
   unitId: string;
@@ -89,7 +88,10 @@ export const moveUnit: ActionFunction<{
   };
 };
 
-const upgradeCell: ActionFunction<{ position: Point }> = (state, payload) => {
+export const upgradeCell: ActionFunction<{ position: Point }> = (
+  state,
+  payload
+) => {
   const { senderId, position } = payload;
   const player = getCurrentPlayer(state, senderId);
   const cell = getCellForPosition(state.cells, position);

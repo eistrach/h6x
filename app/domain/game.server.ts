@@ -1,3 +1,5 @@
+import { endTurn, upgradeCell } from "./../lib/game-actions";
+import { GameState, PlayingState } from "./../lib/game";
 import { PrismaClient } from "@prisma/client";
 import {
   buyUnitDuringSetup,
@@ -12,6 +14,7 @@ import { getMapForId } from "./map.server";
 import { prisma } from "~/db.server";
 import { Point } from "~/lib/grid";
 import { SetupState } from "~/lib/game";
+import { buyUnit } from "~/lib/game-actions";
 
 export async function getGamesForUser(userId: string) {
   return prisma.player
@@ -171,7 +174,31 @@ export async function startSetupPhase(id: string) {
   });
 }
 
-export async function buyUnit(
+export async function buy(
+  id: string,
+  playerId: string,
+  position: Point,
+  unitId: string
+) {
+  const game = await requireGame(id);
+  if (game.phase === "PREPARATION")
+    return buyUnitP(id, playerId, position, unitId);
+  else return buyUnitG(id, playerId, position, unitId);
+}
+
+export async function upgrade(id: string, playerId: string, position: Point) {
+  const game = await requireGame(id);
+  if (game.phase === "PREPARATION") return upgradeUnitP(id, playerId, position);
+  else return upgradeUnitG(id, playerId, position);
+}
+
+export async function end(id: string, playerId: string) {
+  const game = await requireGame(id);
+  if (game.phase === "PREPARATION") return endTurnP(id, playerId);
+  else return endTurnG(id, playerId);
+}
+
+export async function buyUnitP(
   id: string,
   playerId: string,
   position: Point,
@@ -207,7 +234,40 @@ export async function buyUnit(
   });
 }
 
-export async function upgradeUnit(
+export async function buyUnitG(
+  id: string,
+  playerId: string,
+  position: Point,
+  unitId: string
+) {
+  const game = await requireGame(id);
+  if (game.phase !== "PLAYING") {
+    throw new Error("Game is already started");
+  }
+
+  const player = game.players.find((player) => player.id === playerId);
+
+  if (!player) {
+    throw new Error("Player not found");
+  }
+
+  const gameState = game.gameState as PlayingState;
+
+  const newState = buyUnit(gameState, {
+    senderId: playerId,
+    position,
+    unitId,
+  });
+
+  return await prisma.game.update({
+    where: { id },
+    data: {
+      gameState: newState,
+    },
+  });
+}
+
+export async function upgradeUnitP(
   id: string,
   playerId: string,
   position: Point
@@ -241,7 +301,38 @@ export async function upgradeUnit(
   });
 }
 
-export async function endTurn(id: string, playerId: string) {
+export async function upgradeUnitG(
+  id: string,
+  playerId: string,
+  position: Point
+) {
+  const game = await requireGame(id);
+  if (game.phase !== "PLAYING") {
+    throw new Error("Game is already started");
+  }
+
+  const player = game.players.find((player) => player.id === playerId);
+
+  if (!player) {
+    throw new Error("Player not found");
+  }
+
+  const gameState = game.gameState as PlayingState;
+
+  const newState = upgradeCell(gameState, {
+    senderId: playerId,
+    position,
+  });
+
+  return await prisma.game.update({
+    where: { id },
+    data: {
+      gameState: newState,
+    },
+  });
+}
+
+export async function endTurnP(id: string, playerId: string) {
   const game = await requireGame(id);
   if (game.phase !== "PREPARATION") {
     throw new Error("Game is already started");
@@ -280,6 +371,33 @@ export async function endTurn(id: string, playerId: string) {
     },
   });
 }
+
+export async function endTurnG(id: string, playerId: string) {
+  const game = await requireGame(id);
+  if (game.phase !== "PLAYING") {
+    throw new Error("Game is already started");
+  }
+
+  const player = game.players.find((player) => player.id === playerId);
+
+  if (!player) {
+    throw new Error("Player not found");
+  }
+
+  const gameState = game.gameState as PlayingState;
+
+  const newState = endTurn(gameState, {
+    senderId: playerId,
+  });
+
+  return await prisma.game.update({
+    where: { id },
+    data: {
+      gameState: newState,
+    },
+  });
+}
+
 export async function startGame(id: string) {
   const game = await requireGame(id);
   if (game.phase !== "PREPARATION") {

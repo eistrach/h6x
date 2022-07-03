@@ -78,8 +78,12 @@ export default function GameView({
             const playerCell = playerCells.find((c) =>
               compareCell(c.position, cell)
             )!;
+
+            const isSelected =
+              selectedCell && compareCell(selectedCell.position, cell);
             return (
               <PlayerCell
+                selected={isSelected}
                 onClick={onClick}
                 key={cell.toString()}
                 cell={cell}

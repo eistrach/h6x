@@ -4,11 +4,14 @@ import { z } from "zod";
 import GamePreview from "~/components/map/GamePreview";
 import GameView from "~/components/map/GameView";
 import {
-  buyUnit,
-  endTurn,
+  buy,
+  buyUnitP,
+  end,
+  endTurnP,
   getGame,
   startSetupPhase,
-  upgradeUnit,
+  upgrade,
+  upgradeUnitP,
 } from "~/domain/game.server";
 import { PlayingState, SetupState } from "~/lib/game";
 import { requireUser } from "~/session.server";
@@ -102,7 +105,7 @@ export const action = async ({ request, params }: ActionArgs) => {
         await startSetupPhase(gameId);
         break;
       case "buyUnit":
-        await buyUnit(
+        await buy(
           gameId,
           result.data.playerId,
           result.data.position,
@@ -110,10 +113,10 @@ export const action = async ({ request, params }: ActionArgs) => {
         );
         break;
       case "upgradeUnit":
-        await upgradeUnit(gameId, result.data.playerId, result.data.position);
+        await upgrade(gameId, result.data.playerId, result.data.position);
         break;
       case "endTurn":
-        await endTurn(gameId, result.data.playerId);
+        await end(gameId, result.data.playerId);
         break;
     }
     return redirect(`/games/${gameId}`);

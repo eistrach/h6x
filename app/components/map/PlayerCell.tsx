@@ -17,6 +17,7 @@ type PlayerCellProps = {
   playerCell: CellState;
   players: PlayerState[];
   onClick: (cell: CellState, player: PlayerState) => void;
+  selected: boolean;
 };
 
 export default function PlayerCell({
@@ -24,6 +25,7 @@ export default function PlayerCell({
   playerCell,
   players,
   onClick,
+  selected,
 }: PlayerCellProps) {
   const { x, y } = cell.toPoint();
 
@@ -34,10 +36,12 @@ export default function PlayerCell({
     <g
       onClick={() => onClick(playerCell, player)}
       transform={`translate(${x + SVG_OFFSET_X}, ${y + SVG_OFFSET_Y})`}
-      className={clsx("stroke-black", color.fill)}
+      className={clsx("stroke-black", color.fill, {
+        "fill-gray-300 ": selected,
+      })}
     >
       <polygon
-        strokeWidth={HEX_STROKE_WIDTH}
+        strokeWidth={selected ? HEX_STROKE_WIDTH : HEX_STROKE_WIDTH}
         points={cellCorners
           .map((corner) => `${corner.x},${corner.y}`)
           .join(" ")}
@@ -47,7 +51,7 @@ export default function PlayerCell({
         transform={`translate(${HEX_WIDTH / 2}, ${HEX_HEIGHT / 2 + 0.5})`}
         dominantBaseline="middle"
         textAnchor="middle"
-        className="fill-black"
+        className="fill-black stroke-black"
         fontSize="5"
         strokeWidth=".3"
       >
