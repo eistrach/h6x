@@ -28,10 +28,12 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     case "LOBBY":
       return redirect("/games");
     case "PREPARATION":
-      const { player } = [...game.players]
+      const players = [...game.players]
         .sort((a, b) => a.id.localeCompare(b.id))
-        .map((p) => ({ player: p, done: (p.setupState as SetupState).done }))
-        .find(({ player, done }) => player.userId === user.id && !done)!;
+        .filter((player) => player.userId === user.id)!;
+
+      const p = players.find((p) => !(p.setupState as SetupState).done);
+      const player = p || players[0];
 
       const setupState = player.setupState as SetupState;
 
@@ -46,16 +48,14 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     case "PLAYING":
       console.log("pp");
       const gameState = game.gameState as PlayingState;
-      const currentPlayer = gameState.players.find(
-        (p) => p.userId === user.id
-      )!;
+      const currentPlayer = gameState.players.find((p) => p.userId === user.id);
       return {
         phase: "PLAYING" as const,
         cells: game.map.cells,
         playerCells: gameState.cells,
         players: gameState.players,
         playerId: gameState.currentPlayerId,
-        canTakeAction: gameState.currentPlayerId === currentPlayer.id,
+        canTakeAction: gameState.currentPlayerId === currentPlayer?.id,
       };
   }
 };
