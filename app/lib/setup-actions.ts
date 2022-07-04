@@ -1,3 +1,4 @@
+import { generateMoney } from "./game-actions";
 import { compareCell, layoutGrid, Point } from "./grid";
 import {
   DEFAULT_NEUTRAL_UNIT_ID,
@@ -97,18 +98,8 @@ export const endSetupTurn: SetupActionFunction<{}> = (state, payload) => {
   assertSetupNotFinished(state);
   assertPlayerIsSender(player, senderId);
 
-  const playerCells = state.cells.filter((c) => c.ownerId === player.id);
-  const generatedMoney = playerCells.reduce((acc, cell) => {
-    const unit = getUnitForId(cell.unitId);
-    return acc + unit.income;
-  }, 0);
-
   return {
     ...state,
-    players: updatePlayer(state, {
-      ...player,
-      money: player.money + generatedMoney,
-    }),
     done: true,
     actions: [...state.actions, { name: "endTurn", payload }],
   };
@@ -183,14 +174,18 @@ export const initializeGame = (setup: SetupState[]) => {
     s.cells.filter((c) => c.ownerId === s.currentPlayerId)
   );
 
-  const otherCells = setup[0].cells.filter((c) =>
-    playerCells.some((pc) => !compareCell(pc.position, c.position))
+  const otherCells = setup[0].cells.filter(
+    (c) => !playerCells.some((pc) => compareCell(pc.position, c.position))
   );
 
-  return {
-    players: players,
-    cells: [...playerCells, ...otherCells],
-    actions: setup.flatMap((s) => s.actions),
-    currentPlayerId: players[0].id,
-  };
+  return players.reduce(
+    (acc, state) => generateMoney(acc, { senderId: state.id }),
+    {
+      players: players,
+      cells: [...playerCells, ...otherCells],
+      actions: setup.flatMap((s) => s.actions),
+      currentPlayerId: players[0].id,
+      turn: 0,
+    }
+  );
 };

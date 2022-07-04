@@ -1,23 +1,26 @@
 import { Cell } from "@prisma/client";
 import { Form, useFetcher } from "@remix-run/react";
 import clsx from "clsx";
+import * as PopperJS from "@popperjs/core";
 import { useState } from "react";
-import { NEUTRAL_COLOR, PLAYER_COLORS } from "~/lib/constants";
+import { usePopper } from "react-popper";
+import { PLAYER_COLORS } from "~/lib/constants";
 import { CellState, PlayerState } from "~/lib/game";
 import {
   asMathGrid,
   SVG_SIZE,
   cellsToMathCells,
   compareCell,
-  HEX_WIDTH,
-  HEX_HEIGHT,
   cellsAreNeighbors,
   Point,
+  getNeighboringCells,
 } from "~/lib/grid";
 import { UNITS } from "~/lib/units";
 import { useUser } from "~/utils";
 import { Button } from "../base/Button";
-import CellPreview from "./CellPreview";
+import { IconButton } from "../base/IconButton";
+import { PointyCompassDirection } from "honeycomb-grid";
+import { SwordIcon } from "../map/icons/SwordIcon";
 import PlayerCell from "./PlayerCell";
 
 type GamePreviewProps = {
@@ -26,6 +29,70 @@ type GamePreviewProps = {
   players: PlayerState[];
   playerId: string;
   canTakeAction: boolean;
+};
+
+const PopOver = ({
+  setPopperElement,
+  styles,
+  attributes,
+  setArrowElement,
+  children,
+  show,
+  className,
+}: {
+  setPopperElement: any;
+  styles: any;
+  attributes: any;
+  setArrowElement: any;
+  children: React.ReactNode;
+  show: boolean;
+  className?: string;
+}) => {
+  return (
+    <div
+      className={clsx("tooltip bg-gray-200 p-1 rounded-full", {
+        hidden: !show,
+      })}
+      ref={setPopperElement as any}
+      style={styles.popper}
+      {...attributes.popper}
+    >
+      <div className={className}>{children}</div>
+
+      <div
+        className="arrow "
+        ref={setArrowElement as any}
+        style={styles.arrow}
+      />
+    </div>
+  );
+};
+
+export const usePopover = (placement?: PopperJS.Placement) => {
+  const [referenceElement, setReferenceElement] = useState(null);
+  const [popperElement, setPopperElement] = useState(null);
+  const [arrowElement, setArrowElement] = useState(null);
+  const { styles, attributes } = usePopper(referenceElement, popperElement, {
+    placement,
+
+    modifiers: [
+      { name: "arrow", options: { element: arrowElement } },
+      {
+        name: "offset",
+        options: {
+          offset: [0, -5],
+        },
+      },
+    ],
+  });
+
+  return {
+    setReferenceElement,
+    setPopperElement,
+    setArrowElement,
+    styles,
+    attributes,
+  };
 };
 
 export default function GameView({
@@ -44,34 +111,42 @@ export default function GameView({
     (c) => selectedCellPosition && compareCell(c.position, selectedCellPosition)
   );
 
-  const onClick = (cell: CellState, player: PlayerState) => {
-    if (
+  const popovers = {
+    E: usePopover("right"),
+    NE: usePopover("top"),
+    NW: usePopover("top"),
+    W: usePopover("left"),
+    SE: usePopover("bottom"),
+    SW: usePopover("bottom"),
+  };
+
+  const canAttack = (cell: CellState) => {
+    return (
       selectedCell?.ownerId === playerId &&
       selectedCell.count > 1 &&
       cellsAreNeighbors(selectedCell.position, cell.position) &&
       !compareCell(selectedCell.position, cell.position) &&
       selectedCell.ownerId !== cell.ownerId
-    ) {
-      fetcher.submit(
-        {
-          _intent: "attackUnit",
-          "position[x]": selectedCell.position.x.toString(),
-          "position[y]": selectedCell.position.y.toString(),
-          "target[x]": cell.position.x.toString(),
-          "target[y]": cell.position.y.toString(),
-          playerId: playerId,
-        },
-        { method: "post" }
-      );
-    } else {
-      setSelectedCellPosition(cell.position);
-    }
+    );
+  };
+
+  const onClick = (cell: CellState, player: PlayerState) => {
+    setSelectedCellPosition(cell.position);
   };
 
   const currentPlayer = players.find((p) => p.id === playerId)!;
   const isOwnCell = selectedCell?.ownerId === currentPlayer.id;
 
   const currentColor = PLAYER_COLORS[currentPlayer.index];
+
+  const enemyNeighbors =
+    canTakeAction && selectedCell && selectedCell.ownerId === currentPlayer.id
+      ? Object.fromEntries(
+          Object.entries(
+            getNeighboringCells(selectedCell.position, playerCells)
+          ).filter(([, c]) => c.ownerId !== currentPlayer.id && canAttack(c))
+        )
+      : {};
 
   return (
     <div className="">
@@ -94,6 +169,38 @@ export default function GameView({
         <div className={clsx(currentColor.bg, "p-4")}>{user.displayName}</div>
       </div>
 
+      {Object.entries(popovers).map(([k, p], i) => {
+        const cell = enemyNeighbors[k];
+        return (
+          <PopOver key={i} show={!!cell} {...p}>
+            <Form
+              method="post"
+              className="w-5 h-5 flex items-center justify-center"
+            >
+              <input type="hidden" name="_intent" value="attackUnit" />
+              <input
+                type="hidden"
+                name="position[x]"
+                value={selectedCell?.position.x}
+              />
+              <input
+                type="hidden"
+                name="position[y]"
+                value={selectedCell?.position.y}
+              />
+              <input type="hidden" name="playerId" value={playerId} />
+              <input type="hidden" name="target[x]" value={cell?.position.x} />
+              <input type="hidden" name="target[y]" value={cell?.position.y} />
+              <IconButton
+                type="submit"
+                className="text-red-700"
+                iconCss="w-5 h-5"
+                Icon={SwordIcon}
+              />
+            </Form>
+          </PopOver>
+        );
+      })}
       <svg
         className=""
         viewBox={`0, 0, ${SVG_SIZE}, ${SVG_SIZE}`}
@@ -105,11 +212,17 @@ export default function GameView({
             const playerCell = playerCells.find((c) =>
               compareCell(c.position, cell)
             )!;
-
             const isSelected =
               selectedCell && compareCell(selectedCell.position, cell);
+            const [direction] = (Object.entries(enemyNeighbors).find(([_, c]) =>
+              compareCell(c.position, cell)
+            ) || []) as [PointyCompassDirection, CellState];
+            const popover = direction ? popovers[direction] : null;
             return (
               <PlayerCell
+                popperRef={
+                  popover ? (popover.setReferenceElement as any) : null
+                }
                 selected={!!isSelected}
                 onClick={onClick}
                 key={cell.toString()}

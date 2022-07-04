@@ -1,5 +1,12 @@
 import { Cell } from "@prisma/client";
-import { defineGrid, Hex, Grid as HoneyGrid, extendHex } from "honeycomb-grid";
+import {
+  defineGrid,
+  Hex,
+  Grid as HoneyGrid,
+  extendHex,
+  CompassDirection,
+  PointyCompassDirection,
+} from "honeycomb-grid";
 
 export const SVG_SCALE = 24;
 export const HEX_RADIUS = 8;
@@ -87,10 +94,39 @@ export const cellToPoint = (cell: Omit<Cell, "id">) => {
 };
 
 export const cellsAreNeighbors = (c1: Point, c2: Point) => {
-  console.log(c1, c2, layoutGrid.neighborsOf(asMathCell(c1.x, c1.y)));
   return layoutGrid
     .neighborsOf(asMathCell(c1.x, c1.y))
     .some((c) => compareCell(c, c2));
+};
+
+export const getNeighboringCells = <
+  T extends { position: { x: number; y: number } }
+>(
+  cell: Point,
+  cells: T[]
+): { [key in PointyCompassDirection]: T } => {
+  const directions = [
+    "E",
+    "SE",
+    "SW",
+    "W",
+    "NE",
+    "NW",
+  ] as PointyCompassDirection[];
+
+  const cs = layoutGrid
+    .neighborsOf(asMathCell(cell.x, cell.y), directions)
+    .map(
+      (c, i) =>
+        [
+          directions[i],
+          cells.find((c2) => compareCell(c, c2.position))!,
+        ] as const
+    )
+    .filter(([, c]) => !!c);
+  return Object.fromEntries(new Map(cs)) as unknown as {
+    [key in PointyCompassDirection]: T;
+  };
 };
 
 export type Point = { x: number; y: number };

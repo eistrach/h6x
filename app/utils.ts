@@ -50,7 +50,6 @@ export function validateEmail(email: unknown): email is string {
 }
 
 export async function copyTextToClipboard(text: string) {
-  console.log(text);
   if ("clipboard" in navigator) {
     return await navigator.clipboard.writeText(text);
   } else {

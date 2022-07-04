@@ -1,21 +1,18 @@
 import { redirect } from "@remix-run/node";
-import { useActionData, useLoaderData, useMatches } from "@remix-run/react";
+import { useActionData, useLoaderData } from "@remix-run/react";
 import { useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { z } from "zod";
-import GamePreview from "~/components/map/GamePreview";
-import GameView from "~/components/map/GameView";
+
 import {
   attack,
   buy,
-  buyUnitP,
   end,
-  endTurnP,
   getGame,
   startSetupPhase,
   upgrade,
-  upgradeUnitP,
 } from "~/domain/game.server";
+
 import { PlayingState, SetupState } from "~/lib/game";
 import { requireUser } from "~/session.server";
 import {
@@ -25,6 +22,11 @@ import {
   useDataRefreshOnInterval,
 } from "~/utils";
 import { requireParam, validateForm } from "~/utils.server";
+
+import styles from "~/custom.css";
+import { LinksFunction } from "@remix-run/node";
+import GameView from "~/components/game/GameView";
+export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const gameId = requireParam(params, "id");
@@ -57,7 +59,6 @@ export const loader = async ({ request, params }: LoaderArgs) => {
         canTakeAction: !setupState.done,
       };
     case "PLAYING":
-      console.log("pp");
       const gameState = game.gameState as PlayingState;
       const currentPlayer = gameState.players.find((p) => p.userId === user.id);
       return {

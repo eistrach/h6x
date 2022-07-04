@@ -14,10 +14,10 @@ import {
   assertCellsAreNeighbours,
   assertCurrentPlayer,
   assertPlayerTurn,
+  getPlayerForId,
 } from "./game";
 import { getUnitForId } from "./units";
 import { Point } from "./grid";
-import { updateCells } from "~/domain/map.server";
 
 export const buyUnit: ActionFunction<{
   unitId: string;
@@ -197,11 +197,9 @@ export const attackCell: ActionFunction<{
   };
 };
 
-export const endTurn: ActionFunction<{}> = (state, payload) => {
+export const generateMoney: ActionFunction<{}> = (state, payload) => {
   const { senderId } = payload;
-  const player = getCurrentPlayer(state, senderId);
-  assertCurrentPlayer(state, senderId);
-  assertPlayerTurn(state, player);
+  const player = getPlayerForId(state, senderId);
 
   const playerCells = state.cells.filter((c) => c.ownerId === player.id);
   const generatedMoney = playerCells.reduce((acc, cell) => {
@@ -209,17 +207,28 @@ export const endTurn: ActionFunction<{}> = (state, payload) => {
     return acc + unit.income;
   }, 0);
 
-  const [currentPlayer, ...next] = state.players;
-  const players = [
-    ...next,
-    {
-      ...currentPlayer,
-      money: currentPlayer.money + generatedMoney,
-    },
-  ];
-
   return {
     ...state,
+    players: updatePlayer(state, {
+      ...player,
+      money: player.money + generatedMoney,
+    }),
+    actions: [...state.actions, { name: "generateMoney", payload }],
+  };
+};
+
+export const endTurn: ActionFunction<{}> = (state, payload) => {
+  const { senderId } = payload;
+  const player = getCurrentPlayer(state, senderId);
+  assertCurrentPlayer(state, senderId);
+  assertPlayerTurn(state, player);
+
+  const newState = generateMoney(state, { senderId });
+  const [currentPlayer, ...next] = newState.players;
+  const players = [...next, currentPlayer];
+
+  return {
+    ...newState,
     players,
     turn: state.turn + 1,
     cells: state.cells.map((cell) => ({

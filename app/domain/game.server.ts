@@ -418,7 +418,7 @@ export async function startGame(id: string) {
         prisma.player.update({
           where: { id: p.id },
           data: {
-            setupState: undefined,
+            setupState: "",
           },
         })
       )
