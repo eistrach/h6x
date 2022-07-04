@@ -208,7 +208,7 @@ export const generateMoney: ActionFunction<{}> = (state, payload) => {
     ...state,
     players: updatePlayer(state, {
       ...player,
-      money: player.money + generatedMoney,
+      money: (player.money || 0) + generatedMoney,
     }),
     actions: [...state.actions, { name: "generateMoney", payload }],
   };
