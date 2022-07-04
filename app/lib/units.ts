@@ -32,7 +32,7 @@ export const UNITS = [
     income: 1,
     limit: 8,
 
-    cost: 25,
+    cost: 15,
   },
 
   {
@@ -44,7 +44,7 @@ export const UNITS = [
     income: 1,
     limit: 8,
 
-    cost: 25,
+    cost: 15,
   },
 
   {
@@ -56,7 +56,7 @@ export const UNITS = [
     income: 15,
     limit: 3,
 
-    cost: 30,
+    cost: 25,
   },
 ] as const;
 
