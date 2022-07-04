@@ -31,10 +31,7 @@ export const buyUnit: ActionFunction<{
   assertCellAction(state, player, cell);
   assertPlayerHasMoney(player, unit.cost);
   assertUnitNotEqual(unitId, cell.unitId);
-
-  const waste = cell.count - unit.limit;
-  const count = waste > 0 ? cell.count - waste : cell.count;
-
+  
   return {
     ...state,
     players: updatePlayer(state, {
@@ -44,7 +41,7 @@ export const buyUnit: ActionFunction<{
     cells: updateCell(state.cells, {
       ...cell,
       unitId,
-      count,
+      1,
     }),
     actions: [...state.actions, { name: "buyUnit", payload }],
   };
