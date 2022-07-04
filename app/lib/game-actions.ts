@@ -41,7 +41,7 @@ export const buyUnit: ActionFunction<{
     cells: updateCell(state.cells, {
       ...cell,
       unitId,
-      1,
+      count: 1,
     }),
     actions: [...state.actions, { name: "buyUnit", payload }],
   };
