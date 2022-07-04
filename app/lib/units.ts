@@ -2,11 +2,11 @@ export const UNITS = [
   {
     id: "default",
     name: "Neutral",
-    attack: 5,
-    defense: 5,
+    attack: 4,
+    defense: 4,
     plunder: 0,
     income: 2,
-    limit: 8,
+    limit: 10,
 
     cost: 10,
   },
@@ -27,10 +27,10 @@ export const UNITS = [
     id: "attacker",
     name: "Attacker",
     attack: 10,
-    defense: 1,
+    defense: 2,
     plunder: 0,
-    income: 1,
-    limit: 8,
+    income: 3,
+    limit: 5,
 
     cost: 15,
   },
@@ -38,11 +38,11 @@ export const UNITS = [
   {
     id: "defender",
     name: "Defender",
-    attack: 1,
+    attack: 2,
     defense: 10,
     plunder: 0,
-    income: 1,
-    limit: 8,
+    income: 2,
+    limit: 6,
 
     cost: 15,
   },
@@ -50,10 +50,10 @@ export const UNITS = [
   {
     id: "farmer",
     name: "Farmer",
-    attack: 1,
-    defense: 1,
+    attack: 0,
+    defense: 3,
     plunder: 0,
-    income: 15,
+    income: 14,
     limit: 3,
 
     cost: 25,
