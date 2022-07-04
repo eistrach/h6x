@@ -38,6 +38,7 @@ export const layoutGrid = asMathGrid.hexagon({ radius: GRID_RADIUS });
 export const cellCorners = asMathCell().corners();
 
 export function compareCell(c1: Point, c2: Point) {
+  if (!c1 || !c2) return false;
   return c1.x === c2.x && c1.y === c2.y;
 }
 
@@ -114,8 +115,11 @@ export const getNeighboringCells = <
     "NW",
   ] as PointyCompassDirection[];
 
+  console.log(cell, cells);
+
   const cs = layoutGrid
     .neighborsOf(asMathCell(cell.x, cell.y), directions)
+    .filter((c) => !!c)
     .map(
       (c, i) =>
         [
