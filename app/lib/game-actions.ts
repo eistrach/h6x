@@ -204,7 +204,7 @@ export const generateMoney: ActionFunction<{}> = (state, payload) => {
   const playerCells = state.cells.filter((c) => c.ownerId === player.id);
   const generatedMoney = playerCells.reduce((acc, cell) => {
     const unit = getUnitForId(cell.unitId);
-    return acc + unit.income;
+    return acc + unit.income * cell.limit;
   }, 0);
 
   return {
