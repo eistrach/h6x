@@ -156,8 +156,7 @@ export const action = async ({ request, params }: ActionArgs) => {
 };
 
 const GamePage = () => {
-  const { playerCells, cells, players, canTakeAction, playerId } =
-    useLoaderData<LoaderData>();
+  const gameState = useLoaderData<LoaderData>();
   const { error } = useActionData() || {};
   useDataRefreshOnInterval(1000);
 
@@ -170,13 +169,7 @@ const GamePage = () => {
   return (
     <div>
       <Toaster position="top-right" />
-      <GameView
-        players={players}
-        playerCells={playerCells}
-        cells={cells}
-        canTakeAction={canTakeAction}
-        playerId={playerId}
-      />
+      <GameView state={gameState} />
     </div>
   );
 };

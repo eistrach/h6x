@@ -25,11 +25,12 @@ export const Button = ({
   theme = InputTheme.Primary,
   ...rest
 }: ButtonProps) => {
+  const mp = rest.disabled ? {} : buttonHoverMotion;
   return (
     <motion.button
-      {...buttonHoverMotion}
+      {...mp}
       className={clsx(
-        "inline-flex rounded-sm items-center border border-transparent  text-sm font-semibold   focus:outline-none focus:ring-2 focus:ring-offset-2",
+        "disabled:cursor-not-allowed  disabled:opacity-40 inline-flex rounded-sm items-center border border-transparent  text-sm font-semibold   focus:outline-none focus:ring-2 focus:ring-offset-2",
         theme,
         className
       )}

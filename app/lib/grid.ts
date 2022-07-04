@@ -4,7 +4,6 @@ import {
   Hex,
   Grid as HoneyGrid,
   extendHex,
-  CompassDirection,
   PointyCompassDirection,
 } from "honeycomb-grid";
 

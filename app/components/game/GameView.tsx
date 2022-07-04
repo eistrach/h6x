@@ -1,4 +1,4 @@
-import { Cell } from "@prisma/client";
+import { Cell, GamePhase } from "@prisma/client";
 import { Form, useFetcher } from "@remix-run/react";
 import clsx from "clsx";
 import * as PopperJS from "@popperjs/core";
@@ -15,7 +15,7 @@ import {
   Point,
   getNeighboringCells,
 } from "~/lib/grid";
-import { UNITS } from "~/lib/units";
+import { getUnitForId, UNITS } from "~/lib/units";
 import { useUser } from "~/utils";
 import { Button } from "../base/Button";
 import { IconButton } from "../base/IconButton";
@@ -23,12 +23,15 @@ import { PointyCompassDirection } from "honeycomb-grid";
 import { SwordIcon } from "../map/icons/SwordIcon";
 import PlayerCell from "./PlayerCell";
 
-type GamePreviewProps = {
-  cells: Omit<Cell, "id">[];
-  playerCells: CellState[];
-  players: PlayerState[];
-  playerId: string;
-  canTakeAction: boolean;
+export type GamePreviewProps = {
+  state: {
+    cells: Omit<Cell, "id">[];
+    playerCells: CellState[];
+    players: PlayerState[];
+    playerId: string;
+    canTakeAction: boolean;
+    phase: GamePhase;
+  };
 };
 
 const PopOver = ({
@@ -95,13 +98,8 @@ export const usePopover = (placement?: PopperJS.Placement) => {
   };
 };
 
-export default function GameView({
-  cells,
-  playerCells,
-  players,
-  canTakeAction,
-  playerId,
-}: GamePreviewProps) {
+export default function GameView({ state }: GamePreviewProps) {
+  const { cells, playerCells, players, canTakeAction, playerId, phase } = state;
   const user = useUser();
   const fetcher = useFetcher();
   const grid = asMathGrid(cellsToMathCells(cells));
@@ -136,11 +134,15 @@ export default function GameView({
 
   const currentPlayer = players.find((p) => p.id === playerId)!;
   const isOwnCell = selectedCell?.ownerId === currentPlayer.id;
+  const selectedUnit = selectedCell && getUnitForId(selectedCell.unitId);
 
   const currentColor = PLAYER_COLORS[currentPlayer.index];
 
   const enemyNeighbors =
-    canTakeAction && selectedCell && selectedCell.ownerId === currentPlayer.id
+    canTakeAction &&
+    phase === "PLAYING" &&
+    selectedCell &&
+    selectedCell.ownerId === currentPlayer.id
       ? Object.fromEntries(
           Object.entries(
             getNeighboringCells(selectedCell.position, playerCells)
@@ -252,8 +254,14 @@ export default function GameView({
                     value={selectedCell.position.y}
                   />
                   <input type="hidden" name="playerId" value={playerId} />
-                  <Button name="_intent" value="upgradeUnit">
-                    Buy Unit
+                  <Button
+                    disabled={
+                      selectedUnit && currentPlayer.money < selectedUnit?.cost
+                    }
+                    name="_intent"
+                    value="upgradeUnit"
+                  >
+                    Buy Unit: ${selectedUnit?.cost}
                   </Button>
                 </Form>
               </div>
