@@ -16,11 +16,11 @@ import {
   assertPlayerTurn,
   getPlayerForId,
 } from "./game";
-import { getUnitForId } from "./units";
+import { getUnitForId, UnitId } from "./units";
 import { Point } from "./grid";
 
 export const buyUnit: ActionFunction<{
-  unitId: string;
+  unitId: UnitId;
   position: Point;
 }> = (state, payload) => {
   const { senderId, unitId, position } = payload;

@@ -14,7 +14,12 @@ import {
   HEX_WIDTH,
   SVG_SCALE,
 } from "~/lib/grid";
-import { getUnitForId } from "~/lib/units";
+import { getUnitForId, UnitId } from "~/lib/units";
+import AttackerSvg from "./cells/AttackerSvg";
+import DefaultSvg from "./cells/DefaultSvg";
+import DefenderSvg from "./cells/DefenderSvg";
+import FarmerSvg from "./cells/FarmerSvg";
+import SnowballerSvg from "./cells/SnowballerSvg";
 
 type PlayerCellProps = {
   cell: MathCell;
@@ -23,6 +28,20 @@ type PlayerCellProps = {
   onClick: (cell: CellState, player: PlayerState) => void;
   selected: boolean;
   popperRef?: React.LegacyRef<SVGSVGElement>;
+};
+
+const UnitComponent = {
+  attacker: AttackerSvg,
+  default: DefaultSvg,
+  defender: DefenderSvg,
+  farmer: FarmerSvg,
+  snowballer: SnowballerSvg,
+};
+
+const Unit = (unitId: UnitId) => {
+  const unit = getUnitForId(unitId);
+  const Component = UnitComponent[unit.id];
+  return <Component />;
 };
 
 export default function PlayerCell({
@@ -38,36 +57,42 @@ export default function PlayerCell({
   const player = players.find((p) => p.id === playerCell.ownerId)!;
   const color = (player && PLAYER_COLORS[player.index]) || NEUTRAL_COLOR;
 
+  const unit = getUnitForId(playerCell.unitId);
+  const Component = UnitComponent[unit.id];
+
   return (
     <svg ref={popperRef}>
       <g
+        strokeWidth={selected ? 10 : 7}
         strokeLinejoin="round"
         onClick={() => onClick(playerCell, player)}
-        transform={`translate(${x + SVG_OFFSET_X}, ${
-          y + SVG_OFFSET_Y
-        }) scale (0.85)`}
+        transform={`translate(${x + SVG_OFFSET_X}, ${y + SVG_OFFSET_Y}) `}
         className={clsx(color.fill, {
           " stroke-lime-600 ": selected,
           " stroke-gray-600 ": !selected,
         })}
       >
-        <polygon
-          strokeWidth={selected ? HEX_STROKE_WIDTH * 2 : HEX_STROKE_WIDTH}
-          points={cellCorners
-            .map((corner) => `${corner.x},${corner.y}`)
-            .join(" ")}
-        />
+        <Component />
 
         <text
-          transform={`translate(${HEX_WIDTH / 2}, ${HEX_HEIGHT / 2 + 0.5})`}
+          transform={`translate(${HEX_WIDTH / 2 - 0.9}, ${
+            HEX_HEIGHT / 2 - 1
+          }) `}
           dominantBaseline="middle"
           textAnchor="middle"
           className="fill-black stroke-black"
           fontSize="5"
           strokeWidth=".3"
         >
-          {playerCell.count}/{getUnitForId(playerCell.unitId).name[0]}
+          {playerCell.count}
         </text>
+
+        {/* <polygon
+          
+          points={cellCorners
+            .map((corner) => `${corner.x},${corner.y}`)
+            .join(" ")}
+        /> */}
       </g>
     </svg>
   );

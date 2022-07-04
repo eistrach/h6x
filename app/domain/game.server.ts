@@ -1,3 +1,4 @@
+import { UnitId } from "./../lib/units";
 import { attackCell, endTurn, upgradeCell } from "./../lib/game-actions";
 import { GameState, PlayingState } from "./../lib/game";
 import { PrismaClient } from "@prisma/client";
@@ -180,7 +181,7 @@ export async function buy(
   id: string,
   playerId: string,
   position: Point,
-  unitId: string
+  unitId: UnitId
 ) {
   const game = await requireGame(id);
   if (game.phase === "PREPARATION")
@@ -204,7 +205,7 @@ export async function buyUnitP(
   id: string,
   playerId: string,
   position: Point,
-  unitId: string
+  unitId: UnitId
 ) {
   const game = await requireGame(id);
   if (game.phase !== "PREPARATION") {
@@ -240,7 +241,7 @@ export async function buyUnitG(
   id: string,
   playerId: string,
   position: Point,
-  unitId: string
+  unitId: UnitId
 ) {
   const game = await requireGame(id);
   if (game.phase !== "PLAYING") {

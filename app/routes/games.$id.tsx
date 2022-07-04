@@ -83,7 +83,7 @@ const Schema = z.union([
       x: z.preprocess(Number, z.number()),
       y: z.preprocess(Number, z.number()),
     }),
-    unitId: z.string().min(1),
+    unitId: z.enum(["default", "attacker", "defender", "farmer", "snowballer"]),
     playerId: z.string().min(1),
   }),
   z.object({
@@ -115,8 +115,6 @@ export const action = async ({ request, params }: ActionArgs) => {
   const gameId = requireParam(params, "id");
   const user = await requireUser(request);
   const result = await validateForm(request, Schema);
-
-  console.log(result);
 
   if (!result.success) {
     return result;
@@ -161,7 +159,7 @@ const GamePage = () => {
   const { playerCells, cells, players, canTakeAction, playerId } =
     useLoaderData<LoaderData>();
   const { error } = useActionData() || {};
-  useDataRefreshOnInterval(5000);
+  useDataRefreshOnInterval(1000);
 
   useEffect(() => {
     if (error) {

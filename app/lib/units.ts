@@ -1,18 +1,4 @@
-export type Unit = {
-  id: string;
-  name: string;
-  attack: number;
-  defense: number;
-  plunder: number;
-  income: number;
-  limit: number;
-
-  cost: number;
-};
-
-// 5
-
-export const UNITS: Unit[] = [
+export const UNITS = [
   {
     id: "default",
     name: "Neutral",
@@ -72,8 +58,11 @@ export const UNITS: Unit[] = [
 
     cost: 50,
   },
-];
+] as const;
 
-export const getUnitForId = (id: string): Unit => {
+export type Unit = typeof UNITS[number];
+export type UnitId = Unit["id"];
+
+export const getUnitForId = (id: UnitId): Unit => {
   return UNITS.find((unit) => unit.id === id)!;
 };

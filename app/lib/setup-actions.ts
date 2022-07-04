@@ -21,7 +21,7 @@ import {
   getPlayerForId,
   updatePlayer,
 } from "./game";
-import { getUnitForId } from "./units";
+import { getUnitForId, UnitId } from "./units";
 
 const assertSetupNotFinished = (state: SetupState) => {
   if (state.done) {
@@ -30,7 +30,7 @@ const assertSetupNotFinished = (state: SetupState) => {
 };
 
 export const buyUnitDuringSetup: SetupActionFunction<{
-  unitId: string;
+  unitId: UnitId;
   position: Point;
 }> = (state, payload) => {
   const { senderId, unitId, position } = payload;
@@ -132,7 +132,7 @@ export const initializeCells = (players: PlayerState[], mapCells: Cell[]) => {
     return cells.map((cell) => {
       return {
         position: { x: cell.x, y: cell.y },
-        unitId: DEFAULT_PLAYER_UNIT_ID,
+        unitId: DEFAULT_PLAYER_UNIT_ID as UnitId,
         count: 1,
         ownerId: player.id,
       };
@@ -142,7 +142,7 @@ export const initializeCells = (players: PlayerState[], mapCells: Cell[]) => {
   const neutralCells = availableCells.map((cell) => {
     return {
       position: { x: cell.x, y: cell.y },
-      unitId: DEFAULT_NEUTRAL_UNIT_ID,
+      unitId: DEFAULT_NEUTRAL_UNIT_ID as UnitId,
       count: 3,
       ownerId: "neutral",
     };

@@ -1,4 +1,5 @@
 import { cellsAreNeighbors, compareCell, Point } from "./grid";
+import { UnitId } from "./units";
 
 export type PlayerState = {
   id: string;
@@ -9,7 +10,7 @@ export type PlayerState = {
 
 export type CellState = {
   ownerId: string;
-  unitId: string;
+  unitId: UnitId;
   count: number;
   position: Point;
   pendingMovePosition?: Point;
