@@ -1,4 +1,4 @@
-import { UnitId } from "./../lib/units";
+import { UnitId } from "../config/units";
 import { attackCell, endTurn, upgradeCell } from "./../lib/game-actions";
 import { CellState, GameState, PlayerState, PlayingState } from "./../lib/game";
 import { Cell, GamePhase, PrismaClient } from "@prisma/client";
@@ -101,10 +101,6 @@ export async function createGame(creatorId: string, mapId: string) {
 
 export async function joinGame(id: string, userId: string) {
   const game = await requireGame(id);
-
-  // if (game.players.some((player) => player.userId === userId)) {
-  //   throw new Error("User is already in the game");
-  // }
 
   if (game.phase !== "LOBBY") {
     throw new Error("Game is already started");
@@ -462,6 +458,11 @@ export async function attack(
     },
   });
 }
+
+export const isPlayerAlreadyInGame = async (id: string, playerId: string) => {
+  const game = await requireGame(id);
+  return game.players.some((p) => p.id === playerId);
+};
 
 export type GState = {
   playerCells: CellState[];

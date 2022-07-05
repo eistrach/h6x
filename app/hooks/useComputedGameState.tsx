@@ -7,7 +7,7 @@ import {
   getNeighboringCells,
   Point,
 } from "~/lib/grid";
-import { getUnitForId } from "~/lib/units";
+import { getUnitForId } from "~/config/units";
 
 export const canAttack = (
   playerId: string,

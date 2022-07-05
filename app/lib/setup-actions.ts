@@ -21,7 +21,7 @@ import {
   getPlayerForId,
   updatePlayer,
 } from "./game";
-import { getUnitForId, UnitId } from "./units";
+import { getUnitForId, UnitId } from "../config/units";
 
 const assertSetupNotFinished = (state: SetupState) => {
   if (state.done) {

@@ -42,8 +42,10 @@ export const loader = async ({ request, params }: LoaderArgs) => {
         .sort((a, b) => a.id.localeCompare(b.id))
         .filter((player) => player.userId === user.id)!;
 
-      const p = players.find((p) => !(p.setupState as SetupState).done);
-      const player = p || players[0];
+      const notDonePlayer = players.find(
+        (p) => !(p.setupState as SetupState).done
+      );
+      const player = notDonePlayer || players[0];
 
       const setupState = player.setupState as SetupState;
 

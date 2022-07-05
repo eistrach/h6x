@@ -8,12 +8,7 @@ import {
   HEX_HEIGHT,
   HEX_WIDTH,
 } from "~/lib/grid";
-import { getUnitForId } from "~/lib/units";
-import AttackerSvg from "./cells/AttackerSvg";
-import DefaultSvg from "./cells/DefaultSvg";
-import DefenderSvg from "./cells/DefenderSvg";
-import FarmerSvg from "./cells/FarmerSvg";
-import SnowballerSvg from "./cells/SnowballerSvg";
+import { getUnitForId } from "~/config/units";
 
 type PlayerCellProps = {
   cell: MathCell;
@@ -22,14 +17,6 @@ type PlayerCellProps = {
   onClick: (cell: CellState) => void;
   selected: boolean;
   popperRef?: React.LegacyRef<SVGSVGElement>;
-};
-
-const UnitComponent = {
-  attacker: AttackerSvg,
-  default: DefaultSvg,
-  defender: DefenderSvg,
-  farmer: FarmerSvg,
-  snowballer: SnowballerSvg,
 };
 
 export default function PlayerCell({
@@ -46,7 +33,6 @@ export default function PlayerCell({
   const color = (owner && PLAYER_COLORS[owner.index]) || NEUTRAL_COLOR;
 
   const unit = getUnitForId(playerCell.unitId);
-  const Component = UnitComponent[unit.id];
 
   return (
     <svg ref={popperRef}>
@@ -60,7 +46,7 @@ export default function PlayerCell({
           " stroke-gray-600 ": !selected,
         })}
       >
-        <Component />
+        <unit.SVG />
 
         <text
           transform={`translate(${HEX_WIDTH / 2 - 0.9}, ${

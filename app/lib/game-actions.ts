@@ -16,7 +16,7 @@ import {
   assertPlayerTurn,
   getPlayerForId,
 } from "./game";
-import { getUnitForId, UnitId } from "./units";
+import { getUnitForId, UnitId } from "../config/units";
 import { Point } from "./grid";
 
 export const buyUnit: ActionFunction<{
@@ -31,7 +31,7 @@ export const buyUnit: ActionFunction<{
   assertCellAction(state, player, cell);
   assertPlayerHasMoney(player, unit.cost);
   assertUnitNotEqual(unitId, cell.unitId);
-  
+
   return {
     ...state,
     players: updatePlayer(state, {

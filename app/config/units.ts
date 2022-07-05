@@ -1,3 +1,9 @@
+import AttackerSvg from "~/svg/AttackerSvg";
+import DefaultSvg from "~/svg/DefaultSvg";
+import DefenderSvg from "~/svg/DefenderSvg";
+import FarmerSvg from "~/svg/FarmerSvg";
+import SnowballerSvg from "~/svg/SnowballerSvg";
+
 export const UNITS = [
   {
     id: "default",
@@ -9,6 +15,8 @@ export const UNITS = [
     limit: 10,
 
     cost: 10,
+
+    SVG: DefaultSvg,
   },
 
   {
@@ -21,6 +29,7 @@ export const UNITS = [
     limit: 15,
 
     cost: 10,
+    SVG: SnowballerSvg,
   },
 
   {
@@ -33,6 +42,7 @@ export const UNITS = [
     limit: 5,
 
     cost: 15,
+    SVG: AttackerSvg,
   },
 
   {
@@ -45,6 +55,7 @@ export const UNITS = [
     limit: 6,
 
     cost: 15,
+    SVG: DefenderSvg,
   },
 
   {
@@ -57,6 +68,7 @@ export const UNITS = [
     limit: 3,
 
     cost: 25,
+    SVG: FarmerSvg,
   },
 ] as const;
 

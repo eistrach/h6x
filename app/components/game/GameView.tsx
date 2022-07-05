@@ -1,5 +1,5 @@
 import { Form } from "@remix-run/react";
-import { UNITS } from "~/lib/units";
+import { UNITS } from "~/config/units";
 import { Button } from "../base/Button";
 import { useSelectedCell } from "~/hooks/useSelectedCell";
 import PlayersInfo from "./PlayersInfo";
