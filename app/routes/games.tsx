@@ -51,7 +51,7 @@ const GameList = ({ games, title }: { games: LoaderData; title: string }) => {
           </Disclosure.Button>
 
           <Disclosure.Panel>
-            <ul className="grid grid-cols-1 items-center sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols:5 gap-4">
+            <ul className="flex flex-col w-full  sm:flex-row items-center  flex-wrap  gap-4">
               {games.map((game) => (
                 <GameCard key={game.id} game={game}></GameCard>
               ))}
@@ -92,7 +92,7 @@ const GamesPage = () => {
     <div className="min-h-full h-full">
       <AnimatePresence initial={false}>{outlet}</AnimatePresence>
 
-      <div className=" px-6 py-6 mb-16 flex flex-col gap-20 ">
+      <div className=" px-6 py-6 mb-16 grid grid-cols-1 lg:grid-cols-2 gap-20 ">
         <GameList games={actionableGames} title="Your Turn" />
         <GameList games={lobbyGames} title="Lobby" />
         <GameList games={runningGames} title="Waiting" />
