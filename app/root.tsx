@@ -13,7 +13,7 @@ import fontStyles from "./styles/rubik.css";
 import customStyles from "./styles/custom.css";
 import { LogoIcon } from "./components/icons/LogoIcon";
 import { LoaderArgs, useOptionalUser } from "./utils";
-import { getUser } from "./session.server";
+import { getUser } from "./auth/session.server";
 import clsx from "clsx";
 
 export const links: LinksFunction = () => [
@@ -36,6 +36,7 @@ export const loader = async ({ request }: LoaderArgs) => {
 
 export default function App() {
   const user = useOptionalUser();
+  console.log(user);
   return (
     <html lang="en" className="">
       <head>
@@ -58,10 +59,16 @@ export default function App() {
                   #{user.username.split("#")[1]}
                 </span>
               </div>
-              <img
-                className="w-10 h-10 ring-white ring-2 shadow-md rounded-full"
-                src={user.avatarUrl || ""}
-              ></img>
+              <div className="w-10 h-10 ring-white ring-2 shadow-md rounded-full bg-white">
+                {!!user.avatarUrl ? (
+                  <img
+                    src={user.avatarUrl}
+                    className="object-cover rounded-full"
+                  ></img>
+                ) : (
+                  <span>{user.displayName[0]}</span>
+                )}
+              </div>
             </div>
           </div>
         )}

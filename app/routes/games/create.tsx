@@ -10,7 +10,7 @@ import { Link } from "~/components/base/Link";
 import { InputTheme } from "~/components/base/InputTheme";
 import { createGame } from "~/domain/game.server";
 import { getPublishedMaps } from "~/domain/map.server";
-import { requireUser } from "~/session.server";
+import { requireUser } from "~/auth/session.server";
 import { ActionArgs, LoaderArgs, UnpackData } from "~/utils";
 import { validateForm } from "~/utils.server";
 

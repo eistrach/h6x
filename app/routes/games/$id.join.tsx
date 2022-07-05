@@ -1,7 +1,7 @@
 import { redirect } from "@remix-run/node";
 import { useEffect } from "react";
 import { joinGame } from "~/domain/game.server";
-import { requireUser } from "~/session.server";
+import { requireUser } from "~/auth/session.server";
 import { LoaderArgs } from "~/utils";
 import { requireParam } from "~/utils.server";
 

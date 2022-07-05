@@ -1,11 +1,14 @@
 import { Form } from "@remix-run/react";
-import { SocialsProvider } from "remix-auth-socials";
 import { ActionArgs, LoaderArgs } from "~/utils";
-import { authenticator } from "~/session.server";
+import { authenticator } from "~/auth/session.server";
 import { Button } from "~/components/base/Button";
 import { DiscordIcon } from "~/components/icons/DiscordIcon";
 import { LogoIcon } from "~/components/icons/LogoIcon";
 import { InputTheme } from "~/components/base/InputTheme";
+import { z } from "zod";
+import { validateForm } from "~/utils.server";
+import { badRequest } from "remix-utils";
+import { GoogleIcon } from "~/components/icons/GoogleIcon";
 
 export const loader = async ({ request }: LoaderArgs) => {
   return await authenticator.isAuthenticated(request, {
@@ -13,8 +16,17 @@ export const loader = async ({ request }: LoaderArgs) => {
   });
 };
 
+const schema = z.object({
+  provider: z.enum(["discord", "google"]),
+});
 export const action = async ({ request }: ActionArgs) => {
-  return authenticator.authenticate(SocialsProvider.DISCORD, request);
+  const result = await validateForm(request, schema);
+
+  if (!result.success) {
+    throw badRequest("Provider not supported");
+  }
+
+  return authenticator.authenticate(result.data.provider, request);
 };
 
 const LoginPage = () => {
@@ -27,9 +39,25 @@ const LoginPage = () => {
         <LogoIcon className="w-28" />
         <span className="font-extrabold text-6xl">h6x</span>
       </div>
-      <div>
-        <Button theme={InputTheme.Discord} type="submit" LeftIcon={DiscordIcon}>
+      <div className="flex flex-col gap-8">
+        <Button
+          name="provider"
+          value="discord"
+          theme={InputTheme.Discord}
+          type="submit"
+          LeftIcon={DiscordIcon}
+        >
           Sign in with Discord
+        </Button>
+
+        <Button
+          name="provider"
+          value="google"
+          theme={InputTheme.Google}
+          type="submit"
+          LeftIcon={GoogleIcon}
+        >
+          Sign in with Google
         </Button>
       </div>
     </Form>

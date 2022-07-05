@@ -1,6 +1,5 @@
 import clsx from "clsx";
 import { HTMLMotionProps, motion } from "framer-motion";
-import { string } from "zod";
 import { InputTheme } from "./InputTheme";
 
 export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> &

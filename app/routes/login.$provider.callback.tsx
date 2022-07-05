@@ -1,11 +1,13 @@
 import { SocialsProvider } from "remix-auth-socials";
 import { LoaderArgs } from "~/utils";
-import { authenticator } from "~/session.server";
+import { authenticator } from "~/auth/session.server";
 import { redirect } from "@remix-run/node";
+import { requireParam } from "~/utils.server";
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({ request, params }: LoaderArgs) => {
+  const provider = requireParam(params, "provider");
   try {
-    await authenticator.authenticate(SocialsProvider.DISCORD, request, {
+    await authenticator.authenticate(provider, request, {
       successRedirect: "/games",
       failureRedirect: "/login",
     });

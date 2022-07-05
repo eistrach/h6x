@@ -10,6 +10,7 @@ import { IconButton } from "../base/IconButton";
 import clsx from "clsx";
 import { IconLink } from "../base/IconLink";
 import { Form } from "@remix-run/react";
+import { PLAYER_COLORS } from "~/config/config";
 
 export type GameCardProps = PropsWithChildren<{
   game: UnpackArray<UnpackData<typeof getGamesForUser>>;
@@ -51,10 +52,20 @@ const GameCard = ({ game }: GameCardProps) => {
             ))}
             {game.players.map((player) => (
               <li key={player.id}>
-                <img
-                  className="w-9 h-9 ring ring-green-400 shadow-md rounded-full"
-                  src={player.user.avatarUrl || ""}
-                ></img>
+                <div
+                  className={clsx(
+                    "w-9 h-9 ring-green-400 ring-2 shadow-md rounded-full bg-white"
+                  )}
+                >
+                  {!!player.user.avatarUrl ? (
+                    <img
+                      src={player.user.avatarUrl}
+                      className="object-cover rounded-full"
+                    ></img>
+                  ) : (
+                    <span>{player.user.displayName[0]}</span>
+                  )}
+                </div>
               </li>
             ))}
           </ol>

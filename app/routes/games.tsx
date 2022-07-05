@@ -2,7 +2,7 @@ import { useLoaderData, useOutlet } from "@remix-run/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "~/components/base/Link";
 import { getGamesForUser } from "~/domain/game.server";
-import { requireUser } from "~/session.server";
+import { requireUser } from "~/auth/session.server";
 import { LoaderArgs, UnpackData } from "~/utils";
 
 import { PlusIcon } from "@heroicons/react/solid";

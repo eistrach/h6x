@@ -14,7 +14,7 @@ import {
 } from "~/domain/game.server";
 
 import { PlayingState, SetupState } from "~/domain/logic/game";
-import { requireUser } from "~/session.server";
+import { requireUser } from "~/auth/session.server";
 import {
   ActionArgs,
   LoaderArgs,
