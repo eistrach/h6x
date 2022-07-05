@@ -52,7 +52,6 @@ export const loader = async ({ request, params }: LoaderArgs) => {
 
       return {
         phase: "PREPARATION" as const,
-        cells: game.map.cells,
         playerCells: setupState.cells,
         players: setupState.players,
         playerId: setupState.currentPlayerId,
@@ -63,7 +62,6 @@ export const loader = async ({ request, params }: LoaderArgs) => {
       const currentPlayer = gameState.players.find((p) => p.userId === user.id);
       return {
         phase: "PLAYING" as const,
-        cells: game.map.cells,
         playerCells: gameState.cells,
         players: gameState.players,
         playerId: gameState.currentPlayerId,
@@ -164,7 +162,7 @@ const GamePage = () => {
     if (error) {
       toast.error(error);
     }
-  }, [error]);
+  });
 
   return (
     <div>

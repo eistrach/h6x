@@ -114,8 +114,6 @@ export const getNeighboringCells = <
     "NW",
   ] as PointyCompassDirection[];
 
-  console.log(cell, cells);
-
   const cs = layoutGrid
     .neighborsOf(asMathCell(cell.x, cell.y), directions)
     .filter((c) => !!c)

@@ -1,7 +1,7 @@
 import { UnitId } from "./../lib/units";
 import { attackCell, endTurn, upgradeCell } from "./../lib/game-actions";
-import { GameState, PlayingState } from "./../lib/game";
-import { PrismaClient } from "@prisma/client";
+import { CellState, GameState, PlayerState, PlayingState } from "./../lib/game";
+import { Cell, GamePhase, PrismaClient } from "@prisma/client";
 
 import { v4 as uuid } from "uuid";
 import {
@@ -462,3 +462,11 @@ export async function attack(
     },
   });
 }
+
+export type GState = {
+  playerCells: CellState[];
+  players: PlayerState[];
+  playerId: string;
+  canTakeAction: boolean;
+  phase: GamePhase;
+};
