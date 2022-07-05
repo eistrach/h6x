@@ -1,8 +1,8 @@
-import AttackerSvg from "~/svg/AttackerSvg";
-import DefaultSvg from "~/svg/DefaultSvg";
-import DefenderSvg from "~/svg/DefenderSvg";
-import FarmerSvg from "~/svg/FarmerSvg";
-import SnowballerSvg from "~/svg/SnowballerSvg";
+import AttackerSvg from "~/components/svg/AttackerSvg";
+import DefaultSvg from "~/components/svg/DefaultSvg";
+import DefenderSvg from "~/components/svg/DefenderSvg";
+import FarmerSvg from "~/components/svg/FarmerSvg";
+import SnowballerSvg from "~/components/svg/SnowballerSvg";
 
 export const UNITS = [
   {
