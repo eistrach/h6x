@@ -3,8 +3,8 @@ import { SocialsProvider } from "remix-auth-socials";
 import { ActionArgs, LoaderArgs } from "~/utils";
 import { authenticator } from "~/session.server";
 import { Button } from "~/components/base/Button";
-import { DiscordIcon } from "~/components/map/icons/DiscordIcon";
-import { LogoIcon } from "~/components/map/icons/LogoIcon";
+import { DiscordIcon } from "~/components/icons/DiscordIcon";
+import { LogoIcon } from "~/components/icons/LogoIcon";
 import { InputTheme } from "~/components/base/InputTheme";
 
 export const loader = async ({ request }: LoaderArgs) => {

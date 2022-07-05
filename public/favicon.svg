@@ -1,0 +1,41 @@
+<svg width="184" height="200" viewBox="0 0 184 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+	<style>
+		.favicon-stroke {
+		stroke: #000;
+		
+		}
+		
+		.favicon-fill {
+		fill: #000;
+		}
+		
+		@media (prefers-color-scheme: dark) {
+		.favicon-stroke {
+		stroke: #fff;
+		}
+		.favicon-fill {
+		fill: #fff;
+		}
+		}
+	</style>
+	<g class="favicon-stroke">
+		<path d="M69.2265 16.6987L88.453 50L69.2265 83.3013L30.7735 83.3013L11.547 50L30.7735 16.6987L69.2265 16.6987Z" stroke-width="20" />
+		<path d="M153.227 66.6987L172.453 100L153.226 133.301L114.774 133.301L95.547 100L114.774 66.6987L153.227 66.6987Z" stroke-width="20" />
+		<path d="M69.2265 116.699L88.453 150L69.2265 183.301L30.7735 183.301L11.547 150L30.7735 116.699L69.2265 116.699Z" stroke-width="20" />
+		<g filter="url(#filter0_d_4_2)">
+			<path class="favicon-fill" d="M134 100L111.44 59.6961L87.8161 99.3852L134 100ZM47.9541 53.4372L101.02 85.0238L105.111 78.1494L52.0459 46.5628L47.9541 53.4372Z" />
+		</g>
+		<defs>
+			<filter id="filter0_d_4_2" x="43.9541" y="46.5628" width="94.0459" height="61.4372" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+				<feFlood flood-opacity="0" result="BackgroundImageFix" />
+				<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+				<feOffset dy="4" />
+				<feGaussianBlur stdDeviation="2" />
+				<feComposite in2="hardAlpha" operator="out" />
+				<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0" />
+				<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_4_2" />
+				<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_4_2" result="shape" />
+			</filter>
+		</defs>
+	</g>
+</svg>

@@ -6,7 +6,7 @@ import { CellState } from "~/lib/game";
 import { compareCell, Point } from "~/lib/grid";
 import { IconButton } from "../base/IconButton";
 import { PopperPopover } from "../base/PopperPopover";
-import { SwordIcon } from "../map/icons/SwordIcon";
+import { SwordIcon } from "../icons/SwordIcon";
 
 export type DirectionalPopovers = { [k in PointyCompassDirection]: Popover };
 export type AttackableNeighbors = { [k in PointyCompassDirection]?: CellState };
