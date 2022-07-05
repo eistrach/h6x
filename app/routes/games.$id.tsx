@@ -120,7 +120,7 @@ export const action = async ({ request, params }: ActionArgs) => {
   try {
     switch (result.data._intent) {
       case "startGame":
-        await startSetupPhase(gameId);
+        await startSetupPhase(gameId, user.id);
         break;
       case "buyUnit":
         await buy(

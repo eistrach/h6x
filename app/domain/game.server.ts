@@ -20,7 +20,7 @@ import { SetupState } from "~/domain/logic/game";
 import { buyUnit } from "~/domain/logic/game-actions";
 
 export async function getGamesForUser(userId: string) {
-  return prisma.player
+  const games = await prisma.player
     .findMany({
       where: {
         userId,
@@ -50,6 +50,15 @@ export async function getGamesForUser(userId: string) {
             index === self.findIndex((g) => g.id === game.id)
         )
     );
+
+  return games.map((g) => ({
+    ...g,
+    gameState: g.gameState as PlayingState | null,
+    players: g.players.map((p) => ({
+      ...p,
+      setupState: p.setupState as SetupState | null,
+    })),
+  }));
 }
 
 export async function getGame(id: string) {
@@ -124,7 +133,7 @@ export async function joinGame(id: string, userId: string) {
   });
 }
 
-export async function startSetupPhase(id: string) {
+export async function startSetupPhase(id: string, userId: string) {
   const game = await requireGame(id);
   if (game.players.length < 2) {
     throw new Error("Game needs at least 2 players");
@@ -132,6 +141,10 @@ export async function startSetupPhase(id: string) {
 
   if (game.phase !== "LOBBY") {
     throw new Error("Game is already started");
+  }
+
+  if (game.creatorId !== userId) {
+    throw new Error("Only the game creator can start the game");
   }
 
   const map = await getMapForId(game.mapId);

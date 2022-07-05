@@ -1,6 +1,6 @@
 import { PropsWithChildren } from "react";
 import { getGamesForUser } from "~/domain/game.server";
-import { copyTextToClipboard, UnpackArray, UnpackData } from "~/utils";
+import { copyTextToClipboard, UnpackArray, UnpackData, useUser } from "~/utils";
 import { Button } from "../base/Button";
 import GamePreview from "../map/GamePreview";
 import { ShareIcon } from "@heroicons/react/solid";
@@ -10,13 +10,13 @@ import { IconButton } from "../base/IconButton";
 import clsx from "clsx";
 import { IconLink } from "../base/IconLink";
 import { Form } from "@remix-run/react";
-import { PLAYER_COLORS } from "~/config/config";
 
 export type GameCardProps = PropsWithChildren<{
   game: UnpackArray<UnpackData<typeof getGamesForUser>>;
 }>;
 
 const GameCard = ({ game }: GameCardProps) => {
+  const user = useUser();
   const handleShare = () => {
     const shareUrl = `${window.location.href}/${game.id}/join`;
 
@@ -93,15 +93,17 @@ const GameCard = ({ game }: GameCardProps) => {
 
           {game.players.length > 1 &&
             (game.phase === "LOBBY" ? (
-              <Form method="post" action={`${game.id}`}>
-                <IconButton
-                  Icon={PlayIcon}
-                  className="w-12 h-12 text-green-500"
-                  type="submit"
-                  name="_intent"
-                  value="startGame"
-                />
-              </Form>
+              game?.creatorId === user.id ? (
+                <Form method="post" action={`${game.id}`}>
+                  <IconButton
+                    Icon={PlayIcon}
+                    className="w-12 h-12 text-green-500"
+                    type="submit"
+                    name="_intent"
+                    value="startGame"
+                  />
+                </Form>
+              ) : null
             ) : (
               <IconLink
                 to={game.id}

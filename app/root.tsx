@@ -38,7 +38,7 @@ export const loader = async ({ request }: LoaderArgs) => {
 
 export default function App() {
   const user = useOptionalUser();
-  console.log(user);
+
   return (
     <html lang="en" className="">
       <head>
