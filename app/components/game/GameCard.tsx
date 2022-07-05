@@ -16,6 +16,20 @@ export type GameCardProps = PropsWithChildren<{
 }>;
 
 const GameCard = ({ game }: GameCardProps) => {
+  const handleShare = () => {
+    const shareUrl = `${window.location.href}/${game.id}/join`;
+
+    if (navigator.share) {
+      navigator.share({
+        title: "Share game",
+        text: "Share game",
+        url: shareUrl,
+      });
+    } else {
+      copyTextToClipboard(shareUrl);
+    }
+  };
+
   return (
     <li className="relative bg-white  p-2 flex">
       <div className="absolute w-full h-full bg-primary-200 -z-10" />
@@ -57,9 +71,7 @@ const GameCard = ({ game }: GameCardProps) => {
         >
           {game.phase === "LOBBY" && game.players.length < 6 && (
             <Button
-              onClick={() =>
-                copyTextToClipboard(`${window.location.href}/${game.id}/join`)
-              }
+              onClick={handleShare}
               theme={InputTheme.Outlined}
               className="rounded-sm text-gray-900"
               LeftIcon={ShareIcon}
