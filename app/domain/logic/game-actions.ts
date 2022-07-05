@@ -16,8 +16,8 @@ import {
   assertPlayerTurn,
   getPlayerForId,
 } from "./game";
-import { getUnitForId, UnitId } from "../config/units";
-import { Point } from "./grid";
+import { getUnitForId, UnitId } from "~/config/units";
+import { Point } from "~/grid-math";
 
 export const buyUnit: ActionFunction<{
   unitId: UnitId;

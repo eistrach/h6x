@@ -13,7 +13,7 @@ import {
   upgrade,
 } from "~/domain/game.server";
 
-import { PlayingState, SetupState } from "~/lib/game";
+import { PlayingState, SetupState } from "~/domain/logic/game";
 import { requireUser } from "~/session.server";
 import {
   ActionArgs,

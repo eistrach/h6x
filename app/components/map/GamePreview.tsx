@@ -1,5 +1,5 @@
 import { Cell } from "@prisma/client";
-import { asMathGrid, SVG_SIZE, cellsToMathCells } from "~/lib/grid";
+import { asMathGrid, SVG_SIZE, cellsToMathCells } from "~/grid-math";
 import CellPreview from "./CellPreview";
 
 type GamePreviewProps = {

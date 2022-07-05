@@ -1,8 +1,8 @@
 import { Cell } from "@prisma/client";
 import { findCell, isCellSelected } from "~/hooks/useComputedGameState";
 import { useGrid } from "~/hooks/useGrid";
-import { CellState, PlayerState } from "~/lib/game";
-import { SVG_SIZE } from "~/lib/grid";
+import { CellState, PlayerState } from "~/domain/logic/game";
+import { SVG_SIZE } from "~/grid-math";
 import {
   AttackableNeighbors,
   DirectionalPopovers,

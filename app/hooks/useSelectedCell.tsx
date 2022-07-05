@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { CellState } from "~/lib/game";
-import { compareCell, Point } from "~/lib/grid";
+import { CellState } from "~/domain/logic/game";
+import { compareCell, Point } from "~/grid-math";
 
 export const useSelectedCell = (availableCells: CellState[]) => {
   const [selectedCellPosition, setSelectedCellPosition] =

@@ -1,5 +1,5 @@
-import { cellsAreNeighbors, compareCell, Point } from "./grid";
-import { UnitId } from "../config/units";
+import { cellsAreNeighbors, compareCell, Point } from "~/grid-math";
+import { UnitId } from "../../config/units";
 
 export type PlayerState = {
   id: string;

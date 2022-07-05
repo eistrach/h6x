@@ -1,13 +1,13 @@
 import clsx from "clsx";
-import { NEUTRAL_COLOR, PLAYER_COLORS } from "~/lib/constants";
-import { CellState, PlayerState } from "~/lib/game";
+import { NEUTRAL_COLOR, PLAYER_COLORS } from "~/config/config";
+import { CellState, PlayerState } from "~/domain/logic/game";
 import {
   MathCell,
   SVG_OFFSET_X,
   SVG_OFFSET_Y,
   HEX_HEIGHT,
   HEX_WIDTH,
-} from "~/lib/grid";
+} from "~/grid-math";
 import { getUnitForId } from "~/config/units";
 
 type PlayerCellProps = {

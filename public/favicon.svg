@@ -2,7 +2,6 @@
 	<style>
 		.favicon-stroke {
 		stroke: #000;
-		
 		}
 		
 		.favicon-fill {

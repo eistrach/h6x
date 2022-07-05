@@ -1,10 +1,10 @@
 import { generateMoney } from "./game-actions";
-import { compareCell, layoutGrid, Point } from "./grid";
+import { compareCell, layoutGrid, Point } from "../../grid-math";
 import {
   DEFAULT_NEUTRAL_UNIT_ID,
   DEFAULT_PLAYER_UNIT_ID,
   START_MONEY,
-} from "./constants";
+} from "../../config/config";
 import { Cell, Player } from "@prisma/client";
 import { v4 as uuid } from "uuid";
 import {
@@ -21,7 +21,7 @@ import {
   getPlayerForId,
   updatePlayer,
 } from "./game";
-import { getUnitForId, UnitId } from "../config/units";
+import { getUnitForId, UnitId } from "../../config/units";
 
 const assertSetupNotFinished = (state: SetupState) => {
   if (state.done) {

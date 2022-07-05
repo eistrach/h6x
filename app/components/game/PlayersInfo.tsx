@@ -1,6 +1,6 @@
 import clsx from "clsx";
-import { PLAYER_COLORS } from "~/lib/constants";
-import { PlayerState } from "~/lib/game";
+import { PLAYER_COLORS } from "~/config/config";
+import { PlayerState } from "~/domain/logic/game";
 import { useUser } from "~/utils";
 
 export type PlayersInfoProps = {

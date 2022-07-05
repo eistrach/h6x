@@ -1,5 +1,5 @@
 import { Cell } from "@prisma/client";
-import { MathCell, asMathGrid, layoutGrid, SVG_SIZE } from "~/lib/grid";
+import { MathCell, asMathGrid, layoutGrid, SVG_SIZE } from "~/grid-math";
 import HexView from "./CellView";
 
 type HexMapProps = {

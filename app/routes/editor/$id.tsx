@@ -2,7 +2,7 @@ import { Cell, CellType } from "@prisma/client";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import { useState } from "react";
 import MapView from "~/components/map/MapView";
-import { cellInGrid, getAllCellsInArea, MathCell, Point } from "~/lib/grid";
+import { cellInGrid, getAllCellsInArea, MathCell, Point } from "~/grid-math";
 
 import { RadioGroup } from "@headlessui/react";
 import { redirect } from "@remix-run/node";

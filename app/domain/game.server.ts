@@ -1,7 +1,7 @@
 import { UnitId } from "../config/units";
-import { attackCell, endTurn, upgradeCell } from "./../lib/game-actions";
-import { CellState, GameState, PlayerState, PlayingState } from "./../lib/game";
-import { Cell, GamePhase, PrismaClient } from "@prisma/client";
+import { attackCell, endTurn, upgradeCell } from "./logic/game-actions";
+import { CellState, PlayerState, PlayingState } from "./../domain/logic/game";
+import { GamePhase } from "@prisma/client";
 
 import { v4 as uuid } from "uuid";
 import {
@@ -12,12 +12,12 @@ import {
   initializePlayers,
   initializeSetup,
   upgradeCellDuringSetup,
-} from "./../lib/setup-actions";
+} from "./logic/setup-actions";
 import { getMapForId } from "./map.server";
 import { prisma } from "~/db.server";
-import { Point } from "~/lib/grid";
-import { SetupState } from "~/lib/game";
-import { buyUnit } from "~/lib/game-actions";
+import { Point } from "~/grid-math";
+import { SetupState } from "~/domain/logic/game";
+import { buyUnit } from "~/domain/logic/game-actions";
 
 export async function getGamesForUser(userId: string) {
   return prisma.player

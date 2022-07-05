@@ -1,13 +1,12 @@
 import { GState } from "~/domain/game.server";
-import { PLAYER_COLORS } from "~/lib/constants";
-import { CellState } from "~/lib/game";
 import {
   cellsAreNeighbors,
   compareCell,
   getNeighboringCells,
   Point,
-} from "~/lib/grid";
+} from "~/grid-math";
 import { getUnitForId } from "~/config/units";
+import { CellState } from "~/domain/logic/game";
 
 export const canAttack = (
   playerId: string,

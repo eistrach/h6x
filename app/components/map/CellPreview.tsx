@@ -4,7 +4,7 @@ import {
   SVG_OFFSET_X,
   SVG_OFFSET_Y,
   cellCorners,
-} from "~/lib/grid";
+} from "~/grid-math";
 
 type CellPreviewProps = {
   cell?: MathCell;
