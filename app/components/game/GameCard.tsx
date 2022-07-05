@@ -35,7 +35,7 @@ const GameCard = ({ game }: GameCardProps) => {
   const creator = game.creator;
 
   return (
-    <li className="relative bg-white shadow-lg flex flex-col items-center">
+    <li className="relative max-w-sm bg-white shadow-lg flex flex-col items-center">
       <div className="p-2 flex w-full justify-between items-center">
         <div className="w-full flex items-center justify-between">
           <div className="flex items-center gap-2 p-2 text-sm rounded-sm  text-white ">
@@ -98,7 +98,7 @@ const GameCard = ({ game }: GameCardProps) => {
 
       <div
         className={clsx(
-          "flex items-center justify-between bg-gray-100 p-4 mt-2 w-full h-full rounded-lg"
+          "flex items-center justify-between bg-gray-50 p-4 mt-2 w-full h-full rounded-lg"
         )}
       >
         {game.phase === "LOBBY" && game.players.length < 6 && (
