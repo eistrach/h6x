@@ -23,10 +23,7 @@ import {
 } from "~/utils";
 import { requireParam, validateForm } from "~/utils.server";
 
-import styles from "~/custom.css";
-import { LinksFunction } from "@remix-run/node";
 import GameView from "~/components/game/GameView";
-export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const gameId = requireParam(params, "id");

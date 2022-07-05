@@ -8,8 +8,9 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 
-import styles from "./tailwind.css";
-import fontStyles from "./rubik.css";
+import styles from "./styles/tailwind.css";
+import fontStyles from "./styles/rubik.css";
+import customStyles from "./styles/custom.css";
 import { LogoIcon } from "./components/map/icons/LogoIcon";
 import { LoaderArgs, useOptionalUser } from "./utils";
 import { getUser } from "./session.server";
@@ -18,6 +19,7 @@ import clsx from "clsx";
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: styles },
   { rel: "stylesheet", href: fontStyles },
+  { rel: "stylesheet", href: customStyles },
 ];
 
 export const meta: MetaFunction = () => ({
