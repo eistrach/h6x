@@ -9,6 +9,7 @@ const envSchema = z.object({
   GOOGLE_CLIENT_ID: z.string().min(1),
   GOOGLE_CLIENT_SECRET: z.string().min(1),
   GOOGLE_CALLBACK_URL: z.string().min(1),
+  ADMIN_EMAILS: z.string().min(1).optional(),
   NODE_ENV: z.string().min(1),
 });
 

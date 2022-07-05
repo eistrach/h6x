@@ -18,7 +18,7 @@ import {
   toggleMapVisibility,
   updateMap,
 } from "~/domain/map.server";
-import { requireUser } from "~/auth/session.server";
+import { requireAdmin, requireUser } from "~/auth/session.server";
 import { badRequest, notFound } from "remix-utils";
 import { ActionArgs, LoaderArgs, UnpackData } from "~/utils";
 import { validateCellConnections } from "~/domain/validations";
@@ -45,7 +45,7 @@ const Schema = z.object({
 });
 export const action = async ({ request }: ActionArgs) => {
   const [user, result] = await Promise.all([
-    requireUser(request),
+    requireAdmin(request),
     validateForm(request, Schema),
   ]);
 

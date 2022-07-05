@@ -10,12 +10,12 @@ import { z } from "zod";
 import { createMap, getMapsForUser } from "~/domain/map.server";
 import type { ActionArgs, LoaderArgs, UnpackData } from "~/utils";
 import { validateForm } from "~/utils.server";
-import { requireUser } from "~/auth/session.server";
+import { requireAdmin, requireUser } from "~/auth/session.server";
 
 const Schema = z.object({ name: z.string().min(1) });
 export const action = async ({ request }: ActionArgs) => {
   const [user, result] = await Promise.all([
-    requireUser(request),
+    requireAdmin(request),
     validateForm(request, Schema),
   ]);
 

@@ -22,6 +22,13 @@ export const sessionStorage = createCookieSessionStorage({
 export const authenticator = new Authenticator<string>(sessionStorage);
 authenticator.use(discortStrategy).use(googleStrategy);
 
+export const isAdmin = (user: User) => {
+  return (env.ADMIN_EMAILS || "")
+    .split(",")
+    .map((email) => email.trim())
+    .includes(user.email);
+};
+
 export async function requireUser(request: Request) {
   const userId = await authenticator.isAuthenticated(request, {
     failureRedirect: "/login",
@@ -33,7 +40,17 @@ export async function requireUser(request: Request) {
     await authenticator.logout(request, { redirectTo: "/login" });
   }
 
-  return user as User;
+  return { ...user!, isAdmin: isAdmin(user!) };
+}
+
+export async function requireAdmin(request: Request) {
+  const user = await requireUser(request);
+
+  if (!user.isAdmin) {
+    throw new Error("Not authorized");
+  }
+
+  return user;
 }
 
 export async function getUser(request: Request) {
@@ -45,5 +62,9 @@ export async function getUser(request: Request) {
 
   const user = await getUserById(userId);
 
-  return user;
+  if (!user) {
+    return null;
+  }
+
+  return { ...user, isAdmin: isAdmin(user) };
 }
