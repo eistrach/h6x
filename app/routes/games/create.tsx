@@ -1,9 +1,13 @@
 import { Listbox } from "@headlessui/react";
+import { ArrowLeftIcon } from "@heroicons/react/solid";
 import { redirect } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { z } from "zod";
+import { Button } from "~/components/base/Button";
+import { Link } from "~/components/base/Link";
+import { InputTheme } from "~/components/base/InputTheme";
 import { createGame } from "~/domain/game.server";
 import { getPublishedMaps } from "~/domain/map.server";
 import { requireUser } from "~/session.server";
@@ -43,32 +47,55 @@ const CreateGamePage = () => {
   };
 
   return (
-    <motion.div
-      layoutId="createGame"
-      className="fixed z-50 mt-4 left-4 right-4 top-16 bottom-3 shadow-2xl border-2 border-black bg-primary-400 "
-    >
-      <Form method="post" className=" flex flex-col  gap-2 ">
-        Create Map{" "}
-        <Listbox
-          name="selectedMapId"
-          value={selectedMapId}
-          onChange={setSelectedMapId}
+    <>
+      <motion.div
+        exit={{ opacity: 0 }}
+        className="absolute min-h-screen w-full bg-gray-800/40 z-10 top-0"
+      />
+      <motion.div
+        layoutId="background"
+        className="fixed z-50 mt-4 left-0 right-0 top-32 bottom-0 bg-gray-200 rounded-t-xl px-6 py-2.5"
+      >
+        <Form
+          method="post"
+          className=" flex flex-col justify-between h-full  gap-2 x"
         >
-          <Listbox.Button>
-            {getMapForId(selectedMapId)?.name || "Select a map"}
-          </Listbox.Button>
-          <Listbox.Options>
-            {maps &&
-              maps.map((map) => (
-                <Listbox.Option key={map.id} value={map.id}>
-                  {map.name}
-                </Listbox.Option>
-              ))}
-          </Listbox.Options>
-        </Listbox>
-        <button type="submit">Submit</button>
-      </Form>
-    </motion.div>
+          <p className="text-xl font-bold">Create Map</p>
+          <div>
+            <Listbox
+              name="selectedMapId"
+              value={selectedMapId}
+              onChange={setSelectedMapId}
+            >
+              <Listbox.Button>
+                {getMapForId(selectedMapId)?.name || "Select a map"}
+              </Listbox.Button>
+              <Listbox.Options>
+                {maps &&
+                  maps.map((map) => (
+                    <Listbox.Option key={map.id} value={map.id}>
+                      {map.name}
+                    </Listbox.Option>
+                  ))}
+              </Listbox.Options>
+            </Listbox>
+          </div>
+          <div className="flex justify-between items-center">
+            <Link
+              motionProps={{ layoutId: "leftButton" }}
+              theme={InputTheme.OutlinedBlack}
+              LeftIcon={ArrowLeftIcon}
+              to="/games"
+            >
+              Back
+            </Link>
+            <Button layoutId="rightButton" type="submit">
+              Create
+            </Button>
+          </div>
+        </Form>
+      </motion.div>
+    </>
   );
 };
 
