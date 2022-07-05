@@ -51,7 +51,7 @@ const GameList = ({ games, title }: { games: LoaderData; title: string }) => {
           </Disclosure.Button>
 
           <Disclosure.Panel>
-            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <ul className="grid grid-cols-1 items-center sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols:5 gap-4">
               {games.map((game) => (
                 <GameCard key={game.id} game={game}></GameCard>
               ))}
