@@ -63,9 +63,9 @@ const GameList = ({ games, title }: { games: LoaderData; title: string }) => {
   );
 };
 
-const getActionableGames = (games: LoaderData) => {
+const getActionableGames = (games: LoaderData, currentUserId: string) => {
   return games.filter((game) => {
-    const player = game.players.find((p) => p.userId === game.creatorId);
+    const player = game.players.find((p) => p.userId === currentUserId);
     return (
       (game.phase === "PLAYING" &&
         game.gameState?.currentPlayerId === player?.id) ||
@@ -78,8 +78,9 @@ const GamesPage = () => {
   useDataRefreshOnInterval(1000);
   const games = useLoaderData<LoaderData>();
   const outlet = useOutlet();
+  const user = useUser();
 
-  const actionableGames = getActionableGames(games);
+  const actionableGames = getActionableGames(games, user.id);
 
   const lobbyGames = games.filter((game) => game.phase === "LOBBY");
   const runningGames = games.filter(
