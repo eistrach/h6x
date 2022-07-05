@@ -1,5 +1,6 @@
 import type { LinksFunction, MetaFunction } from "@remix-run/node";
 import {
+  Link,
   Links,
   LiveReload,
   Meta,
@@ -15,6 +16,7 @@ import { LogoIcon } from "./components/icons/LogoIcon";
 import { LoaderArgs, useOptionalUser } from "./utils";
 import { getUser } from "./auth/session.server";
 import clsx from "clsx";
+import ProfileMenu from "./components/base/ProfileMenu";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: styles },
@@ -46,30 +48,11 @@ export default function App() {
       <body className="h-full bg-gray-100 overscroll-none">
         {user && (
           <div className="fixed z-10 left-0 right-0 top-0 rounded-b-2xl backdrop-blur-sm h-16 bg-gray-200/50 px-4 flex justify-between items-center">
-            <div className="  flex gap-1 justify-start items-center">
+            <Link to="/" className="flex gap-1 justify-start items-center">
               <LogoIcon className="w-10 h-10" />
               <span className="font-extrabold text-2xl">h6x</span>
-            </div>
-            <div className="flex items-center gap-2 ">
-              <div className="flex flex-col items-end">
-                <span className="font-bold  text-stone-900">
-                  {user.displayName}
-                </span>
-                <span className="text-xs text-gray-500">
-                  #{user.username.split("#")[1]}
-                </span>
-              </div>
-              <div className="w-10 h-10 ring-white ring-2 shadow-md rounded-full bg-white">
-                {!!user.avatarUrl ? (
-                  <img
-                    src={user.avatarUrl}
-                    className="object-cover rounded-full"
-                  ></img>
-                ) : (
-                  <span>{user.displayName[0]}</span>
-                )}
-              </div>
-            </div>
+            </Link>
+            <ProfileMenu />
           </div>
         )}
         <main
