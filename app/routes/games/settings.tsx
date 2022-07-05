@@ -1,26 +1,42 @@
-import { Listbox } from "@headlessui/react";
-import { redirect } from "@remix-run/node";
-import { Form, useLoaderData } from "@remix-run/react";
+import { ArrowLeftIcon } from "@heroicons/react/solid";
+import { Form } from "@remix-run/react";
 import { motion } from "framer-motion";
-import { useState } from "react";
-import { z } from "zod";
-import { createGame } from "~/domain/game.server";
-import { getPublishedMaps } from "~/domain/map.server";
-import { requireUser } from "~/session.server";
-import { ActionArgs, LoaderArgs, UnpackData } from "~/utils";
-import { validateForm } from "~/utils.server";
+import { Button } from "~/components/base/Button";
+import { InputTheme } from "~/components/base/InputTheme";
+import { Link } from "~/components/base/Link";
 
 const SettingsPage = () => {
   return (
-    <motion.div
-      layoutId="openSettings"
-      className="fixed z-50 left-4 right-4 top-16 mt-4 bottom-3 shadow-2xl border-2 border-black bg-primary-200 "
-    >
-      <Form method="post" className=" flex flex-col  gap-2 ">
-        Settings
-        <button type="submit">Submit</button>
-      </Form>
-    </motion.div>
+    <>
+      <motion.div
+        exit={{ opacity: 0 }}
+        className="absolute min-h-screen w-full bg-gray-800/40 z-10 top-0"
+      />
+      <motion.div
+        layoutId="background"
+        className="fixed z-50 mt-4 left-0 right-0 top-32 bottom-0 bg-gray-200 rounded-t-xl px-6 py-2.5"
+      >
+        <Form
+          method="post"
+          className=" flex flex-col justify-between h-full  gap-2 "
+        >
+          <p className="text-xl font-bold">Settings</p>
+          <div className="flex justify-between items-center">
+            <Link
+              motionProps={{ layoutId: "leftButton" }}
+              theme={InputTheme.OutlinedBlack}
+              LeftIcon={ArrowLeftIcon}
+              to="/games"
+            >
+              Back
+            </Link>
+            <Button layoutId="rightButton" type="submit">
+              Save
+            </Button>
+          </div>
+        </Form>
+      </motion.div>
+    </>
   );
 };
 

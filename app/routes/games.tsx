@@ -1,5 +1,5 @@
 import { useLoaderData, useOutlet } from "@remix-run/react";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "~/components/base/Link";
 import { getGamesForUser } from "~/domain/game.server";
 import { requireUser } from "~/session.server";
@@ -30,9 +30,12 @@ const GamesPage = () => {
           games.map((game) => <GameCard key={game.id} game={game}></GameCard>)}
       </ul>
 
-      <div className="fixed bottom-0 rounded-t-2xl backdrop-blur-sm left-0 right-0 flex bg-gray-200/50 py-3 px-4 justify-between items-center">
+      <motion.div
+        layoutId="background"
+        className="fixed bottom-0 rounded-t-2xl backdrop-blur-sm left-0 right-0 flex bg-gray-200/50 py-3 px-4 justify-between items-center"
+      >
         <Link
-          motionProps={{ layoutId: "openSettings" }}
+          motionProps={{ layoutId: "leftButton" }}
           theme={InputTheme.OutlinedBlack}
           LeftIcon={CogIcon}
           to="settings"
@@ -40,13 +43,13 @@ const GamesPage = () => {
           Settings
         </Link>
         <Link
-          motionProps={{ layoutId: "createGame" }}
+          motionProps={{ layoutId: "rightButton" }}
           LeftIcon={PlusIcon}
           to="create"
         >
           New Game
         </Link>
-      </div>
+      </motion.div>
     </div>
   );
 };
