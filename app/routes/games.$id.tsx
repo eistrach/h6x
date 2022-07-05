@@ -23,10 +23,7 @@ import {
 } from "~/utils";
 import { requireParam, validateForm } from "~/utils.server";
 
-import styles from "~/custom.css";
-import { LinksFunction } from "@remix-run/node";
 import GameView from "~/components/game/GameView";
-export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const gameId = requireParam(params, "id");
@@ -52,7 +49,6 @@ export const loader = async ({ request, params }: LoaderArgs) => {
 
       return {
         phase: "PREPARATION" as const,
-        cells: game.map.cells,
         playerCells: setupState.cells,
         players: setupState.players,
         playerId: setupState.currentPlayerId,
@@ -63,7 +59,6 @@ export const loader = async ({ request, params }: LoaderArgs) => {
       const currentPlayer = gameState.players.find((p) => p.userId === user.id);
       return {
         phase: "PLAYING" as const,
-        cells: game.map.cells,
         playerCells: gameState.cells,
         players: gameState.players,
         playerId: gameState.currentPlayerId,
@@ -164,7 +159,7 @@ const GamePage = () => {
     if (error) {
       toast.error(error);
     }
-  }, [error]);
+  });
 
   return (
     <div>
