@@ -18,6 +18,7 @@ import clsx from "clsx";
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: styles },
   { rel: "stylesheet", href: fontStyles },
+  { rel: "icon", href: "/favicon.png", type: "image/png" },
 ];
 
 export const meta: MetaFunction = () => ({
