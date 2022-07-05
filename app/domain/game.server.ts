@@ -28,6 +28,7 @@ export async function getGamesForUser(userId: string) {
       include: {
         game: {
           include: {
+            creator: true,
             map: {
               include: {
                 cells: true,

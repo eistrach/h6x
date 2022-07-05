@@ -9,7 +9,7 @@ const ProfileMenu = () => {
   return (
     <Menu as="div" className="ml-4 relative flex-shrink-0">
       <div>
-        <Menu.Button className="flex items-center gap-2 p-2 text-sm rounded-sm  text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-lime-500 focus:ring-white">
+        <Menu.Button className="flex items-center gap-2 p-2 text-sm rounded-sm  text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-primary-500 focus:ring-white">
           <span className="sr-only">Open user menu</span>
 
           <div className="flex flex-col items-end">

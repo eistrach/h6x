@@ -42,7 +42,7 @@ export default function PlayerCell({
         onClick={() => onClick(playerCell)}
         transform={`translate(${x + SVG_OFFSET_X}, ${y + SVG_OFFSET_Y}) `}
         className={clsx(color.fill, {
-          " stroke-lime-600 ": selected,
+          " stroke-primary-600 ": selected,
           " stroke-gray-600 ": !selected,
         })}
       >

@@ -9,7 +9,7 @@ export type LinkProps = React.LinkHTMLAttributes<HTMLLinkElement> &
     LeftIcon?: (props: React.ComponentProps<"svg">) => JSX.Element;
     RightIcon?: (props: React.ComponentProps<"svg">) => JSX.Element;
     theme?: InputTheme;
-    motionProps: HTMLMotionProps<"div">;
+    motionProps?: HTMLMotionProps<"div">;
   };
 
 export const Link = ({
