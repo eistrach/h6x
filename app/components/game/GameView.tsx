@@ -90,7 +90,7 @@ export default function GameView({ state }: GameViewProps) {
               <div className="grid grid-cols-2 md:grid-cols-5  gap-2">
                 {UNITS.map((unit) => {
                   return (
-                    <Form method="post">
+                    <Form method="post" key={unit.id}>
                       <input
                         type="hidden"
                         name="position[x]"

@@ -17,6 +17,7 @@ import { LinksFunction } from "@remix-run/react/routeModules";
 import {
   SnapItem,
   SnapList,
+  useDragToScroll,
   useVisibleElements,
 } from "react-snaplist-carousel";
 
@@ -54,21 +55,13 @@ const CreateGamePage = () => {
     },
     (elements) => elements[0]
   );
-  const [selectedMapId, setSelectedMapId] = useState<string | null>(
-    maps ? maps[0].id : null
-  );
 
-  useEffect(() => {
-    handleCarouselChange(selectedMapIndex);
-  }, [selectedMapIndex]);
+  const selectedMapId = maps?.[selectedMapIndex]?.id;
+
+  const { isDragging } = useDragToScroll({ ref: mapList });
 
   const getMapForId = (id: string | null) => {
     return maps?.find((map) => map.id === id) || null;
-  };
-
-  const handleCarouselChange = (index: number) => {
-    const mapId = maps?.[index].id;
-    setSelectedMapId(mapId);
   };
 
   return (
