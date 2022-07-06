@@ -11,6 +11,7 @@ import clsx from "clsx";
 import { IconLink } from "../base/IconLink";
 import { Form, Link as RemixLink } from "@remix-run/react";
 import { Link } from "../base/Link";
+import { DuplicateIcon } from "@heroicons/react/solid";
 
 export type GameCardProps = PropsWithChildren<{
   game: UnpackArray<UnpackData<typeof getGamesForUser>>;
@@ -18,10 +19,14 @@ export type GameCardProps = PropsWithChildren<{
 
 const GameCard = ({ game }: GameCardProps) => {
   const user = useUser();
+  const canShare =
+    typeof window !== "undefined" &&
+    typeof navigator !== "undefined" &&
+    navigator?.share;
   const handleShare = () => {
     const shareUrl = `${window.location.href}/${game.id}/join`;
 
-    if (navigator.share) {
+    if (canShare) {
       navigator.share({
         title: "Share game",
         text: "Share game",
@@ -105,9 +110,9 @@ const GameCard = ({ game }: GameCardProps) => {
           <Button
             onClick={handleShare}
             theme={InputTheme.Link}
-            LeftIcon={ShareIcon}
+            LeftIcon={canShare ? ShareIcon : DuplicateIcon}
           >
-            Share
+            {canShare ? "Invite" : "Copy link"}
           </Button>
         )}
         {game.players.length > 1 &&
