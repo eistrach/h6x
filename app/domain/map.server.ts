@@ -7,6 +7,9 @@ export const getPublishedMaps = () => {
     where: {
       published: true,
     },
+    include: {
+      cells: true,
+    },
   });
 };
 

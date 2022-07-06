@@ -1,4 +1,3 @@
-import { Listbox } from "@headlessui/react";
 import { ArrowLeftIcon } from "@heroicons/react/solid";
 import { redirect } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
@@ -13,6 +12,14 @@ import { getPublishedMaps } from "~/domain/map.server";
 import { requireUser } from "~/auth/session.server";
 import { ActionArgs, LoaderArgs, UnpackData } from "~/utils";
 import { validateForm } from "~/utils.server";
+import { Carousel } from "react-responsive-carousel";
+import GamePreview from "~/components/map/GamePreview";
+import carouselStyles from "react-responsive-carousel/lib/styles/carousel.min.css";
+import { LinksFunction } from "@remix-run/react/routeModules";
+
+export const links: LinksFunction = () => [
+  { rel: "stylesheet", href: carouselStyles },
+];
 
 const Schema = z.object({
   selectedMapId: z.string().min(1),
@@ -40,10 +47,17 @@ export const loader = async ({ request }: LoaderArgs) => {
 
 const CreateGamePage = () => {
   const maps = useLoaderData<LoaderData>();
-  const [selectedMapId, setSelectedMapId] = useState<string | null>(null);
+  const [selectedMapId, setSelectedMapId] = useState<string | null>(
+    maps ? maps[0].id : null
+  );
 
   const getMapForId = (id: string | null) => {
     return maps?.find((map) => map.id === id) || null;
+  };
+
+  const handleCarouselChange = (index: number) => {
+    const mapId = maps?.[index].id;
+    setSelectedMapId(mapId);
   };
 
   return (
@@ -62,23 +76,26 @@ const CreateGamePage = () => {
         >
           <p className="text-xl font-bold">Create Map</p>
           <div>
-            <Listbox
-              name="selectedMapId"
-              value={selectedMapId}
-              onChange={setSelectedMapId}
+            <Carousel
+              onChange={handleCarouselChange}
+              showIndicators={false}
+              showStatus={false}
+              showArrows={true}
             >
-              <Listbox.Button>
-                {getMapForId(selectedMapId)?.name || "Select a map"}
-              </Listbox.Button>
-              <Listbox.Options>
-                {maps &&
-                  maps.map((map) => (
-                    <Listbox.Option key={map.id} value={map.id}>
-                      {map.name}
-                    </Listbox.Option>
-                  ))}
-              </Listbox.Options>
-            </Listbox>
+              {maps?.map((map) => (
+                <div key={map.id} className="p-10">
+                  <GamePreview
+                    cells={map.cells}
+                    className="bg-gradient-to-br shadow-md from-primary-200/80 to-primary-400/80  rounded-full"
+                    cellClassName="stroke-gray-900 fill-white"
+                  />
+                  <p className="mt-2 font-semibold">{map.name}</p>
+                </div>
+              ))}
+            </Carousel>
+            {selectedMapId && (
+              <input type="hidden" name="selectedMapId" value={selectedMapId} />
+            )}
           </div>
           <div className="flex justify-between items-center">
             <Link
