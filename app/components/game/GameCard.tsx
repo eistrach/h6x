@@ -12,6 +12,7 @@ import { IconLink } from "../base/IconLink";
 import { Form, Link as RemixLink } from "@remix-run/react";
 import { Link } from "../base/Link";
 import { DuplicateIcon } from "@heroicons/react/solid";
+import { motion } from "framer-motion";
 
 export type GameCardProps = PropsWithChildren<{
   game: UnpackArray<UnpackData<typeof getGamesForUser>>;
@@ -40,7 +41,14 @@ const GameCard = ({ game }: GameCardProps) => {
   const creator = game.creator;
 
   return (
-    <li className="relative w-full self-stretch sm:max-w-sm bg-white shadow-lg flex flex-col items-center">
+    <motion.li
+      variants={{
+        collapsed: { scale: 0.7 },
+        open: { scale: 1 },
+      }}
+      transition={{ duration: 0.25 }}
+      className="relative w-full self-stretch sm:max-w-sm bg-white shadow-lg flex flex-col items-center"
+    >
       <div className="p-2 flex w-full justify-between items-center">
         <div className="w-full flex items-center justify-between">
           <div className="flex items-center gap-2 p-2 text-sm rounded-sm  text-white ">
@@ -135,7 +143,7 @@ const GameCard = ({ game }: GameCardProps) => {
             </Link>
           ))}
       </div>
-    </li>
+    </motion.li>
   );
 };
 

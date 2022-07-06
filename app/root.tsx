@@ -12,11 +12,9 @@ import {
 import styles from "./styles/tailwind.css";
 import fontStyles from "./styles/rubik.css";
 import customStyles from "./styles/custom.css";
-import { LogoIcon } from "./components/icons/LogoIcon";
 import { LoaderArgs, useOptionalUser } from "./utils";
 import { getUser } from "./auth/session.server";
 import clsx from "clsx";
-import ProfileMenu from "./components/base/ProfileMenu";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: styles },
@@ -40,7 +38,7 @@ export default function App() {
   const user = useOptionalUser();
 
   return (
-    <html lang="en" className="">
+    <html lang="en" className="scroll-smooth">
       <head>
         <Meta />
         <Links />

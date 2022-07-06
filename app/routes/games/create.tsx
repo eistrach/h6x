@@ -83,7 +83,12 @@ const CreateGamePage = () => {
               onChange={handleCarouselChange}
               showIndicators={false}
               showStatus={false}
-              showArrows={true}
+              showArrows={false}
+              swipeable
+              emulateTouch
+              centerMode
+              infiniteLoop={false}
+              centerSlidePercentage={100}
             >
               {maps?.map((map) => (
                 <div key={map.id} className="p-10">
