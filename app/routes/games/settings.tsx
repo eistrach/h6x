@@ -10,6 +10,9 @@ const SettingsPage = () => {
     <>
       <motion.div
         exit={{ opacity: 0 }}
+        transition={{
+          duration: 0.3,
+        }}
         className="absolute min-h-screen w-full bg-gray-800/40 z-10 top-0"
       />
       <motion.div
