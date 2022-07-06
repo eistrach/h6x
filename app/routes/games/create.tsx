@@ -13,18 +13,12 @@ import { requireUser } from "~/auth/session.server";
 import { ActionArgs, LoaderArgs, UnpackData } from "~/utils";
 import { validateForm } from "~/utils.server";
 import GamePreview from "~/components/map/GamePreview";
-import carouselStyles from "react-responsive-carousel/lib/styles/carousel.min.css";
 import { LinksFunction } from "@remix-run/react/routeModules";
 import {
   SnapItem,
   SnapList,
-  useScroll,
   useVisibleElements,
 } from "react-snaplist-carousel";
-
-// export const links: LinksFunction = () => [
-//   { rel: "stylesheet", href: carouselStyles },
-// ];
 
 const Schema = z.object({
   selectedMapId: z.string().min(1),
@@ -97,6 +91,7 @@ const CreateGamePage = () => {
           <p className="text-xl font-bold">Create Map</p>
           <div className="flex w-full items-center">
             <SnapList direction="horizontal" ref={mapList}>
+              {" "}
               {maps?.map((map) => (
                 <SnapItem
                   key={map.id}

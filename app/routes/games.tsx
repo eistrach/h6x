@@ -32,10 +32,10 @@ const GameList = ({ games, title }: { games: LoaderData; title: string }) => {
   if (!games.length) return null;
 
   return (
-    <Disclosure as="div" defaultOpen>
+    <Disclosure defaultOpen>
       {({ open }) => (
         <>
-          <Disclosure.Button className="text-left w-full flex justify-between mb-8">
+          <Disclosure.Button className="text-left w-full flex justify-between mt-8 mb-2">
             <div className="flex items-center gap-2">
               <h2 className="text-2xl font-bold">{title}</h2>
               <span className="text-lg font-semibold text-gray-700">
@@ -53,13 +53,29 @@ const GameList = ({ games, title }: { games: LoaderData; title: string }) => {
             </span>
           </Disclosure.Button>
 
-          <Disclosure.Panel>
-            <ul className="flex flex-col w-full  sm:flex-row items-center  flex-wrap  gap-4">
-              {games.map((game) => (
-                <GameCard key={game.id} game={game}></GameCard>
-              ))}
-            </ul>
-          </Disclosure.Panel>
+          <AnimatePresence initial={false}>
+            {open && (
+              <Disclosure.Panel
+                static
+                as={motion.ul}
+                key="content"
+                initial="collapsed"
+                animate="open"
+                exit="collapsed"
+                variants={{
+                  open: { opacity: 1, height: "auto" },
+                  collapsed: { opacity: 0, height: 0 },
+                }}
+                transition={{ duration: 0.25, ease: [0.04, 0.62, 0.23, 0.98] }}
+              >
+                <ul className="flex flex-col w-full  sm:flex-row items-center  flex-wrap  gap-4">
+                  {games.map((game) => (
+                    <GameCard key={game.id} game={game}></GameCard>
+                  ))}
+                </ul>
+              </Disclosure.Panel>
+            )}
+          </AnimatePresence>
         </>
       )}
     </Disclosure>
@@ -106,7 +122,7 @@ const GamesPage = () => {
       <div className="min-h-full h-full mt-16">
         <AnimatePresence initial={false}>{outlet}</AnimatePresence>
 
-        <div className=" px-6 py-6 mb-16 grid grid-cols-1 lg:grid-cols-2 gap-20 ">
+        <div className=" px-6  mb-16 flex flex-col ">
           <GameList games={actionableGames} title="Your Turn" />
           <GameList games={lobbyGames} title="Lobby" />
           <GameList games={runningGames} title="Waiting" />
