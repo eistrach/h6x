@@ -2,7 +2,7 @@ import { ArrowLeftIcon } from "@heroicons/react/solid";
 import { redirect } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { Button } from "~/components/base/Button";
 import { Link } from "~/components/base/Link";
@@ -12,14 +12,19 @@ import { getPublishedMaps } from "~/domain/map.server";
 import { requireUser } from "~/auth/session.server";
 import { ActionArgs, LoaderArgs, UnpackData } from "~/utils";
 import { validateForm } from "~/utils.server";
-import { Carousel } from "react-responsive-carousel";
 import GamePreview from "~/components/map/GamePreview";
 import carouselStyles from "react-responsive-carousel/lib/styles/carousel.min.css";
 import { LinksFunction } from "@remix-run/react/routeModules";
+import {
+  SnapItem,
+  SnapList,
+  useScroll,
+  useVisibleElements,
+} from "react-snaplist-carousel";
 
-export const links: LinksFunction = () => [
-  { rel: "stylesheet", href: carouselStyles },
-];
+// export const links: LinksFunction = () => [
+//   { rel: "stylesheet", href: carouselStyles },
+// ];
 
 const Schema = z.object({
   selectedMapId: z.string().min(1),
@@ -47,9 +52,21 @@ export const loader = async ({ request }: LoaderArgs) => {
 
 const CreateGamePage = () => {
   const maps = useLoaderData<LoaderData>();
+  const mapList = useRef(null);
+  const selectedMapIndex = useVisibleElements(
+    {
+      ref: mapList,
+      debounce: 10,
+    },
+    (elements) => elements[0]
+  );
   const [selectedMapId, setSelectedMapId] = useState<string | null>(
     maps ? maps[0].id : null
   );
+
+  useEffect(() => {
+    handleCarouselChange(selectedMapIndex);
+  }, [selectedMapId]);
 
   const getMapForId = (id: string | null) => {
     return maps?.find((map) => map.id === id) || null;
@@ -78,24 +95,30 @@ const CreateGamePage = () => {
           className=" flex flex-col justify-between h-full  gap-2 x"
         >
           <p className="text-xl font-bold">Create Map</p>
-          <div>
-            <Carousel
-              onChange={handleCarouselChange}
-              showIndicators={false}
-              showStatus={false}
-              showArrows={true}
-            >
+          <div className="flex w-full items-center">
+            <SnapList direction="horizontal" ref={mapList}>
               {maps?.map((map) => (
-                <div key={map.id} className="p-10">
-                  <GamePreview
-                    cells={map.cells}
-                    className="bg-gradient-to-br shadow-md from-primary-200/80 to-primary-400/80  rounded-full"
-                    cellClassName="stroke-gray-900 fill-white"
-                  />
-                  <p className="mt-2 font-semibold">{map.name}</p>
-                </div>
+                <SnapItem
+                  key={map.id}
+                  snapAlign="center"
+                  margin={{
+                    left: "14px",
+                    right: "14px",
+                  }}
+                  height="auto"
+                  width="auto"
+                >
+                  <div className="flex flex-col items-center justify-center">
+                    <GamePreview
+                      cells={map.cells}
+                      className="w-64 h-64 bg-gradient-to-br shadow-md from-primary-200/80 to-primary-400/80  rounded-full"
+                      cellClassName="stroke-gray-900 fill-white"
+                    />
+                    <p className="mt-2 font-semibold">{map.name}</p>
+                  </div>
+                </SnapItem>
               ))}
-            </Carousel>
+            </SnapList>
             {selectedMapId && (
               <input type="hidden" name="selectedMapId" value={selectedMapId} />
             )}

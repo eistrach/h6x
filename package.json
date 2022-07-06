@@ -33,7 +33,7 @@
     "react-hook-mighty-mouse": "^1.4.31",
     "react-hot-toast": "^2.2.0",
     "react-popper": "^2.3.0",
-    "react-responsive-carousel": "^3.2.23",
+    "react-snaplist-carousel": "^4.4.2",
     "remix-auth": "^3.2.2",
     "remix-auth-socials": "^1.0.2",
     "remix-utils": "^3.3.0",
