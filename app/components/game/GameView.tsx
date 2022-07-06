@@ -1,4 +1,4 @@
-import { Form, Link } from "@remix-run/react";
+import { Form, Link, useTransition } from "@remix-run/react";
 import { UNITS } from "~/config/units";
 import { Button } from "../base/Button";
 import { useSelectedCell } from "~/hooks/useSelectedCell";
@@ -10,7 +10,7 @@ import AttackPopovers from "./AttackPopovers";
 import GameMap from "./GameMap";
 import { motion } from "framer-motion";
 import { InputTheme } from "../base/InputTheme";
-import { CogIcon, PlusIcon } from "@heroicons/react/solid";
+import { CheckCircleIcon, CogIcon, PlusIcon } from "@heroicons/react/solid";
 import { LogoIcon } from "../icons/LogoIcon";
 
 type GameViewProps = {
@@ -24,9 +24,14 @@ export default function GameView({ state }: GameViewProps) {
     useComputedGameState(state, selectedCell);
   const directionalPopovers = useDirectionalPopovers();
 
+  const transition = useTransition();
+
+  const disableActions = transition.state !== "idle";
+
   return (
     <div className="h-screen flex justify-center items-center flex-col">
       <AttackPopovers
+        disabled={disableActions}
         attackableNeighbors={attackableNeighbors}
         directionalPopovers={directionalPopovers}
         playerId={playerId}
@@ -72,7 +77,8 @@ export default function GameView({ state }: GameViewProps) {
                   <input type="hidden" name="playerId" value={playerId} />
                   <Button
                     disabled={
-                      selectedUnit && currentPlayer.money < selectedUnit?.cost
+                      disableActions ||
+                      (selectedUnit && currentPlayer.money < selectedUnit?.cost)
                     }
                     name="_intent"
                     value="upgradeUnit"
@@ -101,7 +107,9 @@ export default function GameView({ state }: GameViewProps) {
                         type="submit"
                         name="_intent"
                         value="buyUnit"
-                        disabled={unit.cost > currentPlayer.money}
+                        disabled={
+                          disableActions || unit.cost > currentPlayer.money
+                        }
                       >
                         {unit.name}: ${unit.cost}
                       </Button>
@@ -117,7 +125,13 @@ export default function GameView({ state }: GameViewProps) {
           >
             <Form method="post" className="ml-auto">
               <input type="hidden" name="playerId" value={playerId} />
-              <Button name="_intent" value="endTurn" type="submit">
+              <Button
+                disabled={disableActions}
+                RightIcon={CheckCircleIcon}
+                name="_intent"
+                value="endTurn"
+                type="submit"
+              >
                 End Turn
               </Button>
             </Form>

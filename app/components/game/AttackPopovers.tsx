@@ -16,6 +16,7 @@ export type AttackPopoversProps = {
   directionalPopovers: DirectionalPopovers;
   sourceCell?: CellState;
   attackableNeighbors: AttackableNeighbors;
+  disabled?: boolean;
 };
 
 export const getAttackPopoverRef = (
@@ -36,6 +37,7 @@ const AttackPopovers = ({
   directionalPopovers,
   sourceCell,
   attackableNeighbors,
+  disabled,
 }: AttackPopoversProps) => {
   return (
     <>
@@ -68,6 +70,7 @@ const AttackPopovers = ({
               <input type="hidden" name="target[x]" value={cell?.position.x} />
               <input type="hidden" name="target[y]" value={cell?.position.y} />
               <IconButton
+                disabled={disabled}
                 type="submit"
                 className="text-red-700"
                 iconCss="w-6 h-6"
