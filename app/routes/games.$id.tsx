@@ -24,6 +24,10 @@ import {
 import { requireParam, validateForm } from "~/utils.server";
 
 import GameView from "~/components/game/GameView";
+import { AnimatePresence, motion } from "framer-motion";
+import { CogIcon, PlusIcon } from "@heroicons/react/solid";
+import { Link } from "~/components/base/Link";
+import { InputTheme } from "~/components/base/InputTheme";
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const gameId = requireParam(params, "id");
@@ -55,6 +59,7 @@ export const loader = async ({ request, params }: LoaderArgs) => {
         players: setupState.players,
         playerId: setupState.currentPlayerId,
         canTakeAction: !setupState.done,
+        users: game.players.map((p) => p.user),
       };
     case "PLAYING":
       const gameState = game.gameState as PlayingState;
@@ -65,6 +70,7 @@ export const loader = async ({ request, params }: LoaderArgs) => {
         players: gameState.players,
         playerId: gameState.currentPlayerId,
         canTakeAction: gameState.currentPlayerId === currentPlayer?.id,
+        users: game.players.map((p) => p.user),
       };
   }
 };
@@ -161,12 +167,15 @@ const GamePage = () => {
     if (error) {
       toast.error(error);
     }
-  });
+  }, [error]);
 
   return (
     <div>
       <Toaster position="top-right" />
-      <GameView state={gameState} />
+
+      <div className="min-h-full h-full">
+        <GameView state={gameState} />
+      </div>
     </div>
   );
 };

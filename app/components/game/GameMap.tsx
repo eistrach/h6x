@@ -31,7 +31,7 @@ const GameMap = ({
   const grid = useGrid(cells);
   return (
     <svg
-      className=""
+      className="bg-white max-w-2xl shadow-lg rounded-lg border border-gray-100 mx-4"
       viewBox={`0, 0, ${SVG_SIZE}, ${SVG_SIZE}`}
       fill="currentColor"
       preserveAspectRatio="xMidYMid"

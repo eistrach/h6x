@@ -1,4 +1,6 @@
+import { User } from "@prisma/client";
 import clsx from "clsx";
+import { AnimatePresence, motion } from "framer-motion";
 import { PLAYER_COLORS } from "~/config/config";
 import { PlayerState } from "~/domain/logic/game";
 import { useUser } from "~/utils";
@@ -6,30 +8,66 @@ import { useUser } from "~/utils";
 export type PlayersInfoProps = {
   currentPlayer: PlayerState;
   players: PlayerState[];
+  users: User[];
 };
 
-const PlayersInfo = ({ currentPlayer, players }: PlayersInfoProps) => {
-  const user = useUser();
+const PlayersInfo = ({ currentPlayer, players, users }: PlayersInfoProps) => {
   return (
-    <div className="flex justify-between items-center p-4">
-      <div className="flex gap-2">
-        {[...players]
-          .sort((p1, p2) => p2.index - p1.index)
-          .map((p) => {
+    <div className="flex w-full justify-end items-center pt-1">
+      <ol className="flex-shrink-0 flex m-2 -space-x-1 items-center">
+        <AnimatePresence>
+          {[...players].reverse().map((p) => {
             const color = PLAYER_COLORS[p.index];
+
+            const user = users.find((u) => u.id === p.userId)!;
+            const isCurrentPlayer = p.id === currentPlayer.id;
             return (
-              <div
+              <motion.li
+                initial={{ opacity: 0, scale: 0 }}
+                animate={{
+                  opacity: 1,
+                  scale: 1,
+                  transition: { delay: 0.1, type: "spring" },
+                }}
+                layout
+                exit={{ opacity: 0, scale: 0 }}
                 key={p.id}
-                className={clsx(color.bg, "py-1 px-2 text-black")}
+                className="flex  flex-col justify-center items-center"
               >
-                ${p.money}
-              </div>
+                <div
+                  className={clsx(
+                    "ring-4 shadow-md rounded-full bg-white z-10",
+                    color.ring,
+                    {
+                      "w-10 h-10": isCurrentPlayer,
+                      "w-8 h-8 opacity-75": !isCurrentPlayer,
+                    }
+                  )}
+                >
+                  <div>
+                    {!!user.avatarUrl ? (
+                      <img
+                        src={user.avatarUrl}
+                        className="object-cover rounded-full"
+                      ></img>
+                    ) : (
+                      <span>{user.displayName[0]}</span>
+                    )}
+                  </div>
+                </div>
+                <div
+                  className={clsx("p-1", {
+                    "font-bold text-sm": isCurrentPlayer,
+                    "text-xs text-gray-500": !isCurrentPlayer,
+                  })}
+                >
+                  ${p.money}
+                </div>
+              </motion.li>
             );
           })}
-      </div>
-      <div className={clsx(PLAYER_COLORS[currentPlayer.index].bg, "p-4")}>
-        {user.displayName}
-      </div>
+        </AnimatePresence>
+      </ol>
     </div>
   );
 };

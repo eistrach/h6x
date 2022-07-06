@@ -44,14 +44,14 @@ const AttackPopovers = ({
         return (
           <PopperPopover
             key={i}
-            wrapperClassName={clsx("bg-gray-200 p-1 rounded-full", {
+            wrapperClassName={clsx("bg-white p-1 rounded-full", {
               hidden: !cell,
             })}
             {...p}
           >
             <Form
               method="post"
-              className="w-5 h-5 flex items-center justify-center"
+              className="w-6 h-6 flex items-center justify-center"
             >
               <input type="hidden" name="_intent" value="attackUnit" />
               <input
@@ -70,7 +70,7 @@ const AttackPopovers = ({
               <IconButton
                 type="submit"
                 className="text-red-700"
-                iconCss="w-5 h-5"
+                iconCss="w-6 h-6"
                 Icon={SwordIcon}
               />
             </Form>

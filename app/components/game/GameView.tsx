@@ -1,4 +1,4 @@
-import { Form } from "@remix-run/react";
+import { Form, Link } from "@remix-run/react";
 import { UNITS } from "~/config/units";
 import { Button } from "../base/Button";
 import { useSelectedCell } from "~/hooks/useSelectedCell";
@@ -8,6 +8,10 @@ import { useComputedGameState } from "~/hooks/useComputedGameState";
 import { useDirectionalPopovers } from "~/hooks/useDirectionalPopovers";
 import AttackPopovers from "./AttackPopovers";
 import GameMap from "./GameMap";
+import { motion } from "framer-motion";
+import { InputTheme } from "../base/InputTheme";
+import { CogIcon, PlusIcon } from "@heroicons/react/solid";
+import { LogoIcon } from "../icons/LogoIcon";
 
 type GameViewProps = {
   state: GState;
@@ -21,14 +25,25 @@ export default function GameView({ state }: GameViewProps) {
   const directionalPopovers = useDirectionalPopovers();
 
   return (
-    <div className="">
+    <div className="h-screen flex justify-center items-center flex-col">
       <AttackPopovers
         attackableNeighbors={attackableNeighbors}
         directionalPopovers={directionalPopovers}
         playerId={playerId}
         sourceCell={selectedCell}
       />
-      <PlayersInfo currentPlayer={currentPlayer} players={players} />
+      <div className="fixed z-10 left-0 right-0 top-0 rounded-b-2xl backdrop-blur-sm h-20 bg-gray-100/50 px-4 flex justify-between items-start">
+        <Link to="/" className="flex gap-1 justify-start items-center my-3">
+          <LogoIcon className="w-10 h-10" />
+          <span className="font-extrabold text-2xl">h6x</span>
+        </Link>
+        <PlayersInfo
+          currentPlayer={currentPlayer}
+          players={players}
+          users={state.users}
+        />
+      </div>
+
       <GameMap
         cells={playerCells}
         onClick={(c) => setSelectedCell(c)}
@@ -96,12 +111,17 @@ export default function GameView({ state }: GameViewProps) {
               </div>
             </div>
           )}
-          <Form method="post" className="">
-            <input type="hidden" name="playerId" value={playerId} />
-            <Button name="_intent" value="endTurn" type="submit">
-              End Turn
-            </Button>
-          </Form>
+          <motion.div
+            layoutId="background"
+            className="fixed bottom-0 rounded-t-2xl backdrop-blur-sm left-0 right-0 flex bg-gray-200/50 py-3 px-4 justify-between items-center"
+          >
+            <Form method="post" className="ml-auto">
+              <input type="hidden" name="playerId" value={playerId} />
+              <Button name="_intent" value="endTurn" type="submit">
+                End Turn
+              </Button>
+            </Form>
+          </motion.div>
         </div>
       )}
     </div>

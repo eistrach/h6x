@@ -1,6 +1,7 @@
 import { useLoaderData, useOutlet } from "@remix-run/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "~/components/base/Link";
+import { Link as RemixLink } from "@remix-run/react";
 import { getGamesForUser } from "~/domain/game.server";
 import { requireUser } from "~/auth/session.server";
 import {
@@ -17,6 +18,8 @@ import { CogIcon } from "@heroicons/react/solid";
 import { InputTheme } from "~/components/base/InputTheme";
 import { Disclosure, Transition } from "@headlessui/react";
 import clsx from "clsx";
+import { LogoIcon } from "~/components/icons/LogoIcon";
+import ProfileMenu from "~/components/base/ProfileMenu";
 type LoaderData = UnpackData<typeof getGamesForUser>;
 
 export const loader = async ({ request }: LoaderArgs) => {
@@ -65,11 +68,11 @@ const GameList = ({ games, title }: { games: LoaderData; title: string }) => {
 
 const getActionableGames = (games: LoaderData, currentUserId: string) => {
   return games.filter((game) => {
-    const player = game.players.find((p) => p.userId === currentUserId);
+    const players = game.players.filter((p) => p.userId === currentUserId);
     return (
       (game.phase === "PLAYING" &&
-        game.gameState?.currentPlayerId === player?.id) ||
-      (game.phase === "PREPARATION" && !player?.setupState?.done)
+        !!players.find((p) => game.gameState?.currentPlayerId === p.id)) ||
+      (game.phase === "PREPARATION" && players.some((p) => !p.setupState?.done))
     );
   });
 };
@@ -89,35 +92,47 @@ const GamesPage = () => {
   );
 
   return (
-    <div className="min-h-full h-full">
-      <AnimatePresence initial={false}>{outlet}</AnimatePresence>
+    <div>
+      {user && (
+        <div className="fixed z-10 left-0 right-0 top-0 rounded-b-2xl backdrop-blur-sm h-16 bg-gray-200/50 px-4 flex justify-between items-center">
+          <RemixLink to="/" className="flex gap-1 justify-start items-center">
+            <LogoIcon className="w-10 h-10" />
+            <span className="font-extrabold text-2xl">h6x</span>
+          </RemixLink>
+          <ProfileMenu />
+        </div>
+      )}
 
-      <div className=" px-6 py-6 mb-16 grid grid-cols-1 lg:grid-cols-2 gap-20 ">
-        <GameList games={actionableGames} title="Your Turn" />
-        <GameList games={lobbyGames} title="Lobby" />
-        <GameList games={runningGames} title="Waiting" />
+      <div className="min-h-full h-full mt-16">
+        <AnimatePresence initial={false}>{outlet}</AnimatePresence>
+
+        <div className=" px-6 py-6 mb-16 grid grid-cols-1 lg:grid-cols-2 gap-20 ">
+          <GameList games={actionableGames} title="Your Turn" />
+          <GameList games={lobbyGames} title="Lobby" />
+          <GameList games={runningGames} title="Waiting" />
+        </div>
+
+        <motion.div
+          layoutId="background"
+          className="fixed bottom-0 rounded-t-2xl backdrop-blur-sm left-0 right-0 flex bg-gray-200/50 py-3 px-4 justify-between items-center"
+        >
+          <Link
+            motionProps={{ layoutId: "leftButton" }}
+            theme={InputTheme.OutlinedBlack}
+            LeftIcon={CogIcon}
+            to="settings"
+          >
+            Settings
+          </Link>
+          <Link
+            motionProps={{ layoutId: "rightButton" }}
+            LeftIcon={PlusIcon}
+            to="create"
+          >
+            New Game
+          </Link>
+        </motion.div>
       </div>
-
-      <motion.div
-        layoutId="background"
-        className="fixed bottom-0 rounded-t-2xl backdrop-blur-sm left-0 right-0 flex bg-gray-200/50 py-3 px-4 justify-between items-center"
-      >
-        <Link
-          motionProps={{ layoutId: "leftButton" }}
-          theme={InputTheme.OutlinedBlack}
-          LeftIcon={CogIcon}
-          to="settings"
-        >
-          Settings
-        </Link>
-        <Link
-          motionProps={{ layoutId: "rightButton" }}
-          LeftIcon={PlusIcon}
-          to="create"
-        >
-          New Game
-        </Link>
-      </motion.div>
     </div>
   );
 };

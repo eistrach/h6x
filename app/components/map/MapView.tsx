@@ -14,7 +14,7 @@ export default function MapView({ cells, onSelect }: HexMapProps) {
 
   return (
     <svg
-      className="w-full"
+      className=""
       viewBox={`0, 0, ${SVG_SIZE}, ${SVG_SIZE}`}
       preserveAspectRatio="xMidYMid"
     >

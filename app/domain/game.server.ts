@@ -1,7 +1,7 @@
 import { UnitId } from "../config/units";
 import { attackCell, endTurn, upgradeCell } from "./logic/game-actions";
 import { CellState, PlayerState, PlayingState } from "./../domain/logic/game";
-import { GamePhase } from "@prisma/client";
+import { GamePhase, User } from "@prisma/client";
 
 import { v4 as uuid } from "uuid";
 import {
@@ -73,7 +73,11 @@ export async function getGame(id: string) {
           cells: true,
         },
       },
-      players: true,
+      players: {
+        include: {
+          user: true,
+        },
+      },
     },
   });
 }
@@ -170,7 +174,7 @@ export async function startSetupPhase(id: string, userId: string) {
 
   return await prisma.$transaction(async (prisma) => {
     await Promise.all(
-      players.map((p) =>
+      players.map(({ user, ...p }) =>
         prisma.player.update({
           where: { id: p.id },
           data: p,
@@ -484,4 +488,5 @@ export type GState = {
   playerId: string;
   canTakeAction: boolean;
   phase: GamePhase;
+  users: User[];
 };

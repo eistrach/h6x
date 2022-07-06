@@ -7,7 +7,7 @@ import {
   PointyCompassDirection,
 } from "honeycomb-grid";
 
-export const SVG_SCALE = 24;
+export const SVG_SCALE = 22;
 export const HEX_RADIUS = 8;
 export const HEX_STROKE_WIDTH = 1;
 
@@ -15,8 +15,8 @@ export const HEX_WIDTH = Math.sqrt(3) * HEX_RADIUS;
 export const HEX_HEIGHT = 2 * HEX_RADIUS;
 
 export const SVG_SIZE = HEX_RADIUS * SVG_SCALE;
-export const SVG_OFFSET_X = SVG_SIZE / 2 - HEX_WIDTH / 2;
-export const SVG_OFFSET_Y = SVG_SIZE / 2 - HEX_HEIGHT / 2;
+export const SVG_OFFSET_X = SVG_SIZE / 2 - HEX_WIDTH / 2 + 1;
+export const SVG_OFFSET_Y = SVG_SIZE / 2 - HEX_HEIGHT / 2 + 1;
 
 export const GRID_RADIUS = 6;
 
