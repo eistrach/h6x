@@ -60,7 +60,7 @@ const CreateGamePage = () => {
 
   useEffect(() => {
     handleCarouselChange(selectedMapIndex);
-  }, [selectedMapId]);
+  }, [selectedMapIndex]);
 
   const getMapForId = (id: string | null) => {
     return maps?.find((map) => map.id === id) || null;
