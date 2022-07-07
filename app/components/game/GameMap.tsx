@@ -1,8 +1,12 @@
-import { Cell } from "@prisma/client";
 import { findCell, isCellSelected } from "~/hooks/useComputedGameState";
 import { useGrid } from "~/hooks/useGrid";
 import { CellState, PlayerState } from "~/domain/logic/game";
-import { SVG_SIZE } from "~/grid-math";
+import {
+  VIEWBOX_HEIGHT,
+  VIEWBOX_WIDTH,
+  VIEWBOX_X,
+  VIEWBOX_Y,
+} from "~/grid-math";
 import {
   AttackableNeighbors,
   DirectionalPopovers,
@@ -31,12 +35,13 @@ const GameMap = ({
   const grid = useGrid(cells);
   return (
     <svg
-      className="bg-white max-w-2xl shadow-lg rounded-lg border border-gray-100 mx-4"
-      viewBox={`0, 0, ${SVG_SIZE}, ${SVG_SIZE}`}
+      className=" max-w-2xl shadow-lg  border-4 border-white mx-4  bg-gradient-to-br  from-primary-200/80 to-primary-400/80  rounded-full"
+      viewBox={`${VIEWBOX_X}, ${VIEWBOX_Y}, ${VIEWBOX_WIDTH}, ${VIEWBOX_HEIGHT}`}
       fill="currentColor"
       preserveAspectRatio="xMidYMid"
     >
       <g>
+        <circle cx={0} cy={0} r={40} />
         {grid.map((cell) => {
           const playerCell = findCell(cells, cell);
           const isSelected = isCellSelected(selectedCell, cell);

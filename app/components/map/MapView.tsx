@@ -1,5 +1,14 @@
 import { Cell } from "@prisma/client";
-import { MathCell, asMathGrid, layoutGrid, SVG_SIZE } from "~/grid-math";
+import {
+  MathCell,
+  layoutCells,
+  VIEWBOX_HEIGHT,
+  VIEWBOX_WIDTH,
+  VIEWBOX_X,
+  VIEWBOX_Y,
+  editorGrid,
+  editorCells,
+} from "~/grid-math";
 import HexView from "./CellView";
 
 type HexMapProps = {
@@ -15,11 +24,11 @@ export default function MapView({ cells, onSelect }: HexMapProps) {
   return (
     <svg
       className=""
-      viewBox={`0, 0, ${SVG_SIZE}, ${SVG_SIZE}`}
+      viewBox={`${VIEWBOX_X}, ${VIEWBOX_Y}, ${VIEWBOX_WIDTH}, ${VIEWBOX_HEIGHT}`}
       preserveAspectRatio="xMidYMid"
     >
       <g>
-        {layoutGrid.map((cell) => (
+        {editorCells.map((cell) => (
           <HexView
             onSelect={onSelect}
             fill={isFilled(cell.x, cell.y)}

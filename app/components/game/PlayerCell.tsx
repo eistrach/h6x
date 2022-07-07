@@ -1,13 +1,7 @@
 import clsx from "clsx";
 import { NEUTRAL_COLOR, PLAYER_COLORS } from "~/config/config";
 import { CellState, PlayerState } from "~/domain/logic/game";
-import {
-  MathCell,
-  SVG_OFFSET_X,
-  SVG_OFFSET_Y,
-  HEX_HEIGHT,
-  HEX_WIDTH,
-} from "~/grid-math";
+import { MathCell, HEX_HEIGHT, HEX_WIDTH, HEX_STROKE_WIDTH } from "~/grid-math";
 import { getUnitForId } from "~/config/units";
 
 type PlayerCellProps = {
@@ -35,32 +29,29 @@ export default function PlayerCell({
   const unit = getUnitForId(playerCell.unitId);
 
   return (
-    <svg ref={popperRef}>
-      <g
-        strokeWidth={selected ? 10 : 7}
-        strokeLinejoin="round"
-        onClick={() => onClick(playerCell)}
-        transform={`translate(${x + SVG_OFFSET_X}, ${y + SVG_OFFSET_Y}) `}
-        className={clsx(color.fill, {
-          " stroke-primary-600 ": selected,
-          " stroke-gray-600 ": !selected,
-        })}
-      >
-        <unit.SVG />
+    <g
+      ref={popperRef}
+      strokeWidth={selected ? HEX_STROKE_WIDTH * 1.25 : HEX_STROKE_WIDTH}
+      strokeLinejoin="round"
+      onClick={() => onClick(playerCell)}
+      transform={`translate(${x - HEX_WIDTH / 2}, ${y - HEX_HEIGHT / 2}) `}
+      className={clsx(color.fill, {
+        " stroke-white ": selected,
+        " stroke-gray-800 ": !selected,
+      })}
+    >
+      <unit.SVG className={clsx(color.fillSecondary, color.strokeSecondary)} />
 
-        <text
-          transform={`translate(${HEX_WIDTH / 2 - 0.9}, ${
-            HEX_HEIGHT / 2 - 1
-          }) `}
-          dominantBaseline="middle"
-          textAnchor="middle"
-          className="fill-black stroke-black"
-          fontSize="5"
-          strokeWidth=".3"
-        >
-          {playerCell.count}
-        </text>
-      </g>
-    </svg>
+      <text
+        transform={`translate(${HEX_WIDTH / 2}, ${HEX_HEIGHT / 3}) `}
+        dominantBaseline="central"
+        textAnchor="middle"
+        className="fill-black stroke-black"
+        fontSize="30"
+        strokeWidth=".2"
+      >
+        {playerCell.count}
+      </text>
+    </g>
   );
 }

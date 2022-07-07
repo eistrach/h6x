@@ -4,21 +4,24 @@ import {
   Hex,
   Grid as HoneyGrid,
   extendHex,
-  PointyCompassDirection,
+  FlatCompassDirection,
 } from "honeycomb-grid";
 
-export const SVG_SCALE = 22;
-export const HEX_RADIUS = 8;
-export const HEX_STROKE_WIDTH = 1;
+export const HEX_RADIUS = 50;
+export const HEX_SPACING = 5;
+export const HEX_STROKE_WIDTH = 4;
 
-export const HEX_WIDTH = Math.sqrt(3) * HEX_RADIUS;
-export const HEX_HEIGHT = 2 * HEX_RADIUS;
+// from svg viewbox of the cell
+export const HEX_HEIGHT = 130;
+export const HEX_WIDTH = 125;
 
-export const SVG_SIZE = HEX_RADIUS * SVG_SCALE;
-export const SVG_OFFSET_X = SVG_SIZE / 2 - HEX_WIDTH / 2 + 1;
-export const SVG_OFFSET_Y = SVG_SIZE / 2 - HEX_HEIGHT / 2 + 1;
+export const MAP_RADIUS = 500;
+export const VIEWBOX_X = -MAP_RADIUS;
+export const VIEWBOX_Y = -MAP_RADIUS;
+export const VIEWBOX_WIDTH = MAP_RADIUS * 2;
+export const VIEWBOX_HEIGHT = MAP_RADIUS * 2;
 
-export const GRID_RADIUS = 6;
+export const GRID_RADIUS = 5;
 
 export type MathCell = Hex<{
   size: number;
@@ -27,14 +30,28 @@ export type MathCell = Hex<{
 export type MathGrid = HoneyGrid<MathCell>;
 
 export const asMathCell = extendHex({
-  size: HEX_RADIUS,
+  size: HEX_RADIUS + HEX_SPACING,
+  orientation: "flat",
 });
+
+export const editorCell = extendHex({
+  size: 40,
+  orientation: "flat",
+});
+
+export const editorGrid = defineGrid(editorCell);
 
 export const asMathGrid = defineGrid(asMathCell);
 
-export const layoutGrid = asMathGrid.hexagon({ radius: GRID_RADIUS });
+export const layoutCells = asMathGrid.hexagon({
+  radius: GRID_RADIUS,
+});
 
-export const cellCorners = asMathCell().corners();
+export const editorCells = editorGrid.hexagon({
+  radius: GRID_RADIUS,
+});
+
+export const cellCorners = editorCell().corners();
 
 export function compareCell(c1: Point, c2: Point) {
   if (!c1 || !c2) return false;
@@ -66,10 +83,10 @@ export const getAllCellsInArea = (
 
     checkedCells.push(cell);
     const neighbors = !fill
-      ? layoutGrid
+      ? layoutCells
           .neighborsOf(cell)
           .filter((c) => !!c && cellInGrid(c, gridCells))
-      : layoutGrid
+      : layoutCells
           .neighborsOf(cell)
           .filter((c) => !!c && !cellInGrid(c, gridCells));
     queue.push(...neighbors);
@@ -94,7 +111,7 @@ export const cellToPoint = (cell: Omit<Cell, "id">) => {
 };
 
 export const cellsAreNeighbors = (c1: Point, c2: Point) => {
-  return layoutGrid
+  return layoutCells
     .neighborsOf(asMathCell(c1.x, c1.y))
     .some((c) => compareCell(c, c2));
 };
@@ -104,17 +121,17 @@ export const getNeighboringCells = <
 >(
   cell: Point,
   cells: T[]
-): { [key in PointyCompassDirection]: T } => {
-  const directions = [
-    "E",
-    "SE",
+): { [key in CompassDirection]: T } => {
+  const directions: CompassDirection[] = [
+    "S",
     "SW",
-    "W",
+    "SE",
+    "N",
     "NE",
     "NW",
-  ] as PointyCompassDirection[];
+  ] as any;
 
-  const cs = layoutGrid
+  const cs = layoutCells
     .neighborsOf(asMathCell(cell.x, cell.y), directions)
     .filter((c) => !!c)
     .map(
@@ -126,8 +143,9 @@ export const getNeighboringCells = <
     )
     .filter(([, c]) => !!c);
   return Object.fromEntries(new Map(cs)) as unknown as {
-    [key in PointyCompassDirection]: T;
+    [key in CompassDirection]: T;
   };
 };
 
+export type CompassDirection = FlatCompassDirection;
 export type Point = { x: number; y: number };

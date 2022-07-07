@@ -1,5 +1,5 @@
 import { generateMoney } from "./game-actions";
-import { compareCell, layoutGrid, Point } from "../../grid-math";
+import { compareCell, layoutCells, Point } from "../../grid-math";
 import {
   DEFAULT_NEUTRAL_UNIT_ID,
   DEFAULT_PLAYER_UNIT_ID,

@@ -1,9 +1,9 @@
 import {
   MathCell,
   HEX_STROKE_WIDTH,
-  SVG_OFFSET_X,
-  SVG_OFFSET_Y,
   cellCorners,
+  HEX_HEIGHT,
+  HEX_WIDTH,
 } from "~/grid-math";
 
 type CellPreviewProps = {
@@ -15,7 +15,7 @@ export default function CellPreview({ cell, className }: CellPreviewProps) {
   const { x, y } = cell?.toPoint() || { x: 0, y: 0 };
   return (
     <g
-      transform={`translate(${x + SVG_OFFSET_X}, ${y + SVG_OFFSET_Y})`}
+      transform={`translate(${x - HEX_WIDTH / 2}, ${y - HEX_HEIGHT / 2}) `}
       className={className}
     >
       <polygon

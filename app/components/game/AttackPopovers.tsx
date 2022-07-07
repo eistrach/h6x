@@ -1,15 +1,14 @@
 import { Form } from "@remix-run/react";
 import clsx from "clsx";
-import { PointyCompassDirection } from "honeycomb-grid";
 import { Popover } from "~/hooks/usePopover";
 import { CellState } from "~/domain/logic/game";
-import { compareCell, Point } from "~/grid-math";
+import { compareCell, CompassDirection, Point } from "~/grid-math";
 import { IconButton } from "../base/IconButton";
 import { PopperPopover } from "../base/PopperPopover";
 import { SwordIcon } from "../icons/SwordIcon";
 
-export type DirectionalPopovers = { [k in PointyCompassDirection]: Popover };
-export type AttackableNeighbors = { [k in PointyCompassDirection]?: CellState };
+export type DirectionalPopovers = { [k in CompassDirection]: Popover };
+export type AttackableNeighbors = { [k in CompassDirection]?: CellState };
 
 export type AttackPopoversProps = {
   playerId: string;
@@ -26,7 +25,7 @@ export const getAttackPopoverRef = (
 ) => {
   const [direction] = (Object.entries(attackableNeighbors).find(([_, c]) =>
     compareCell(c.position, cell)
-  ) || []) as [PointyCompassDirection, CellState];
+  ) || []) as [CompassDirection, CellState];
   return direction
     ? (directionalPopovers[direction].setReferenceElement as any)
     : null;
@@ -42,7 +41,7 @@ const AttackPopovers = ({
   return (
     <>
       {Object.entries(directionalPopovers).map(([k, p], i) => {
-        const cell = attackableNeighbors[k as PointyCompassDirection];
+        const cell = attackableNeighbors[k as CompassDirection];
         return (
           <PopperPopover
             key={i}

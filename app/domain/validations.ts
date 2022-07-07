@@ -1,4 +1,4 @@
-import { cellInGrid, layoutGrid } from "../grid-math";
+import { cellInGrid, layoutCells } from "../grid-math";
 import { Cell } from "@prisma/client";
 import { asMathCell, asMathGrid, MathCell } from "~/grid-math";
 

@@ -1,5 +1,12 @@
 import { Cell } from "@prisma/client";
-import { asMathGrid, SVG_SIZE, cellsToMathCells } from "~/grid-math";
+import {
+  asMathGrid,
+  cellsToMathCells,
+  VIEWBOX_HEIGHT,
+  VIEWBOX_WIDTH,
+  VIEWBOX_X,
+  VIEWBOX_Y,
+} from "~/grid-math";
 import CellPreview from "./CellPreview";
 
 type GamePreviewProps = {
@@ -17,7 +24,7 @@ export default function GamePreview({
   return (
     <svg
       className={className}
-      viewBox={`0, 0, ${SVG_SIZE}, ${SVG_SIZE}`}
+      viewBox={`${VIEWBOX_X}, ${VIEWBOX_Y}, ${VIEWBOX_WIDTH}, ${VIEWBOX_HEIGHT}`}
       fill="currentColor"
       preserveAspectRatio="xMidYMid"
     >

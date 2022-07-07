@@ -9,6 +9,8 @@ export const PLAYER_COLORS = [
     stroke: "stroke-red-400",
     bg: "bg-red-400",
     ring: "ring-red-400",
+    fillSecondary: "fill-red-200",
+    strokeSecondary: "stroke-red-200",
   },
   {
     fill: "fill-yellow-400",
@@ -16,6 +18,8 @@ export const PLAYER_COLORS = [
     stroke: "stroke-yellow-400",
     bg: "bg-yellow-400",
     ring: "ring-yellow-400",
+    fillSecondary: "fill-yellow-200",
+    strokeSecondary: "stroke-yellow-200",
   },
   {
     fill: "fill-emerald-400",
@@ -23,6 +27,8 @@ export const PLAYER_COLORS = [
     stroke: "stroke-emerald-400",
     bg: "bg-emerald-400",
     ring: "ring-emerald-400",
+    fillSecondary: "fill-emerald-200",
+    strokeSecondary: "stroke-emerald-200",
   },
   {
     fill: "fill-sky-400",
@@ -30,6 +36,8 @@ export const PLAYER_COLORS = [
     stroke: "stroke-sky-400",
     bg: "bg-sky-400",
     ring: "ring-sky-400",
+    fillSecondary: "fill-sky-200",
+    strokeSecondary: "stroke-sky-200",
   },
   {
     fill: "fill-violet-400",
@@ -37,6 +45,8 @@ export const PLAYER_COLORS = [
     stroke: "stroke-violet-400",
     bg: "bg-violet-400",
     ring: "ring-violet-400",
+    fillSecondary: "fill-violet-200",
+    strokeSecondary: "stroke-violet-200",
   },
   {
     fill: "fill-pink-400",
@@ -44,6 +54,8 @@ export const PLAYER_COLORS = [
     stroke: "stroke-pink-400",
     bg: "bg-pink-400",
     ring: "ring-pink-400",
+    fillSecondary: "fill-pink-200",
+    strokeSecondary: "stroke-pink-200",
   },
 ];
 
@@ -53,4 +65,6 @@ export const NEUTRAL_COLOR = {
   stroke: "stroke-white",
   bg: "bg-white",
   ring: "ring-white",
+  fillSecondary: "fill-gray-100",
+  strokeSecondary: "stroke-gray-100",
 };

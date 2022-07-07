@@ -1,13 +1,13 @@
 import { useHover } from "@use-gesture/react";
 import clsx from "clsx";
 import {
-  asMathCell,
   MathCell,
-  HEX_STROKE_WIDTH,
-  SVG_OFFSET_X,
-  SVG_OFFSET_Y,
+  HEX_HEIGHT,
+  HEX_WIDTH,
   cellCorners,
+  HEX_STROKE_WIDTH,
 } from "~/grid-math";
+import DefaultSvg from "../svg/DefaultSvg";
 
 type CellViewProps = {
   cell: MathCell;
@@ -25,8 +25,8 @@ export default function CellView({ cell, fill, onSelect }: CellViewProps) {
     <g
       {...bindHover()}
       onClick={() => onSelect?.(cell)}
-      transform={`translate(${x + SVG_OFFSET_X}, ${y + SVG_OFFSET_Y})`}
-      className={clsx("transithion duration-300 cursor-pointer ", {
+      transform={`translate(${x - HEX_WIDTH / 2}, ${y - HEX_HEIGHT / 2}) `}
+      className={clsx("transithion duration-300 cursor-pointer stroke-black", {
         "fill-transparent hover:fill-slate-500": !fill,
         "fill-slate-700": fill,
       })}
