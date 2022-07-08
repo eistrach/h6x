@@ -9,7 +9,7 @@ export const DefaultNeutralModeId: CellModeId = "defensive";
 export const CellModes = {
   average: {
     attackDice: "1d6",
-    defenseDice: "1d6",
+    defenseDice: "1d8",
     diamondsPerTurn: 1,
   },
 
@@ -21,7 +21,7 @@ export const CellModes = {
 
   defensive: {
     attackDice: "1d3",
-    defenseDice: "2d6",
+    defenseDice: "2d8",
     diamondsPerTurn: 1,
   },
 
