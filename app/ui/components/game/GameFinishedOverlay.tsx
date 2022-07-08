@@ -11,8 +11,8 @@ import Confetti from "react-dom-confetti";
 const confettiConfig = {
   angle: 90,
   spread: 360,
-  startVelocity: 40,
-  elementCount: 70,
+  startVelocity: 20,
+  elementCount: 50,
   dragFriction: 0.12,
   duration: 3000,
   stagger: 3,
@@ -68,13 +68,15 @@ export default function GameFinishedOverlay({
             >
               <Dialog.Panel className="relative bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-visible shadow-xl transform transition-all sm:my-8 sm:max-w-sm sm:w-full sm:p-6">
                 <div>
-                  <div className="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-primary-100">
+                  <div className=" mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-primary-100">
                     <ClientOnly fallback={<div />}>
                       {() => (
-                        <Confetti
-                          active={showConfetti}
-                          config={confettiConfig}
-                        />
+                        <div className="absolute inset-0 overflow-hidden pointer-events-none flex justify-center items-start">
+                          <Confetti
+                            active={showConfetti}
+                            config={confettiConfig}
+                          />
+                        </div>
                       )}
                     </ClientOnly>
                     {won ? (

@@ -16,6 +16,7 @@ import { Form } from "@remix-run/react";
 import { Link } from "../base/Link";
 import { DuplicateIcon } from "@heroicons/react/solid";
 import { motion } from "framer-motion";
+import { ClientOnly } from "remix-utils";
 
 export type GameCardProps = PropsWithChildren<{
   game: UnpackArray<UnpackData<typeof getGamesForUser>>;
@@ -118,13 +119,17 @@ const GameCard = ({ game }: GameCardProps) => {
         )}
       >
         {game.phase === "LOBBY" && game.players.length < 6 && (
-          <Button
-            onClick={handleShare}
-            theme={InputTheme.Link}
-            LeftIcon={canShare ? ShareIcon : DuplicateIcon}
-          >
-            {canShare ? "Invite" : "Copy link"}
-          </Button>
+          <ClientOnly fallback={<button />}>
+            {() => (
+              <Button
+                onClick={handleShare}
+                theme={InputTheme.Link}
+                LeftIcon={canShare ? ShareIcon : DuplicateIcon}
+              >
+                {canShare ? "Invite" : "Copy link"}
+              </Button>
+            )}
+          </ClientOnly>
         )}
         {game.players.length > 1 &&
           (game.phase === "LOBBY" ? (
