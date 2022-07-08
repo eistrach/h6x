@@ -53,17 +53,17 @@ const attackCellReducer = (
     return;
   }
 
-  const unitsToMove = Math.min(attackerUnits, MaxUnitsToMove);
-  cell.units = Math.max(attackerUnits - unitsToMove, 0) + 1;
-  targetCell.units = unitsToMove;
-  targetCell.ownerId = cell.ownerId;
-  targetCell.activeModeId = cell.activeModeId;
-
   const hasTargetLost = !getAllCellsForPlayer(state, targetCell.ownerId).length;
   if (hasTargetLost)
     state.playerIdSequence = state.playerIdSequence.filter(
       (id) => id !== targetCell.ownerId
     );
+
+  const unitsToMove = Math.min(attackerUnits, MaxUnitsToMove);
+  cell.units = Math.max(attackerUnits - unitsToMove, 0) + 1;
+  targetCell.units = unitsToMove;
+  targetCell.ownerId = cell.ownerId;
+  targetCell.activeModeId = cell.activeModeId;
 };
 
 export const areCellsHostileNeighbours = (
