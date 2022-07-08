@@ -1,7 +1,7 @@
 import { GameWithState } from "~/domain/game/game.server";
 
 import { CellState } from "~/core/actions/types";
-import { getAllCellsForPlayer, getCurrentPlayer } from "~/domain/game/utils";
+import { getCurrentPlayer } from "~/domain/game/utils";
 import {
   cellsAreNeighbors,
   compareCell,

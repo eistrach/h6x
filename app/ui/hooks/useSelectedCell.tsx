@@ -7,7 +7,7 @@ export const useSelectedCell = (availableCells: CellStates) => {
   const [selectedCellPosition, setSelectedCellPosition] =
     useState<Point | null>();
 
-  const setSelectedCell = (cell?: CellState) => {
+  const setSelectedCell = (cell: CellState | null) => {
     setSelectedCellPosition(cell?.position);
   };
 
