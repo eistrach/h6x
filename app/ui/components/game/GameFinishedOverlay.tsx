@@ -14,15 +14,10 @@ export default function GameFinishedOverlay({
   won: boolean;
   lost: boolean;
 }) {
-  const [rendered, setRendered] = useState(false);
   const title = won ? "Congratulations!" : "Try again!";
   const description = won
     ? "You have destroyed all your enemies."
     : "Unfortunately you were destroyed.";
-
-  useLayoutEffect(() => {
-    setRendered(true);
-  }, []);
 
   return (
     <Transition.Root show={won || lost} as={Fragment}>
