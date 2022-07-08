@@ -8,8 +8,8 @@ export let loader: LoaderFunction = () => {
       name: "h6x",
       start_url: "/",
       display: "standalone",
-      background_color: "#d3d7dd",
-      theme_color: "#c34138",
+      background_color: "#F3F4F6",
+      theme_color: "#F3F4F6",
       shortcuts: [
         {
           name: "Homepage",

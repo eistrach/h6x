@@ -77,7 +77,7 @@ export default function App() {
         <Meta />
         <link rel="manifest" href="/resources/manifest.webmanifest" /> <Links />
       </head>
-      <body className="h-full bg-gray-100 overscroll-none">
+      <body className="h-full bg-gray-100 overscroll-none p-safe">
         <main className={clsx("overscroll-auto h-full", {})}>
           <Outlet />
         </main>

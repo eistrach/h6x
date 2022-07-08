@@ -46,6 +46,7 @@
     "remix-auth-socials": "^1.0.2",
     "remix-utils": "^3.3.0",
     "seedrandom": "^3.0.5",
+    "tailwindcss-safe-area": "^0.2.2",
     "tiny-invariant": "^1.2.0",
     "uuid": "^8.3.2",
     "web-push": "^3.4.5",
