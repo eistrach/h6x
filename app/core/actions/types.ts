@@ -5,7 +5,7 @@ export type PlayerState = {
   id: string;
   userId: string;
   diamonds: number;
-  availableModeChanges?: number;
+  availableModeChanges: number;
   index: number;
 };
 

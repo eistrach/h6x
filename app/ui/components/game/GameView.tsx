@@ -11,7 +11,7 @@ import GameMap from "./GameMap";
 import { motion } from "framer-motion";
 import { CheckCircleIcon } from "@heroicons/react/solid";
 import { LogoIcon } from "../icons/LogoIcon";
-import { getAllCellsForPlayer } from "~/domain/game/utils";
+import { getAllCellsForPlayer, isPlayingState } from "~/domain/game/utils";
 
 export default function GameView(props: GameWithState) {
   const { game, state, canTakeAction } = props;
@@ -112,7 +112,7 @@ export default function GameView(props: GameWithState) {
                         value="changeCellMode"
                         disabled={
                           disableActions ||
-                          (!!currentPlayer.availableModeChanges &&
+                          (isPlayingState(state) &&
                             currentPlayer.availableModeChanges <= 0)
                         }
                       >
@@ -128,6 +128,13 @@ export default function GameView(props: GameWithState) {
             layoutId="background"
             className="fixed bottom-0 rounded-t-2xl backdrop-blur-sm left-0 right-0 flex bg-gray-200/50 py-3 px-4 justify-between items-center"
           >
+            {isPlayingState(state) ? (
+              <span>
+                Available mode changes: {currentPlayer.availableModeChanges}
+              </span>
+            ) : (
+              <span>You may change as many cells as you want</span>
+            )}
             <Form method="post" className="ml-auto">
               <input type="hidden" name="playerId" value={playerId} />
               <Button

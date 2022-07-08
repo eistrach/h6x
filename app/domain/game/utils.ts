@@ -56,6 +56,7 @@ export const initializePlayers = (game: Game): PlayerStates => {
             id: player.id,
             userId: player.userId,
             diamonds: Math.floor(game.map.cells.length / game.players.length),
+            availableModeChanges: 3,
             index,
           },
         ])
@@ -157,4 +158,16 @@ export const updatePlayingState = (
   state.players[state.playerIdSequence[0]].diamonds = diamonds;
 
   return state;
+};
+
+export const isPreparationState = (
+  state: PlayingState | PreparationState
+): state is PreparationState => {
+  return "done" in state;
+};
+
+export const isPlayingState = (
+  state: PlayingState | PreparationState
+): state is PlayingState => {
+  return !("done" in state);
 };

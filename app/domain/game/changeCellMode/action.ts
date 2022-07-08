@@ -1,3 +1,5 @@
+import { isPlayingState } from "./../utils";
+import { isPlainObject } from "immer/dist/internal";
 import { CellModeId } from "~/config/rules";
 import { registerAction } from "~/core/actions";
 import { PlayingState } from "~/core/actions/types";
@@ -13,7 +15,7 @@ const changeCellModeReducer = (
   const player = getCurrentPlayer(state);
   const cell = state.cells[toId(payload.source)];
 
-  player.availableModeChanges && player.availableModeChanges--;
+  if (isPlayingState(state)) player.availableModeChanges--;
   cell.activeModeId = payload.modeId;
 };
 
@@ -30,10 +32,7 @@ export const isDifferentMode = (
 export const canAffordModeChange = (state: PlayingState) => {
   const currentPlayer = getCurrentPlayer(state);
 
-  if (
-    currentPlayer.availableModeChanges &&
-    currentPlayer.availableModeChanges <= 0
-  ) {
+  if (isPlayingState(state) && currentPlayer.availableModeChanges <= 0) {
     throw new Error("You don't have enough diamonds");
   }
 };

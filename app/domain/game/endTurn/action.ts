@@ -1,3 +1,4 @@
+import { isPlayingState } from "./../utils";
 import { isSendersTurn } from "./../../../core/actions/validations";
 import { ModeChangesPerTurn } from "~/config/rules";
 import { registerAction } from "~/core/actions";
@@ -14,7 +15,7 @@ const endTurnReducer = (state: PlayingState | PreparationState) => {
 
   const nextPlayer = getNextPlayer(state);
   if (nextPlayer) {
-    nextPlayer.diamonds = calculateDiamondsForPlayer(state, nextPlayer);
+    nextPlayer.diamonds += calculateDiamondsForPlayer(state, nextPlayer);
   }
 
   const [id, ...rest] = state.playerIdSequence;

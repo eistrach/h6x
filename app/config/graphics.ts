@@ -68,11 +68,11 @@ export const PlayerColors = [
 ];
 
 export const NeutralColor = {
-  fill: "fill-white",
-  selectedFill: "fill-gray-400-400",
-  stroke: "stroke-white",
-  bg: "bg-white",
-  ring: "ring-white",
+  fill: "fill-gray-200",
+  selectedFill: "fill-gray-200",
+  stroke: "stroke-gray-200",
+  bg: "bg-gray-200",
+  ring: "ring-gray-200",
   fillSecondary: "fill-gray-100",
   strokeSecondary: "stroke-gray-100",
 };
