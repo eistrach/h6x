@@ -111,7 +111,7 @@ export const action = async ({ request, params }: ActionArgs) => {
         await endTurn(gameId, result.data.playerId);
         break;
     }
-    return redirect(`/games/${gameId}`);
+    return redirect(`/games/games/${gameId}`);
   } catch (err) {
     console.log(err);
     return { error: (err as any).toString() };

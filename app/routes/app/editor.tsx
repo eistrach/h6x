@@ -24,7 +24,7 @@ export const action = async ({ request }: ActionArgs) => {
   }
 
   const map = await createMap(result.data.name, user.id);
-  return redirect(`/editor/${map.id}`);
+  return redirect(`/app/editor/${map.id}`);
 };
 
 type LoaderData = UnpackData<typeof getMapsForUser>;
