@@ -154,6 +154,7 @@ export const updatePlayingState = (
     turn: 1,
   };
 
+  Object.keys(state.players).forEach((id) => (state.players[id].diamonds = 0));
   const diamonds = calculateDiamondsForPlayer(state, getCurrentPlayer(state));
   state.players[state.playerIdSequence[0]].diamonds = diamonds;
 
