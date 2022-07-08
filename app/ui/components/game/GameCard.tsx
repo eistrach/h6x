@@ -34,8 +34,8 @@ const GameCard = ({ game }: GameCardProps) => {
 
     if (canShare) {
       navigator.share({
-        title: "Share game",
-        text: "Share game",
+        title: "Send h6x game invite",
+        text: `${user.displayName} has invited you to play h6x!`,
         url: shareUrl,
       });
     } else {
