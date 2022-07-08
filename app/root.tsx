@@ -25,7 +25,8 @@ export const links: LinksFunction = () => [
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
   title: "h6x",
-  viewport: "width=device-width,initial-scale=1",
+  viewport: "width=device-width,initial-scale=1, viewport-fit=cover",
+  "apple-mobile-web-app-status-bar-style": "black-translucent",
 });
 export const loader = async ({ request }: LoaderArgs) => {
   const user = await getUser(request);

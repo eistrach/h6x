@@ -4,8 +4,8 @@ import type { LoaderFunction } from "@remix-run/node";
 export let loader: LoaderFunction = () => {
   return json(
     {
-      short_name: "PWA",
-      name: "Remix PWA",
+      short_name: "h6x",
+      name: "h6x",
       start_url: "/",
       display: "standalone",
       background_color: "#d3d7dd",
@@ -68,6 +68,6 @@ export let loader: LoaderFunction = () => {
         "Cache-Control": "public, max-age=600",
         "Content-Type": "application/manifest+json",
       },
-    },
+    }
   );
 };
