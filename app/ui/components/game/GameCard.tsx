@@ -28,7 +28,7 @@ const GameCard = ({ game }: GameCardProps) => {
   const canShare =
     typeof window !== "undefined" &&
     typeof navigator !== "undefined" &&
-    navigator?.share;
+    navigator?.canShare;
   const handleShare = () => {
     const shareUrl = `${window.location.href}/${game.id}/join`;
 

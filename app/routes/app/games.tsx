@@ -92,7 +92,7 @@ const getActionableGames = (games: LoaderData, currentUserId: string) => {
 };
 
 const GamesPage = () => {
-  useDataRefreshOnInterval(1000);
+  useDataRefreshOnInterval(1000, false);
   const games = useLoaderData<LoaderData>();
   const outlet = useOutlet();
   const user = useUser();

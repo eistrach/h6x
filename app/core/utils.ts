@@ -69,12 +69,16 @@ export function randomIntFromInterval(
   return Math.floor(rng() * (max - min + 1) + min);
 }
 
-export function useDataRefreshOnInterval(intervalNumber: number) {
+export function useDataRefreshOnInterval(
+  intervalNumber: number,
+  stop: boolean
+) {
   let { refresh } = useDataRefresh();
   useEffect(() => {
+    if (stop) return;
     let interval = setInterval(refresh, intervalNumber);
     return () => clearInterval(interval);
-  }, [refresh]);
+  }, [refresh, false]);
 }
 
 export const toId = (p: Point | Cell | CellState) => {

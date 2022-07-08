@@ -14,6 +14,7 @@ import { LogoIcon } from "../icons/LogoIcon";
 import { isPlayingState } from "~/domain/game/utils";
 
 import clsx from "clsx";
+import GameFinishedOverlay from "./GameFinishedOverlay";
 
 const animationProps = {
   layout: true,
@@ -38,9 +39,15 @@ export default function GameView(props: GameWithState) {
   const transition = useTransition();
 
   const disableActions = transition.state !== "idle";
+  const isGameDone = state.playerIdSequence.length === 1;
 
   return (
     <div className="h-screen flex justify-center items-center flex-col">
+      <GameFinishedOverlay
+        lost={!canTakeAction && isGameDone}
+        won={canTakeAction && isGameDone}
+      />
+
       <AttackPopovers
         disabled={disableActions}
         attackableNeighbors={attackableNeighbors}
