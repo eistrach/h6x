@@ -121,7 +121,7 @@ export const action = async ({ request, params }: ActionArgs) => {
 const GamePage = () => {
   const state = useLoaderData<GameWithState>();
   const { error } = useActionData() || {};
-  useDataRefreshOnInterval(100000);
+  useDataRefreshOnInterval(1000);
 
   useEffect(() => {
     if (error) {
