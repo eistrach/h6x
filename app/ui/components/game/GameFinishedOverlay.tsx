@@ -1,5 +1,5 @@
 /* This example requires Tailwind CSS v2.0+ */
-import { Fragment, useEffect, useLayoutEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Link } from "../base/Link";
 import AwardSvg from "../svg/AwardSvg";
@@ -7,10 +7,7 @@ import { InputTheme } from "../base/InputTheme";
 import { EmojiSadIcon } from "@heroicons/react/solid";
 import { ClientOnly } from "remix-utils";
 import Confetti from "react-dom-confetti";
-import {
-  ArrowCircleLeftIcon,
-  ArrowNarrowLeftIcon,
-} from "@heroicons/react/outline";
+import { ArrowNarrowLeftIcon } from "@heroicons/react/outline";
 
 const confettiConfig = {
   angle: 90,
@@ -40,13 +37,21 @@ export default function GameFinishedOverlay({
     : "Unfortunately you were destroyed.";
 
   useEffect(() => {
-    setShowConfetti(true);
+    setTimeout(() => {
+      setShowConfetti(true);
+    }, 100);
   }, [won]);
 
   console.log(showConfetti);
+
   return (
     <Transition.Root show={won || lost} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={() => {}}>
+      <Dialog
+        as="div"
+        className="relative z-10"
+        onClose={() => {}}
+        initialFocus={null as any}
+      >
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -73,16 +78,10 @@ export default function GameFinishedOverlay({
               <Dialog.Panel className="relative bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-visible shadow-xl transform transition-all sm:my-8 sm:max-w-sm sm:w-full sm:p-6">
                 <div>
                   <div className=" mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-primary-100">
-                    <ClientOnly fallback={<div />}>
-                      {() => (
-                        <div className="absolute inset-0 overflow-hidden pointer-events-none flex justify-center items-start">
-                          <Confetti
-                            active={showConfetti}
-                            config={confettiConfig}
-                          />
-                        </div>
-                      )}
-                    </ClientOnly>
+                    <div className="absolute inset-0 overflow-hidden pointer-events-none flex justify-center items-start">
+                      <Confetti active={showConfetti} config={confettiConfig} />
+                    </div>
+
                     {won ? (
                       <>
                         <AwardSvg
@@ -125,7 +124,4 @@ export default function GameFinishedOverlay({
       </Dialog>
     </Transition.Root>
   );
-}
-function useRef(arg0: null) {
-  throw new Error("Function not implemented.");
 }
