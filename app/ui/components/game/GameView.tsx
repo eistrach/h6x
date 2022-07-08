@@ -55,8 +55,11 @@ export default function GameView(props: GameWithState) {
         playerId={playerId}
         sourceCell={selectedCell}
       />
-      <div className="fixed z-10 left-0 right-0 top-0 rounded-b-2xl backdrop-blur-sm h-20 bg-gray-100/50 px-4 flex justify-between items-start">
-        <Link to="/" className="flex gap-1 justify-start items-center my-3">
+      <div className="fixed z-10 left-0 right-0 top-0 rounded-b-2xl backdrop-blur-sm  h-20 bg-gray-200/50 px-safe pt-safe flex justify-between items-center">
+        <Link
+          to="/"
+          className="flex gap-1 justify-start items-center my-3 pl-4"
+        >
           <LogoIcon className="w-10 h-10" />
           <span className="font-extrabold text-2xl">h6x</span>
         </Link>
@@ -78,113 +81,116 @@ export default function GameView(props: GameWithState) {
         currentPlayer={currentPlayer}
       />
       {canTakeAction && (
-        <div className="flex flex-col items-center gap-8 m-4">
+        <div className=" ">
           <motion.div
             layout
             className={clsx(
-              "fixed bottom-0 rounded-t-2xl backdrop-blur-sm left-0 right-0 flex flex-col justify-between gap-2 bg-gray-200/50 py-3 px-4 ",
+              "fixed bottom-0 rounded-t-2xl backdrop-blur-sm left-0 right-0 flex flex-col justify-between gap-2 bg-gray-200/50 px-safe pb-safe ",
               { "": canUseBuyActions && selectedCell }
             )}
           >
-            {canUseBuyActions && selectedCell && (
+            <div className="px-4 py-4">
+              {" "}
+              {canUseBuyActions && selectedCell && (
+                <motion.div
+                  layout
+                  className="flex flex-col gap-8 justify-center items-center"
+                >
+                  <motion.div {...animationProps}>
+                    <Form method="post">
+                      <input
+                        type="hidden"
+                        name="position[x]"
+                        value={selectedCell?.position.x}
+                      />
+                      <input
+                        type="hidden"
+                        name="position[y]"
+                        value={selectedCell?.position.y}
+                      />
+                      <input type="hidden" name="playerId" value={playerId} />
+                      <Button
+                        disabled={
+                          disableActions ||
+                          (!!selectedUnit && currentPlayer.diamonds < UnitCost)
+                        }
+                        name="_intent"
+                        value="buyUnit"
+                      >
+                        Buy Unit: ${UnitCost}
+                      </Button>
+                    </Form>
+                  </motion.div>
+                  <div className="grid grid-cols-2 md:grid-cols-5  gap-2">
+                    {Object.keys(CellModes).map((cellModeId) => {
+                      return (
+                        <motion.div {...animationProps} key={cellModeId}>
+                          <Form method="post">
+                            <input
+                              type="hidden"
+                              name="position[x]"
+                              value={selectedCell?.position.x}
+                            />
+                            <input
+                              type="hidden"
+                              name="playerId"
+                              value={playerId}
+                            />
+                            <input
+                              type="hidden"
+                              name="position[y]"
+                              value={selectedCell?.position.y}
+                            />
+                            <input
+                              type="hidden"
+                              name="cellModeId"
+                              value={cellModeId}
+                            />
+                            <Button
+                              type="submit"
+                              name="_intent"
+                              value="changeCellMode"
+                              disabled={
+                                disableActions ||
+                                (isPlayingState(state) &&
+                                  currentPlayer.availableModeChanges <= 0)
+                              }
+                            >
+                              {cellModeId}
+                            </Button>
+                          </Form>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              )}
               <motion.div
                 layout
-                className="flex flex-col gap-8 justify-center items-center"
+                className=" flex justify-between items-center w-full h-min mt-auto"
               >
-                <motion.div {...animationProps}>
-                  <Form method="post">
-                    <input
-                      type="hidden"
-                      name="position[x]"
-                      value={selectedCell?.position.x}
-                    />
-                    <input
-                      type="hidden"
-                      name="position[y]"
-                      value={selectedCell?.position.y}
-                    />
-                    <input type="hidden" name="playerId" value={playerId} />
-                    <Button
-                      disabled={
-                        disableActions ||
-                        (!!selectedUnit && currentPlayer.diamonds < UnitCost)
-                      }
-                      name="_intent"
-                      value="buyUnit"
-                    >
-                      Buy Unit: ${UnitCost}
-                    </Button>
-                  </Form>
-                </motion.div>
-                <div className="grid grid-cols-2 md:grid-cols-5  gap-2">
-                  {Object.keys(CellModes).map((cellModeId) => {
-                    return (
-                      <motion.div {...animationProps} key={cellModeId}>
-                        <Form method="post">
-                          <input
-                            type="hidden"
-                            name="position[x]"
-                            value={selectedCell?.position.x}
-                          />
-                          <input
-                            type="hidden"
-                            name="playerId"
-                            value={playerId}
-                          />
-                          <input
-                            type="hidden"
-                            name="position[y]"
-                            value={selectedCell?.position.y}
-                          />
-                          <input
-                            type="hidden"
-                            name="cellModeId"
-                            value={cellModeId}
-                          />
-                          <Button
-                            type="submit"
-                            name="_intent"
-                            value="changeCellMode"
-                            disabled={
-                              disableActions ||
-                              (isPlayingState(state) &&
-                                currentPlayer.availableModeChanges <= 0)
-                            }
-                          >
-                            {cellModeId}
-                          </Button>
-                        </Form>
-                      </motion.div>
-                    );
-                  })}
-                </div>
+                {isPlayingState(state) ? (
+                  <span>
+                    Available mode changes: {currentPlayer.availableModeChanges}
+                  </span>
+                ) : (
+                  <span>You may change as many cells as you want</span>
+                )}
+                <Form method="post" className="ml-auto">
+                  <input type="hidden" name="playerId" value={playerId} />
+                  <Button
+                    iconClasses="h-8 w-8"
+                    disabled={disableActions}
+                    RightIcon={CheckCircleIcon}
+                    name="_intent"
+                    value="endTurn"
+                    type="submit"
+                  >
+                    Done
+                  </Button>
+                </Form>
               </motion.div>
-            )}
-            <motion.div
-              layout
-              className=" flex justify-between items-center w-full h-min mt-auto"
-            >
-              {isPlayingState(state) ? (
-                <span>
-                  Available mode changes: {currentPlayer.availableModeChanges}
-                </span>
-              ) : (
-                <span>You may change as many cells as you want</span>
-              )}
-              <Form method="post" className="ml-auto">
-                <input type="hidden" name="playerId" value={playerId} />
-                <Button
-                  iconClasses="h-8 w-8"
-                  disabled={disableActions}
-                  RightIcon={CheckCircleIcon}
-                  name="_intent"
-                  value="endTurn"
-                  type="submit"
-                >
-                  Done
-                </Button>
-              </Form>
-            </motion.div>
+            </div>
           </motion.div>
         </div>
       )}

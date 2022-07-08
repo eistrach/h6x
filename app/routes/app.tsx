@@ -13,9 +13,12 @@ const AppPage = () => {
   return (
     <div>
       {user && (
-        <div className="fixed z-10 left-0 right-0 top-0 rounded-b-2xl backdrop-blur-sm h-16 bg-gray-200/50 px-4 flex justify-between items-center">
-          <RemixLink to="/" className="flex gap-1 justify-start items-center">
-            <LogoIcon className="w-10 h-10" />
+        <div className="fixed z-10 left-0 right-0 top-0 rounded-b-2xl backdrop-blur-sm h-20 bg-gray-200/50 px-safe pt-safe  flex justify-between items-center">
+          <RemixLink
+            to="/"
+            className="flex gap-1 justify-start items-center pl-4"
+          >
+            <LogoIcon className="w-10 h-10 " />
             <span className="font-extrabold text-2xl">h6x</span>
           </RemixLink>
           <ProfileMenu />

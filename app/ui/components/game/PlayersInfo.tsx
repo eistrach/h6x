@@ -18,7 +18,7 @@ const PlayersInfo = ({
   users,
 }: PlayersInfoProps) => {
   return (
-    <div className="flex w-full justify-end items-center pt-1">
+    <div className="flex w-full justify-end items-center pt-4 pr-4">
       <ol className="flex-shrink-0 flex m-2 -space-x-1 items-center">
         <AnimatePresence>
           {[...playerSequenceIds].reverse().map((id) => {
