@@ -7,6 +7,10 @@ import { InputTheme } from "../base/InputTheme";
 import { EmojiSadIcon } from "@heroicons/react/solid";
 import { ClientOnly } from "remix-utils";
 import Confetti from "react-dom-confetti";
+import {
+  ArrowCircleLeftIcon,
+  ArrowNarrowLeftIcon,
+} from "@heroicons/react/outline";
 
 const confettiConfig = {
   angle: 90,
@@ -106,8 +110,12 @@ export default function GameFinishedOverlay({
                   </div>
                 </div>
                 <div className="mt-5 sm:mt-6  ">
-                  <Link to="/app/games" theme={InputTheme.Stretched}>
-                    Go back
+                  <Link
+                    to="/app/games"
+                    theme={InputTheme.Stretched}
+                    LeftIcon={ArrowNarrowLeftIcon}
+                  >
+                    Go back to games
                   </Link>
                 </div>
               </Dialog.Panel>

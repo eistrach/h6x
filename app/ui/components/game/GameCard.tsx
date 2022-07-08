@@ -17,6 +17,8 @@ import { Link } from "../base/Link";
 import { DuplicateIcon } from "@heroicons/react/solid";
 import { motion } from "framer-motion";
 import { ClientOnly } from "remix-utils";
+import { getPlayerStates } from "~/domain/game/utils";
+import { PlayerColors } from "~/config/graphics";
 
 export type GameCardProps = PropsWithChildren<{
   game: UnpackArray<UnpackData<typeof getGamesForUser>>;
@@ -43,6 +45,7 @@ const GameCard = ({ game }: GameCardProps) => {
   };
 
   const creator = game.creator;
+  const playerStates = getPlayerStates(game);
 
   return (
     <motion.li
@@ -83,24 +86,30 @@ const GameCard = ({ game }: GameCardProps) => {
                 className="text-primary-900 text-center w-6 h-6  rounded-full ring ring-white bg-gray-100"
               ></li>
             ))}
-            {game.players.map((player) => (
-              <li key={player.id}>
-                <div
-                  className={clsx(
-                    "w-8 h-8 ring-green-400 ring-2 shadow-md rounded-full bg-white"
-                  )}
-                >
-                  {!!player.user.avatarUrl ? (
-                    <img
-                      src={player.user.avatarUrl}
-                      className="object-cover rounded-full"
-                    ></img>
-                  ) : (
-                    <span>{player.user.displayName[0]}</span>
-                  )}
-                </div>
-              </li>
-            ))}
+            {game.players.map((player) => {
+              const ring = playerStates
+                ? PlayerColors[playerStates[player.id].index].ring
+                : "ring-white";
+              return (
+                <li key={player.id}>
+                  <div
+                    className={clsx(
+                      "w-8 h-8  ring-2 shadow-md rounded-full bg-white",
+                      ring
+                    )}
+                  >
+                    {!!player.user.avatarUrl ? (
+                      <img
+                        src={player.user.avatarUrl}
+                        className="object-cover rounded-full"
+                      ></img>
+                    ) : (
+                      <span>{player.user.displayName[0]}</span>
+                    )}
+                  </div>
+                </li>
+              );
+            })}
           </ol>
         </div>
       </div>

@@ -168,7 +168,20 @@ export const isPreparationState = (
 };
 
 export const isPlayingState = (
-  state: PlayingState | PreparationState
+  state: PlayingState | PreparationState | undefined | null
 ): state is PlayingState => {
+  if (!state) return false;
   return !("done" in state);
+};
+
+export const getPlayerStates = (game: Game): PlayerStates | null => {
+  if (game.phase === "PLAYING") {
+    return game.gameState!.players;
+  }
+
+  if (game.phase === "PREPARATION") {
+    return Object.values(game.players)[0].preparationState!.players;
+  }
+
+  return null;
 };
