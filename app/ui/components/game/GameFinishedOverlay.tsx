@@ -6,6 +6,7 @@ import AwardSvg from "../svg/AwardSvg";
 import { InputTheme } from "../base/InputTheme";
 import { EmojiSadIcon } from "@heroicons/react/solid";
 import ConfettiExplosion from "react-confetti-explosion";
+import { ClientOnly } from "remix-utils";
 
 export default function GameFinishedOverlay({
   won,
@@ -50,7 +51,9 @@ export default function GameFinishedOverlay({
                   <div className="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-primary-100">
                     {won ? (
                       <>
-                        <ConfettiExplosion floorHeight={1600} />
+                        <ClientOnly fallback={<div />}>
+                          {() => <ConfettiExplosion floorHeight={1600} />}
+                        </ClientOnly>
                         <AwardSvg
                           className="h-10 w-10 fill-primary-600 stroke-primary-600"
                           aria-hidden="true"

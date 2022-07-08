@@ -39,14 +39,14 @@ export default function GameView(props: GameWithState) {
   const transition = useTransition();
 
   const disableActions = transition.state !== "idle";
-  const isGameDone = state.playerIdSequence.length === 1;
+  const isGameDone =
+    state.playerIdSequence.length === 1 && isPlayingState(state);
 
   return (
     <div className="h-screen flex justify-center items-center flex-col">
-      <GameFinishedOverlay
-        lost={!canTakeAction && isGameDone}
-        won={canTakeAction && isGameDone}
-      />
+      {isGameDone && (
+        <GameFinishedOverlay lost={!canTakeAction} won={canTakeAction} />
+      )}
 
       <AttackPopovers
         disabled={disableActions}
