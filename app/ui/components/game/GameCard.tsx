@@ -90,7 +90,10 @@ const GameCard = ({ game }: GameCardProps) => {
               const ring = state?.players
                 ? PlayerColors[state.players[player.id].index].ring
                 : "ring-white";
-              const lost = state && !state.playerIdSequence.includes(player.id);
+              const lost =
+                game.phase === "PLAYING" &&
+                state &&
+                !state.playerIdSequence.includes(player.id);
               return (
                 <li key={player.id} className="relative">
                   <div
