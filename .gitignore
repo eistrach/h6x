@@ -10,3 +10,4 @@ package-lock.json
 tailwind.css
 
 entry.worker.js
+.node-persist/storage

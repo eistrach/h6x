@@ -32,7 +32,9 @@ if ("serviceWorker" in navigator) {
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
-  const base64 = (base64String + padding).replace(/\-/g, "+").replace(/_/g, "/");
+  const base64 = (base64String + padding)
+    .replace(/\-/g, "+")
+    .replace(/_/g, "/");
 
   const rawData = window.atob(base64);
   const outputArray = new Uint8Array(rawData.length);
@@ -63,7 +65,7 @@ navigator.serviceWorker.ready
     });
   })
   .then(async (subscription) => {
-    await fetch("./resources/subscribe", {
+    await fetch("/resources/subscribe", {
       method: "POST",
       body: JSON.stringify({
         subscription: subscription,
