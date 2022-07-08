@@ -5,11 +5,11 @@ import { requireUser } from "~/domain/auth/session.server";
 export const loader: LoaderFunction = async ({ request }) => {
   await requireUser(request);
   await prisma.game.deleteMany();
-  return redirect("/games");
+  return redirect("/app/games");
 };
 
 export const action: ActionFunction = async ({ request }) => {
   await requireUser(request);
   await prisma.game.deleteMany();
-  return redirect("/games");
+  return redirect("/app/games");
 };

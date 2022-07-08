@@ -29,7 +29,7 @@ const SettingsPage = () => {
               motionProps={{ layoutId: "leftButton" }}
               theme={InputTheme.OutlinedBlack}
               LeftIcon={ArrowLeftIcon}
-              to="/games"
+              to="/app/games"
             >
               Back
             </Link>

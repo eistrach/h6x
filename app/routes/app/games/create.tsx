@@ -35,7 +35,7 @@ export const action = async ({ request }: ActionArgs) => {
   }
 
   await createGame(user.id, result.data.selectedMapId);
-  return redirect(`/games`);
+  return redirect(`/app/games`);
 };
 
 type LoaderData = UnpackData<typeof getPublishedMaps>;
@@ -116,7 +116,7 @@ const CreateGamePage = () => {
               motionProps={{ layoutId: "leftButton" }}
               theme={InputTheme.OutlinedBlack}
               LeftIcon={ArrowLeftIcon}
-              to="/games"
+              to="/app/games"
             >
               Back
             </Link>

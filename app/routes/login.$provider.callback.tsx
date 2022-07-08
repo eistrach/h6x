@@ -8,7 +8,7 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   const provider = requireParam(params, "provider");
   try {
     await authenticator.authenticate(provider, request, {
-      successRedirect: "/games",
+      successRedirect: "/app/games",
       failureRedirect: "/login",
     });
   } catch (error) {

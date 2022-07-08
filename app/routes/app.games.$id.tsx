@@ -27,7 +27,7 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   const result = await getGameWithState(gameId, user);
 
   if (!result) {
-    redirect(`/games`);
+    redirect(`/app/games`);
   }
 
   return result;

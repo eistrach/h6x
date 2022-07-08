@@ -1,7 +1,6 @@
 import { useLoaderData, useOutlet } from "@remix-run/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "~/ui/components/base/Link";
-import { Link as RemixLink } from "@remix-run/react";
 import { getGamesForUser } from "~/domain/game/game.server";
 import { requireUser } from "~/domain/auth/session.server";
 import {
@@ -16,10 +15,8 @@ import { PlusIcon } from "@heroicons/react/solid";
 import GameCard from "~/ui/components/game/GameCard";
 import { CogIcon } from "@heroicons/react/solid";
 import { InputTheme } from "~/ui/components/base/InputTheme";
-import { Disclosure, Transition } from "@headlessui/react";
+import { Disclosure } from "@headlessui/react";
 import clsx from "clsx";
-import { LogoIcon } from "~/ui/components/icons/LogoIcon";
-import ProfileMenu from "~/ui/components/base/ProfileMenu";
 type LoaderData = UnpackData<typeof getGamesForUser>;
 
 export const loader = async ({ request }: LoaderArgs) => {
@@ -109,48 +106,36 @@ const GamesPage = () => {
   );
 
   return (
-    <div>
-      {user && (
-        <div className="fixed z-10 left-0 right-0 top-0 rounded-b-2xl backdrop-blur-sm h-16 bg-gray-200/50 px-4 flex justify-between items-center">
-          <RemixLink to="/" className="flex gap-1 justify-start items-center">
-            <LogoIcon className="w-10 h-10" />
-            <span className="font-extrabold text-2xl">h6x</span>
-          </RemixLink>
-          <ProfileMenu />
-        </div>
-      )}
+    <>
+      <AnimatePresence initial={false}>{outlet}</AnimatePresence>
 
-      <div className="min-h-full h-full mt-16">
-        <AnimatePresence initial={false}>{outlet}</AnimatePresence>
-
-        <div className=" px-6  mb-16 flex flex-col ">
-          <GameList games={actionableGames} title="Your Turn" />
-          <GameList games={lobbyGames} title="Lobby" />
-          <GameList games={runningGames} title="Waiting" />
-        </div>
-
-        <motion.div
-          layoutId="background"
-          className="fixed bottom-0 rounded-t-2xl backdrop-blur-sm left-0 right-0 flex bg-gray-200/50 py-3 px-4 justify-between items-center"
-        >
-          <Link
-            motionProps={{ layoutId: "leftButton" }}
-            theme={InputTheme.OutlinedBlack}
-            LeftIcon={CogIcon}
-            to="settings"
-          >
-            Settings
-          </Link>
-          <Link
-            motionProps={{ layoutId: "rightButton" }}
-            LeftIcon={PlusIcon}
-            to="create"
-          >
-            New Game
-          </Link>
-        </motion.div>
+      <div className=" px-6  mb-16 flex flex-col ">
+        <GameList games={actionableGames} title="Your Turn" />
+        <GameList games={lobbyGames} title="Lobby" />
+        <GameList games={runningGames} title="Waiting" />
       </div>
-    </div>
+
+      <motion.div
+        layoutId="background"
+        className="fixed bottom-0 rounded-t-2xl backdrop-blur-sm left-0 right-0 flex bg-gray-200/50 py-3 px-4 justify-between items-center"
+      >
+        <Link
+          motionProps={{ layoutId: "leftButton" }}
+          theme={InputTheme.OutlinedBlack}
+          LeftIcon={CogIcon}
+          to="settings"
+        >
+          Settings
+        </Link>
+        <Link
+          motionProps={{ layoutId: "rightButton" }}
+          LeftIcon={PlusIcon}
+          to="create"
+        >
+          New Game
+        </Link>
+      </motion.div>
+    </>
   );
 };
 

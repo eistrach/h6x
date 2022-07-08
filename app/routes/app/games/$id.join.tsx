@@ -11,7 +11,7 @@ export const loader = async ({ request, params }: LoaderArgs) => {
 
   await joinGame(gameId, user.id);
 
-  return redirect("/games");
+  return redirect("/app/games");
 };
 
 export default function Test() {
