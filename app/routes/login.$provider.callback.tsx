@@ -1,6 +1,6 @@
 import { SocialsProvider } from "remix-auth-socials";
-import { LoaderArgs } from "~/utils";
-import { authenticator } from "~/auth/session.server";
+import { LoaderArgs } from "~/core/utils";
+import { authenticator } from "~/domain/auth/session.server";
 import { redirect } from "@remix-run/node";
 import { requireParam } from "~/utils.server";
 

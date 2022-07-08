@@ -8,9 +8,9 @@ import {
 import { redirect } from "@remix-run/node";
 import { z } from "zod";
 import { createMap, getMapsForUser } from "~/domain/map.server";
-import type { ActionArgs, LoaderArgs, UnpackData } from "~/utils";
+import type { ActionArgs, LoaderArgs, UnpackData } from "~/core/utils";
 import { validateForm } from "~/utils.server";
-import { requireAdmin, requireUser } from "~/auth/session.server";
+import { requireAdmin, requireUser } from "~/domain/auth/session.server";
 
 const Schema = z.object({ name: z.string().min(1) });
 export const action = async ({ request }: ActionArgs) => {

@@ -1,25 +1,25 @@
 import { useLoaderData, useOutlet } from "@remix-run/react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Link } from "~/components/base/Link";
+import { Link } from "~/ui/components/base/Link";
 import { Link as RemixLink } from "@remix-run/react";
-import { getGamesForUser } from "~/domain/game.server";
-import { requireUser } from "~/auth/session.server";
+import { getGamesForUser } from "~/domain/game/game.server";
+import { requireUser } from "~/domain/auth/session.server";
 import {
   LoaderArgs,
   UnpackData,
   useDataRefreshOnInterval,
   useUser,
-} from "~/utils";
+} from "~/core/utils";
 import { ChevronDownIcon } from "@heroicons/react/outline";
 
 import { PlusIcon } from "@heroicons/react/solid";
-import GameCard from "~/components/game/GameCard";
+import GameCard from "~/ui/components/game/GameCard";
 import { CogIcon } from "@heroicons/react/solid";
-import { InputTheme } from "~/components/base/InputTheme";
+import { InputTheme } from "~/ui/components/base/InputTheme";
 import { Disclosure, Transition } from "@headlessui/react";
 import clsx from "clsx";
-import { LogoIcon } from "~/components/icons/LogoIcon";
-import ProfileMenu from "~/components/base/ProfileMenu";
+import { LogoIcon } from "~/ui/components/icons/LogoIcon";
+import ProfileMenu from "~/ui/components/base/ProfileMenu";
 type LoaderData = UnpackData<typeof getGamesForUser>;
 
 export const loader = async ({ request }: LoaderArgs) => {
@@ -87,8 +87,9 @@ const getActionableGames = (games: LoaderData, currentUserId: string) => {
     const players = game.players.filter((p) => p.userId === currentUserId);
     return (
       (game.phase === "PLAYING" &&
-        !!players.find((p) => game.gameState?.currentPlayerId === p.id)) ||
-      (game.phase === "PREPARATION" && players.some((p) => !p.setupState?.done))
+        !!players.find((p) => game.gameState?.playerIdSequence[0] === p.id)) ||
+      (game.phase === "PREPARATION" &&
+        players.some((p) => !p.preparationState?.done))
     );
   });
 };

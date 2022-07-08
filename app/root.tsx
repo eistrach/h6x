@@ -12,8 +12,8 @@ import {
 import styles from "./styles/tailwind.css";
 import fontStyles from "./styles/rubik.css";
 import customStyles from "./styles/custom.css";
-import { LoaderArgs, useOptionalUser } from "./utils";
-import { getUser } from "./auth/session.server";
+import { LoaderArgs, useOptionalUser } from "./core/utils";
+import { getUser } from "./domain/auth/session.server";
 import clsx from "clsx";
 
 export const links: LinksFunction = () => [

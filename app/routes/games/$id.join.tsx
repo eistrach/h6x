@@ -1,8 +1,8 @@
 import { redirect } from "@remix-run/node";
 import { useEffect } from "react";
-import { joinGame } from "~/domain/game.server";
-import { requireUser } from "~/auth/session.server";
-import { LoaderArgs } from "~/utils";
+import { joinGame } from "~/domain/game/game.server";
+import { requireUser } from "~/domain/auth/session.server";
+import { LoaderArgs } from "~/core/utils";
 import { requireParam } from "~/utils.server";
 
 export const loader = async ({ request, params }: LoaderArgs) => {

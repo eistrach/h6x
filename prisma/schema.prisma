@@ -83,7 +83,7 @@ model Player {
   id String @id @default(cuid())
 
   lastSeenActionId Int?
-  setupState       Json?
+  preparationState Json?
 
   gameId String
   game   Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)

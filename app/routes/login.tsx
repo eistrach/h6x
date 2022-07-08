@@ -1,14 +1,14 @@
 import { Form } from "@remix-run/react";
-import { ActionArgs, LoaderArgs } from "~/utils";
-import { authenticator } from "~/auth/session.server";
-import { Button } from "~/components/base/Button";
-import { DiscordIcon } from "~/components/icons/DiscordIcon";
-import { LogoIcon } from "~/components/icons/LogoIcon";
-import { InputTheme } from "~/components/base/InputTheme";
+import { ActionArgs, LoaderArgs } from "~/core/utils";
+import { authenticator } from "~/domain/auth/session.server";
+import { Button } from "~/ui/components/base/Button";
+import { DiscordIcon } from "~/ui/components/icons/DiscordIcon";
+import { LogoIcon } from "~/ui/components/icons/LogoIcon";
+import { InputTheme } from "~/ui/components/base/InputTheme";
 import { z } from "zod";
 import { validateForm } from "~/utils.server";
 import { badRequest } from "remix-utils";
-import { GoogleIcon } from "~/components/icons/GoogleIcon";
+import { GoogleIcon } from "~/ui/components/icons/GoogleIcon";
 
 export const loader = async ({ request }: LoaderArgs) => {
   return await authenticator.isAuthenticated(request, {

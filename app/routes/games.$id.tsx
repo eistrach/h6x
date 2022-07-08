@@ -4,81 +4,47 @@ import { useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { z } from "zod";
 
-import {
-  attack,
-  buy,
-  end,
-  getGame,
-  startSetupPhase,
-  upgrade,
-} from "~/domain/game.server";
-
-import { PlayingState, SetupState } from "~/domain/logic/game";
-import { requireUser } from "~/auth/session.server";
-import {
-  ActionArgs,
-  LoaderArgs,
-  UnpackData,
-  useDataRefreshOnInterval,
-} from "~/utils";
+import { requireUser } from "~/domain/auth/session.server";
+import { ActionArgs, LoaderArgs, useDataRefreshOnInterval } from "~/core/utils";
 import { requireParam, validateForm } from "~/utils.server";
 
-import GameView from "~/components/game/GameView";
-import { AnimatePresence, motion } from "framer-motion";
-import { CogIcon, PlusIcon } from "@heroicons/react/solid";
-import { Link } from "~/components/base/Link";
-import { InputTheme } from "~/components/base/InputTheme";
+import GameView from "~/ui/components/game/GameView";
+import {
+  GameWithState,
+  getGameWithState,
+  startPreparation,
+} from "~/domain/game/game.server";
+import { changeCellMode } from "~/domain/game/changeCellMode/index.server";
+import { CellModeIds } from "~/config/rules";
+import { buyUnit } from "~/domain/game/buyUnit/index.server";
+import { attackCell } from "~/domain/game/attackCell/index.server";
+import { endTurn } from "~/domain/game/endTurn/index.server";
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const gameId = requireParam(params, "id");
   const user = await requireUser(request);
-  const game = await getGame(gameId);
 
-  if (!game) {
-    throw new Error(`Game ${gameId} not found`);
+  const result = await getGameWithState(gameId, user);
+
+  if (!result) {
+    redirect(`/games`);
   }
 
-  switch (game.phase) {
-    case "LOBBY":
-      return redirect("/games");
-    case "PREPARATION":
-      const players = [...game.players]
-        .sort((a, b) => a.id.localeCompare(b.id))
-        .filter((player) => player.userId === user.id)!;
-
-      const notDonePlayer = players.find(
-        (p) => !(p.setupState as SetupState).done
-      );
-      const player = notDonePlayer || players[0];
-
-      const setupState = player.setupState as SetupState;
-
-      return {
-        phase: "PREPARATION" as const,
-        playerCells: setupState.cells,
-        players: setupState.players,
-        playerId: setupState.currentPlayerId,
-        canTakeAction: !setupState.done,
-        users: game.players.map((p) => p.user),
-      };
-    case "PLAYING":
-      const gameState = game.gameState as PlayingState;
-      const currentPlayer = gameState.players.find((p) => p.userId === user.id);
-      return {
-        phase: "PLAYING" as const,
-        playerCells: gameState.cells,
-        players: gameState.players,
-        playerId: gameState.currentPlayerId,
-        canTakeAction: gameState.currentPlayerId === currentPlayer?.id,
-        users: game.players.map((p) => p.user),
-      };
-  }
+  return result;
 };
-type LoaderData = UnpackData<typeof loader>;
 
 const Schema = z.union([
   z.object({
     _intent: z.literal("startGame"),
+  }),
+  z.object({
+    _intent: z.literal("changeCellMode"),
+    position: z.object({
+      x: z.preprocess(Number, z.number()),
+      y: z.preprocess(Number, z.number()),
+    }),
+    cellModeId: z.enum(CellModeIds),
+    playerId: z.string().min(1),
   }),
   z.object({
     _intent: z.literal("buyUnit"),
@@ -86,19 +52,10 @@ const Schema = z.union([
       x: z.preprocess(Number, z.number()),
       y: z.preprocess(Number, z.number()),
     }),
-    unitId: z.enum(["default", "attacker", "defender", "farmer", "snowballer"]),
     playerId: z.string().min(1),
   }),
   z.object({
-    _intent: z.literal("upgradeUnit"),
-    position: z.object({
-      x: z.preprocess(Number, z.number()),
-      y: z.preprocess(Number, z.number()),
-    }),
-    playerId: z.string().min(1),
-  }),
-  z.object({
-    _intent: z.literal("attackUnit"),
+    _intent: z.literal("attackCell"),
     position: z.object({
       x: z.preprocess(Number, z.number()),
       y: z.preprocess(Number, z.number()),
@@ -120,27 +77,29 @@ export const action = async ({ request, params }: ActionArgs) => {
   const result = await validateForm(request, Schema);
 
   if (!result.success) {
-    return result;
+    return {
+      error: result.errors.map((e) => `${e.path}: ${e.message}`).join("\n"),
+    };
   }
 
   try {
     switch (result.data._intent) {
       case "startGame":
-        await startSetupPhase(gameId, user.id);
+        await startPreparation(gameId, user.id);
         break;
-      case "buyUnit":
-        await buy(
+      case "changeCellMode":
+        await changeCellMode(
           gameId,
           result.data.playerId,
           result.data.position,
-          result.data.unitId
+          result.data.cellModeId
         );
         break;
-      case "upgradeUnit":
-        await upgrade(gameId, result.data.playerId, result.data.position);
+      case "buyUnit":
+        await buyUnit(gameId, result.data.playerId, result.data.position);
         break;
-      case "attackUnit":
-        await attack(
+      case "attackCell":
+        await attackCell(
           gameId,
           result.data.playerId,
           result.data.position,
@@ -149,19 +108,20 @@ export const action = async ({ request, params }: ActionArgs) => {
 
         break;
       case "endTurn":
-        await end(gameId, result.data.playerId);
+        await endTurn(gameId, result.data.playerId);
         break;
     }
     return redirect(`/games/${gameId}`);
   } catch (err) {
+    console.log(err);
     return { error: (err as any).toString() };
   }
 };
 
 const GamePage = () => {
-  const gameState = useLoaderData<LoaderData>();
+  const state = useLoaderData<GameWithState>();
   const { error } = useActionData() || {};
-  useDataRefreshOnInterval(1000);
+  useDataRefreshOnInterval(100000);
 
   useEffect(() => {
     if (error) {
@@ -174,7 +134,7 @@ const GamePage = () => {
       <Toaster position="top-right" />
 
       <div className="min-h-full h-full">
-        <GameView state={gameState} />
+        <GameView {...state} />
       </div>
     </div>
   );

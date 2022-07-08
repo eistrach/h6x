@@ -1,6 +1,5 @@
-import { cellInGrid, layoutCells } from "../grid-math";
 import { Cell } from "@prisma/client";
-import { asMathCell, asMathGrid, MathCell } from "~/grid-math";
+import { asMathCell, cellInGrid, MathCell, asMathGrid } from "~/core/math";
 
 export const validateCellConnections = (cells: Omit<Cell, "id">[]) => {
   const gridCells = cells.map((cell) => asMathCell(cell.x, cell.y));

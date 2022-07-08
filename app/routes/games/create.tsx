@@ -4,15 +4,15 @@ import { Form, useLoaderData } from "@remix-run/react";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
-import { Button } from "~/components/base/Button";
-import { Link } from "~/components/base/Link";
-import { InputTheme } from "~/components/base/InputTheme";
-import { createGame } from "~/domain/game.server";
+import { Button } from "~/ui/components/base/Button";
+import { Link } from "~/ui/components/base/Link";
+import { InputTheme } from "~/ui/components/base/InputTheme";
+import { createGame } from "~/domain/game/game.server";
 import { getPublishedMaps } from "~/domain/map.server";
-import { requireUser } from "~/auth/session.server";
-import { ActionArgs, LoaderArgs, UnpackData } from "~/utils";
+import { requireUser } from "~/domain/auth/session.server";
+import { ActionArgs, LoaderArgs, UnpackData } from "~/core/utils";
 import { validateForm } from "~/utils.server";
-import GamePreview from "~/components/map/GamePreview";
+import GamePreview from "~/ui/components/map/GamePreview";
 import { LinksFunction } from "@remix-run/react/routeModules";
 import {
   SnapItem,

@@ -1,10 +1,8 @@
 import { Cell, CellType } from "@prisma/client";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import { useState } from "react";
-import MapView from "~/components/map/MapView";
-import { cellInGrid, getAllCellsInArea, MathCell, Point } from "~/grid-math";
+import MapView from "~/ui/components/map/MapView";
 
-import { RadioGroup } from "@headlessui/react";
 import { redirect } from "@remix-run/node";
 import { z } from "zod";
 import {
@@ -18,14 +16,14 @@ import {
   toggleMapVisibility,
   updateMap,
 } from "~/domain/map.server";
-import { requireAdmin, requireUser } from "~/auth/session.server";
-import { badRequest, notFound } from "remix-utils";
-import { ActionArgs, LoaderArgs, UnpackData } from "~/utils";
-import { validateCellConnections } from "~/domain/validations";
-import ToolSelection from "~/components/editor/ToolSelection";
-import TileSelection from "~/components/editor/TileSelection";
-import { Button } from "~/components/base/Button";
+import { requireAdmin, requireUser } from "~/domain/auth/session.server";
+import { notFound } from "remix-utils";
+import { ActionArgs, LoaderArgs, UnpackData } from "~/core/utils";
+import ToolSelection from "~/ui/components/editor/ToolSelection";
+import TileSelection from "~/ui/components/editor/TileSelection";
+import { Button } from "~/ui/components/base/Button";
 import clsx from "clsx";
+import { cellInGrid, getAllCellsInArea, MathCell, Point } from "~/core/math";
 
 const Schema = z.object({
   _intent: z.enum(["togglePublished", "save"]),

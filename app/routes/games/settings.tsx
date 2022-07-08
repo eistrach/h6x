@@ -1,9 +1,9 @@
 import { ArrowLeftIcon } from "@heroicons/react/solid";
 import { Form } from "@remix-run/react";
 import { motion } from "framer-motion";
-import { Button } from "~/components/base/Button";
-import { InputTheme } from "~/components/base/InputTheme";
-import { Link } from "~/components/base/Link";
+import { Button } from "~/ui/components/base/Button";
+import { InputTheme } from "~/ui/components/base/InputTheme";
+import { Link } from "~/ui/components/base/Link";
 
 const SettingsPage = () => {
   return (
