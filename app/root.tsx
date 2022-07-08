@@ -38,7 +38,7 @@ export default function App() {
   const user = useOptionalUser();
 
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en">
       <head>
         <Meta />
         <Links />

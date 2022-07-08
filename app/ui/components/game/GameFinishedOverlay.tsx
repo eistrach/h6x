@@ -1,12 +1,26 @@
 /* This example requires Tailwind CSS v2.0+ */
-import { Fragment, useLayoutEffect, useState } from "react";
+import { Fragment, useEffect, useLayoutEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Link } from "../base/Link";
 import AwardSvg from "../svg/AwardSvg";
 import { InputTheme } from "../base/InputTheme";
 import { EmojiSadIcon } from "@heroicons/react/solid";
-import ConfettiExplosion from "react-confetti-explosion";
 import { ClientOnly } from "remix-utils";
+import Confetti from "react-dom-confetti";
+
+const confettiConfig = {
+  angle: 90,
+  spread: 360,
+  startVelocity: 40,
+  elementCount: 70,
+  dragFriction: 0.12,
+  duration: 3000,
+  stagger: 3,
+  width: "10px",
+  height: "10px",
+  perspective: "500px",
+  colors: ["#a864fd", "#29cdff", "#78ff44", "#ff718d", "#fdff6a"],
+};
 
 export default function GameFinishedOverlay({
   won,
@@ -15,11 +29,17 @@ export default function GameFinishedOverlay({
   won: boolean;
   lost: boolean;
 }) {
+  const [showConfetti, setShowConfetti] = useState(false);
   const title = won ? "Congratulations!" : "Try again!";
   const description = won
     ? "You have destroyed all your enemies."
     : "Unfortunately you were destroyed.";
 
+  useEffect(() => {
+    setShowConfetti(true);
+  }, [won]);
+
+  console.log(showConfetti);
   return (
     <Transition.Root show={won || lost} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={() => {}}>
@@ -49,11 +69,16 @@ export default function GameFinishedOverlay({
               <Dialog.Panel className="relative bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-visible shadow-xl transform transition-all sm:my-8 sm:max-w-sm sm:w-full sm:p-6">
                 <div>
                   <div className="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-primary-100">
+                    <ClientOnly fallback={<div />}>
+                      {() => (
+                        <Confetti
+                          active={showConfetti}
+                          config={confettiConfig}
+                        />
+                      )}
+                    </ClientOnly>
                     {won ? (
                       <>
-                        <ClientOnly fallback={<div />}>
-                          {() => <ConfettiExplosion floorHeight={1600} />}
-                        </ClientOnly>
                         <AwardSvg
                           className="h-10 w-10 fill-primary-600 stroke-primary-600"
                           aria-hidden="true"
