@@ -29,7 +29,7 @@ export const Button = ({
     <motion.button
       {...mp}
       className={clsx(
-        "disabled:cursor-not-allowed inline-flex rounded-sm items-center text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2",
+        "disabled:cursor-not-allowed disabled:opacity-50 inline-flex rounded-sm items-center text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2",
         theme,
         className
       )}

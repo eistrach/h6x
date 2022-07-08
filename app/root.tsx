@@ -1,3 +1,5 @@
+import React from "react";
+import { useLocation, useMatches } from "@remix-run/react";
 import type { LinksFunction, MetaFunction } from "@remix-run/node";
 import {
   Link,
@@ -8,48 +10,78 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
-
 import styles from "./styles/tailwind.css";
 import fontStyles from "./styles/rubik.css";
 import customStyles from "./styles/custom.css";
 import { LoaderArgs, useOptionalUser } from "./core/utils";
 import { getUser } from "./domain/auth/session.server";
+let isMount = true;
 import clsx from "clsx";
-
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: styles },
   { rel: "stylesheet", href: fontStyles },
   { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
   { rel: "stylesheet", href: customStyles },
 ];
-
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
   title: "h6x",
   viewport: "width=device-width,initial-scale=1",
 });
-
 export const loader = async ({ request }: LoaderArgs) => {
   const user = await getUser(request);
   return { user };
 };
-
 export default function App() {
   const user = useOptionalUser();
+  let location = useLocation();
+  let matches = useMatches();
+
+  React.useEffect(() => {
+    let mounted = isMount;
+    isMount = false;
+    if ("serviceWorker" in navigator) {
+      if (navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller?.postMessage({
+          type: "REMIX_NAVIGATION",
+          isMount: mounted,
+          location,
+          matches,
+          manifest: window.__remixManifest,
+        });
+      } else {
+        let listener = async () => {
+          await navigator.serviceWorker.ready;
+          navigator.serviceWorker.controller?.postMessage({
+            type: "REMIX_NAVIGATION",
+            isMount: mounted,
+            location,
+            matches,
+            manifest: window.__remixManifest,
+          });
+        };
+        navigator.serviceWorker.addEventListener("controllerchange", listener);
+        return () => {
+          navigator.serviceWorker.removeEventListener(
+            "controllerchange",
+            listener
+          );
+        };
+      }
+    }
+  }, [location]);
 
   return (
     <html lang="en">
       <head>
         <Meta />
-        <Links />
+        <link rel="manifest" href="/resources/manifest.webmanifest" /> <Links />
       </head>
       <body className="h-full bg-gray-100 overscroll-none">
         <main className={clsx("overscroll-auto h-full", {})}>
           <Outlet />
         </main>
-        <ScrollRestoration />
-        <Scripts />
-        <LiveReload />
+        <ScrollRestoration /> <Scripts /> <LiveReload />
       </body>
     </html>
   );

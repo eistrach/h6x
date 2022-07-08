@@ -180,7 +180,9 @@ export default function GameView(props: GameWithState) {
                   name="_intent"
                   value="endTurn"
                   type="submit"
-                ></Button>
+                >
+                  Done
+                </Button>
               </Form>
             </motion.div>
           </motion.div>

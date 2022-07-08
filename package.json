@@ -2,14 +2,16 @@
   "private": true,
   "sideEffects": false,
   "scripts": {
-    "build": "run-s build:*",
+    "build": "npm-run-all -p build:*",
     "build:css": "npm run generate:css -- --minify",
-    "build:remix": "remix build",
-    "dev": "run-p dev:*",
+    "build:remix": "cross-env NODE_ENV=production remix build",
+    "dev": "npm-run-all -p dev:*",
     "dev:css": "npm run generate:css -- --watch",
-    "dev:remix": "remix dev",
+    "dev:remix": "cross-env NODE_ENV=development remix dev",
     "generate:css": "npx tailwindcss -o ./app/styles/tailwind.css",
-    "start": "prisma migrate deploy && remix-serve build"
+    "start": "prisma migrate deploy && remix-serve build",
+    "build:worker": "esbuild ./app/entry.worker.ts --outfile=./public/entry.worker.js --minify --bundle --format=esm --define:process.env.NODE_ENV='\"production\"'",
+    "dev:worker": "esbuild ./app/entry.worker.ts --outfile=./public/entry.worker.js --bundle --format=esm --define:process.env.NODE_ENV='\"development\"' --watch"
   },
   "dependencies": {
     "@headlessui/react": "^1.6.5",
@@ -42,7 +44,12 @@
     "seedrandom": "^3.0.5",
     "tiny-invariant": "^1.2.0",
     "uuid": "^8.3.2",
-    "zod": "^3.17.3"
+    "zod": "^3.17.3",
+    "node-persist": "^3.1.0",
+    "web-push": "^3.4.5",
+    "npm-run-all": "^4.1.5",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.0.0"
   },
   "devDependencies": {
     "@remix-run/dev": "^1.6.0",
@@ -59,7 +66,8 @@
     "npm-run-all": "^4.1.5",
     "prisma": "^4.0.0",
     "tailwindcss": "^3.1.3",
-    "typescript": "^4.6.4"
+    "typescript": "^4.6.4",
+    "@types/node-persist": "^3.1.2"
   },
   "engines": {
     "node": ">=14"

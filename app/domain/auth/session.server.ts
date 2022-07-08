@@ -1,12 +1,7 @@
-import { throwDice } from "./../game/attackCell/action";
 import { redirectCookie } from "./../../cookies";
 import { discortStrategy } from "./discord.server";
 import { User } from "@prisma/client";
-import {
-  createCookie,
-  createCookieSessionStorage,
-  redirect,
-} from "@remix-run/node";
+import { createCookieSessionStorage, redirect } from "@remix-run/node";
 import { Authenticator } from "remix-auth";
 
 import { getUserById } from "~/domain/user.server";

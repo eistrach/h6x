@@ -17,7 +17,7 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     let session = await sessionStorage.getSession(
       request.headers.get("cookie")
     );
-    // and store the user data
+
     session.set(authenticator.sessionKey, userId);
 
     return redirect(redirectUrl, {
