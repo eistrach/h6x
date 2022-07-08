@@ -2,7 +2,6 @@ import React from "react";
 import { useLocation, useMatches } from "@remix-run/react";
 import type { LinksFunction, MetaFunction } from "@remix-run/node";
 import {
-  Link,
   Links,
   LiveReload,
   Meta,
