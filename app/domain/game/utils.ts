@@ -174,13 +174,13 @@ export const isPlayingState = (
   return !("done" in state);
 };
 
-export const getPlayerStates = (game: Game): PlayerStates | null => {
+export const getState = (game: Game): PlayingState | null => {
   if (game.phase === "PLAYING") {
-    return game.gameState!.players;
+    return game.gameState!;
   }
 
   if (game.phase === "PREPARATION") {
-    return Object.values(game.players)[0].preparationState!.players;
+    return Object.values(game.players)[0].preparationState!;
   }
 
   return null;

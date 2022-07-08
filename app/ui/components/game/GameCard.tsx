@@ -8,7 +8,7 @@ import {
 } from "~/core/utils";
 import { Button } from "../base/Button";
 import GamePreview from "../map/GamePreview";
-import { ShareIcon } from "@heroicons/react/solid";
+import { ShareIcon, XIcon } from "@heroicons/react/solid";
 import { PlayIcon } from "@heroicons/react/solid";
 import { InputTheme } from "../base/InputTheme";
 import clsx from "clsx";
@@ -17,7 +17,7 @@ import { Link } from "../base/Link";
 import { DuplicateIcon } from "@heroicons/react/solid";
 import { motion } from "framer-motion";
 import { ClientOnly } from "remix-utils";
-import { getPlayerStates } from "~/domain/game/utils";
+import { getState } from "~/domain/game/utils";
 import { PlayerColors } from "~/config/graphics";
 
 export type GameCardProps = PropsWithChildren<{
@@ -45,7 +45,7 @@ const GameCard = ({ game }: GameCardProps) => {
   };
 
   const creator = game.creator;
-  const playerStates = getPlayerStates(game);
+  const state = getState(game);
 
   return (
     <motion.li
@@ -87,15 +87,17 @@ const GameCard = ({ game }: GameCardProps) => {
               ></li>
             ))}
             {game.players.map((player) => {
-              const ring = playerStates
-                ? PlayerColors[playerStates[player.id].index].ring
+              const ring = state?.players
+                ? PlayerColors[state.players[player.id].index].ring
                 : "ring-white";
+              const lost = state && !state.playerIdSequence.includes(player.id);
               return (
-                <li key={player.id}>
+                <li key={player.id} className="relative">
                   <div
                     className={clsx(
-                      "w-8 h-8  ring-2 shadow-md rounded-full bg-white",
-                      ring
+                      "  ring-2 shadow-md rounded-full bg-white relative",
+                      ring,
+                      { "opacity-50 w-8 h-8": lost, "w-8 h-8": !lost }
                     )}
                   >
                     {!!player.user.avatarUrl ? (
@@ -107,6 +109,11 @@ const GameCard = ({ game }: GameCardProps) => {
                       <span>{player.user.displayName[0]}</span>
                     )}
                   </div>
+                  {lost && (
+                    <span className="text-xs text-gray-800 absolute inset-0 flex justify-center items-center">
+                      <XIcon className="h-8 w-8 " />
+                    </span>
+                  )}
                 </li>
               );
             })}
