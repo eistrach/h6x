@@ -1,6 +1,12 @@
+import { throwDice } from "./../game/attackCell/action";
+import { redirectCookie } from "./../../cookies";
 import { discortStrategy } from "./discord.server";
 import { User } from "@prisma/client";
-import { createCookieSessionStorage } from "@remix-run/node";
+import {
+  createCookie,
+  createCookieSessionStorage,
+  redirect,
+} from "@remix-run/node";
 import { Authenticator } from "remix-auth";
 
 import { getUserById } from "~/domain/user.server";
@@ -30,9 +36,15 @@ export const isAdmin = (user: User) => {
 };
 
 export async function requireUser(request: Request) {
-  const userId = await authenticator.isAuthenticated(request, {
-    failureRedirect: "/login",
-  });
+  const userId = await authenticator.isAuthenticated(request);
+
+  if (!userId) {
+    throw redirect("/login", {
+      headers: {
+        "Set-Cookie": await redirectCookie.serialize(request.url),
+      },
+    });
+  }
 
   const user = await getUserById(userId);
 
