@@ -16,6 +16,7 @@ import { LoaderArgs, useOptionalUser } from "./core/utils";
 import { getUser } from "./domain/auth/session.server";
 let isMount = true;
 import clsx from "clsx";
+import AppUrlListener from "./ui/components/base/AppUrlListener";
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: styles },
   { rel: "stylesheet", href: fontStyles },
@@ -81,6 +82,7 @@ export default function App() {
         <main className={clsx("overscroll-auto h-full", {})}>
           <Outlet />
         </main>
+        <AppUrlListener />
         <ScrollRestoration /> <Scripts /> <LiveReload />
       </body>
     </html>

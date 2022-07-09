@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">h6x</string>
+    <string name="title_activity_main">h6x</string>
+    <string name="package_name">io.h6x.app</string>
+    <string name="custom_url_scheme">io.h6x.app</string>
+</resources>
