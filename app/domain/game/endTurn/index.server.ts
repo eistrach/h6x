@@ -40,5 +40,5 @@ export async function endTurn(id: string, senderPlayerId: string) {
     });
   }
 
-  return updateGameState(game, newState);
+  return updateGameState(game, newState, player);
 }

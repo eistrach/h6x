@@ -1,11 +1,10 @@
 import { Point } from "~/core/math";
 import {
-  requireGame,
+  requireGameAndPlayer,
   requirePlayingState,
   updateGameState,
 } from "../game.server";
 import { v4 as uuid } from "uuid";
-import { prisma } from "~/db.server";
 import { attackCellAction } from "./action";
 
 export async function attackCell(
@@ -14,7 +13,9 @@ export async function attackCell(
   source: Point,
   target: Point
 ) {
-  const game = await requireGame(id, ["PLAYING"]);
+  const { game, player } = await requireGameAndPlayer(id, senderPlayerId, [
+    "PLAYING",
+  ]);
   const state = requirePlayingState(game);
 
   const newState = attackCellAction(state, {
@@ -24,5 +25,5 @@ export async function attackCell(
     senderPlayerId,
   });
 
-  return updateGameState(game, newState);
+  return updateGameState(game, newState, player);
 }

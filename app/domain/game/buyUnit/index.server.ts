@@ -30,5 +30,5 @@ export async function buyUnit(id: string, playerId: string, source: Point) {
     });
   }
 
-  return updateGameState(game, newState);
+  return updateGameState(game, newState, player);
 }

@@ -161,7 +161,18 @@ export function requirePlayingState(game: Game) {
   return state as PlayingState;
 }
 
-export async function updateGameState(game: Game, state: PlayingState) {
+export async function updateGameState(
+  game: Game,
+  state: PlayingState,
+  currentPlayer: Player
+) {
+  await prisma.player.update({
+    where: { id: currentPlayer.id },
+    data: {
+      lastSeenActionId: game.states.length,
+    },
+  });
+
   return prisma.game.update({
     where: { id: game.id },
     data: {

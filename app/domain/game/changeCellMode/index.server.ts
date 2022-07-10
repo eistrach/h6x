@@ -36,5 +36,5 @@ export async function changeCellMode(
     });
   }
 
-  return updateGameState(game, newState);
+  return updateGameState(game, newState, player);
 }

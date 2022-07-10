@@ -1,3 +1,4 @@
+import { Modifier } from "react-popper";
 import { MaxUnitsToMove } from "./../../../config/rules";
 import seedrandom from "seedrandom";
 import { CellModes } from "~/config/rules";
@@ -35,8 +36,15 @@ const attackCellReducer = (
   let attackerUnits = cell.units - 1;
   let defenderUnits = targetCell.units;
 
+  const differenceModifier =
+    1 /
+    (1 - (attackerUnits - defenderUnits) / (attackerUnits + defenderUnits) / 2);
+
+  console.log("Throw Modifier", differenceModifier);
+
   while (attackerUnits > 0 && defenderUnits > 0) {
-    const attackerThrow = throwDice(rng, attackerMode.attackDice);
+    const attackerThrow =
+      throwDice(rng, attackerMode.attackDice) * differenceModifier;
     const defenderThrow = throwDice(rng, defenderMode.defenseDice);
 
     if (attackerThrow > defenderThrow) {
