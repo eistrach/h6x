@@ -22,7 +22,7 @@ RUN mkdir /app
 WORKDIR /app
 
 COPY --from=deps /app/node_modules /app/node_modules
-COPY --from=deps /app/package-lock.json /app/package-lock.json
+COPY --from=deps /app/pnpm-lock.yaml /app/pnpm-lock.yaml
 ADD package.json ./
 RUN pnpm prune --production
 
