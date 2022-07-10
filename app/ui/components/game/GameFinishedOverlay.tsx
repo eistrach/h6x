@@ -42,8 +42,6 @@ export default function GameFinishedOverlay({
     }, 100);
   }, [won]);
 
-  console.log(showConfetti);
-
   return (
     <Transition.Root show={won || lost} as={Fragment}>
       <Dialog

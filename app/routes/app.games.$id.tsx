@@ -1,4 +1,4 @@
-import { useActionData, useLoaderData } from "@remix-run/react";
+import { useActionData, useFetcher, useLoaderData } from "@remix-run/react";
 import { useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { z } from "zod";
@@ -12,6 +12,7 @@ import {
   GameWithState,
   getGameWithState,
   startPreparation,
+  transitionToNextGameState,
 } from "~/domain/game/game.server";
 import { changeCellMode } from "~/domain/game/changeCellMode/index.server";
 import { CellModeIds } from "~/config/rules";
@@ -70,6 +71,9 @@ const Schema = z.union([
     _intent: z.literal("endTurn"),
     playerId: z.string().min(1),
   }),
+  z.object({
+    _intent: z.literal("transitionToNextGameState"),
+  }),
 ]);
 export const action = async ({ request, params }: ActionArgs) => {
   const gameId = requireParam(params, "id");
@@ -110,6 +114,8 @@ export const action = async ({ request, params }: ActionArgs) => {
       case "endTurn":
         await endTurn(gameId, result.data.playerId);
         break;
+      case "transitionToNextGameState":
+        await transitionToNextGameState(gameId, user.id);
     }
     return redirect(`/app/games/${gameId}`);
   } catch (err) {
@@ -122,14 +128,28 @@ const GamePage = () => {
   const state = useLoaderData<GameWithState>();
   const { error } = useActionData() || {};
 
+  const fetcher = useFetcher();
+
   const isPreparation = state.game.phase === "PREPARATION";
   const isDone = isPreparation && state.state.done;
 
   useDataRefreshOnInterval(
     1000,
     !isDone &&
-      (state.state.playerIdSequence.length === 1 || state.canTakeAction)
+      (state.state.playerIdSequence.length === 1 ||
+        state.canTakeAction ||
+        !!state.nextState)
   );
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      fetcher.submit(
+        { _intent: "transitionToNextGameState" },
+        { method: "post" }
+      );
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [JSON.stringify(state.nextState)]);
 
   useEffect(() => {
     if (error) {

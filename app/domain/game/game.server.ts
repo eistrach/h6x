@@ -295,6 +295,7 @@ export async function startGame(id: string) {
           where: { id: p.id },
           data: {
             preparationState: Prisma.JsonNull,
+            lastSeenActionId: 0,
           },
         })
       )
@@ -309,6 +310,32 @@ export async function startGame(id: string) {
     });
   });
 }
+
+const getNextPlayerForUser = async (game: Game, userId: string) => {
+  const orderedPlayerStates = game.gameState!.playerIdSequence.map(
+    (id) => game.players.find((p) => p.id === id)!
+  );
+  return orderedPlayerStates.find((p) => p.userId === userId)!;
+};
+
+export const transitionToNextGameState = async (id: string, userId: string) => {
+  const game = await requireGame(id);
+  const player = await getNextPlayerForUser(game, userId);
+
+  if (game.states.length - 1 === player.lastSeenActionId) {
+    return player;
+  }
+
+  return prisma.player.update({
+    where: { id: player.id },
+    data: {
+      lastSeenActionId: Math.min(
+        player.lastSeenActionId! + 1,
+        game.states.length - 1
+      ),
+    },
+  });
+};
 
 export const isPlayerAlreadyInGame = async (id: string, playerId: string) => {
   const game = await requireGame(id);
@@ -336,11 +363,30 @@ export const getGameWithState = async (id: string, user: User) => {
     };
   }
 
-  const currentPlayer = getCurrentPlayer(game.gameState!);
+  const currentPlayerState = getCurrentPlayer(game.gameState!);
+
+  const player = await getNextPlayerForUser(game, user.id);
+  const lastSeenActionId = player.lastSeenActionId || 0;
+
+  const isLatestState = game.states.length - 1 === lastSeenActionId;
+
+  if (isLatestState) {
+    return {
+      game,
+      state: game.states[game.states.length - 1] as PlayingState,
+      canTakeAction: currentPlayerState?.userId === user.id,
+    };
+  }
+
+  const state = game.states[lastSeenActionId!] as PlayingState;
+
+  const nextState = game.states[lastSeenActionId! + 1] as PlayingState;
+
   return {
     game,
-    state: game.gameState as PlayingState,
-    canTakeAction: currentPlayer?.userId === user.id,
+    state,
+    nextState,
+    canTakeAction: false,
   };
 };
 
