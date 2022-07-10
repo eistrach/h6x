@@ -28,7 +28,6 @@ export const useGameStateTransitions = (
   useEffect(() => {
     if (!state?.causedBy) return;
     if (state.causedBy.name === "attackCell") {
-      console.log("attackCell");
       const payload = state.causedBy.payload as {
         source: Point;
         target: Point;
@@ -42,11 +41,9 @@ export const useGameStateTransitions = (
         setSelectedCell(cell, true);
       }
     } else if (!!state && "source" in state.causedBy.payload) {
-      console.log("selectUnit");
       const cell = state.cells[toId(state.causedBy.payload.source)];
       setSelectedCell(cell, true);
     } else {
-      console.log("reset");
       setSelectedCell(null, true);
     }
   }, [currentStateId]);
