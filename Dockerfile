@@ -11,6 +11,7 @@ RUN mkdir /app
 WORKDIR /app
 
 ADD package.json ./
+ADD .npmrc ./
 RUN npm i -g pnpm
 RUN pnpm i --production=false
 
