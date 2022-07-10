@@ -121,9 +121,14 @@ export const action = async ({ request, params }: ActionArgs) => {
 const GamePage = () => {
   const state = useLoaderData<GameWithState>();
   const { error } = useActionData() || {};
+
+  const isPreparation = state.game.phase === "PREPARATION";
+  const isDone = isPreparation && state.state.done;
+
   useDataRefreshOnInterval(
     1000,
-    state.state.playerIdSequence.length === 1 || state.canTakeAction
+    !isDone &&
+      (state.state.playerIdSequence.length === 1 || state.canTakeAction)
   );
 
   useEffect(() => {

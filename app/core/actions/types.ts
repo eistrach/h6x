@@ -26,6 +26,7 @@ export type PlayingState<P = any> = {
   cells: CellStates;
   causedBy: Action<P>;
   turn: number;
+  done?: boolean;
 };
 
 export type PreparationState<P = any> = PlayingState<P> & {
