@@ -20,6 +20,7 @@ import { buyUnit } from "~/domain/game/buyUnit/index.server";
 import { attackCell } from "~/domain/game/attackCell/index.server";
 import { endTurn } from "~/domain/game/endTurn/index.server";
 import { redirect } from "@remix-run/node";
+import { useHasTabFocus } from "~/ui/hooks/useTabFocus";
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const gameId = requireParam(params, "id");
@@ -133,20 +134,23 @@ const GamePage = () => {
   const isPreparation = state.game.phase === "PREPARATION";
   const isDone = isPreparation && state.state.done;
 
+  const tabFocused = useHasTabFocus();
   useDataRefreshOnInterval(
     1000,
-    !isDone &&
-      (state.state.playerIdSequence.length === 1 ||
-        state.canTakeAction ||
-        !!state.nextState)
+    !tabFocused ||
+      (!isDone &&
+        (state.state.playerIdSequence.length === 1 ||
+          state.canTakeAction ||
+          !!state.nextState))
   );
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      fetcher.submit(
-        { _intent: "transitionToNextGameState" },
-        { method: "post" }
-      );
+      if (state.nextState)
+        fetcher.submit(
+          { _intent: "transitionToNextGameState" },
+          { method: "post" }
+        );
     }, 500);
     return () => clearTimeout(timeout);
   }, [JSON.stringify(state.nextState)]);

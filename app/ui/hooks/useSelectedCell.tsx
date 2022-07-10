@@ -3,12 +3,15 @@ import { CellState, CellStates } from "~/core/actions/types";
 import { Point } from "~/core/math";
 import { toId } from "~/core/utils";
 
-export const useSelectedCell = (availableCells: CellStates) => {
+export const useSelectedCell = (
+  availableCells: CellStates,
+  hasNextState: boolean
+) => {
   const [selectedCellPosition, setSelectedCellPosition] =
     useState<Point | null>();
 
-  const setSelectedCell = (cell: CellState | null) => {
-    setSelectedCellPosition(cell?.position);
+  const setSelectedCell = (cell: CellState | null, force = false) => {
+    if (force || !hasNextState) setSelectedCellPosition(cell?.position);
   };
 
   if (!selectedCellPosition) return [null, setSelectedCell] as const;

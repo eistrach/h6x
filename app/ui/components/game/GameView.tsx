@@ -8,13 +8,15 @@ import { useComputedGameState } from "~/ui/hooks/useComputedGameState";
 import { useDirectionalPopovers } from "~/ui/hooks/useDirectionalPopovers";
 import AttackPopovers from "./AttackPopovers";
 import GameMap from "./GameMap";
-import { motion } from "framer-motion";
+import { motion, Point } from "framer-motion";
 import { CheckCircleIcon } from "@heroicons/react/solid";
 import { LogoIcon } from "../icons/LogoIcon";
 import { isPlayingState } from "~/domain/game/utils";
 
 import clsx from "clsx";
 import GameFinishedOverlay from "./GameFinishedOverlay";
+import { useEffect } from "react";
+import { toId } from "~/core/utils";
 
 const animationProps = {
   layout: true,
@@ -28,10 +30,13 @@ const animationProps = {
 };
 
 export default function GameView(props: GameWithState) {
-  const { game, state, canTakeAction } = props;
+  const { game, state, canTakeAction, nextState } = props;
   const playerId = state.playerIdSequence[0];
 
-  const [selectedCell, setSelectedCell] = useSelectedCell(state.cells);
+  const [selectedCell, setSelectedCell] = useSelectedCell(
+    state.cells,
+    !!nextState
+  );
   const { attackableNeighbors, canUseBuyActions, currentPlayer, selectedUnit } =
     useComputedGameState(props, selectedCell);
   const directionalPopovers = useDirectionalPopovers();
@@ -41,6 +46,23 @@ export default function GameView(props: GameWithState) {
   const disableActions = transition.state !== "idle";
   const isGameDone =
     state.playerIdSequence.length === 1 && isPlayingState(state);
+
+  useEffect(() => {
+    if (nextState?.causedBy.name === "attackCell") {
+      const payload = nextState.causedBy.payload as {
+        source: Point;
+        target: Point;
+      };
+      const sourceCell = nextState.cells[toId(payload.source)];
+      const targetCell = nextState.cells[toId(payload.target)];
+      const hasWon = sourceCell.ownerId === targetCell.ownerId;
+      if (hasWon) {
+        setSelectedCell(nextState.cells[toId(payload.target)], true);
+      }
+    } else if (!!nextState && "source" in nextState.causedBy.payload) {
+      setSelectedCell(state.cells[toId(nextState?.causedBy.payload.source)]);
+    }
+  }, [JSON.stringify(nextState)]);
 
   return (
     <div className="h-screen flex justify-center items-center flex-col">

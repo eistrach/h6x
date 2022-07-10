@@ -17,6 +17,7 @@ import { CogIcon } from "@heroicons/react/solid";
 import { InputTheme } from "~/ui/components/base/InputTheme";
 import { Disclosure } from "@headlessui/react";
 import clsx from "clsx";
+import { useHasTabFocus } from "~/ui/hooks/useTabFocus";
 type LoaderData = UnpackData<typeof getGamesForUser>;
 
 export const loader = async ({ request }: LoaderArgs) => {
@@ -25,11 +26,19 @@ export const loader = async ({ request }: LoaderArgs) => {
   return games;
 };
 
-const GameList = ({ games, title }: { games: LoaderData; title: string }) => {
+const GameList = ({
+  games,
+  title,
+  defaultOpen = true,
+}: {
+  games: LoaderData;
+  title: string;
+  defaultOpen?: boolean;
+}) => {
   if (!games.length) return null;
 
   return (
-    <Disclosure defaultOpen>
+    <Disclosure defaultOpen={defaultOpen}>
       {({ open }) => (
         <>
           <Disclosure.Button className="text-left w-full flex justify-between mt-8 mb-2">
@@ -97,7 +106,8 @@ const getActionableGames = (games: LoaderData, currentUserId: string) => {
 };
 
 const GamesPage = () => {
-  useDataRefreshOnInterval(1000, false);
+  const tabFocused = useHasTabFocus();
+  useDataRefreshOnInterval(1000, !tabFocused);
   const games = useLoaderData<LoaderData>();
   const outlet = useOutlet();
   const user = useUser();
@@ -122,7 +132,7 @@ const GamesPage = () => {
         <GameList games={actionableGames} title="Your Turn" />
         <GameList games={lobbyGames} title="Lobby" />
         <GameList games={runningGames} title="Waiting" />
-        <GameList games={finishedGames} title="Finished" />
+        <GameList games={finishedGames} title="Finished" defaultOpen={false} />
       </div>
 
       <motion.div
