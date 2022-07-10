@@ -1,0 +1,109 @@
+Arguments: 
+  /Users/eugen/.nvm/versions/node/v18.5.0/bin/node /Users/eugen/.nvm/versions/node/v18.5.0/bin/yarn
+
+PATH: 
+  /Users/eugen/.nvm/versions/node/v18.5.0/bin:/Users/eugen/.local/bin:/Users/eugen/.fig/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin:/Library/Frameworks/Mono.framework/Versions/Current/Commands
+
+Yarn version: 
+  1.22.19
+
+Node version: 
+  18.5.0
+
+Platform: 
+  darwin x64
+
+Trace: 
+  Error: ENOENT: no such file or directory, copyfile '/Users/eugen/Library/Caches/Yarn/v6/npm-globals-13.16.0-9be4aca28f311aaeb974ea54978ebbb5e35ce46a-integrity/node_modules/globals/globals.json' -> '/Users/eugen/Repositories/h6x/node_modules/@eslint/eslintrc/node_modules/globals/globals.json'
+
+npm manifest: 
+  {
+    "private": true,
+    "sideEffects": false,
+    "scripts": {
+      "build": "npm-run-all build:*",
+      "build:css": "pnpm run generate:css -- --minify",
+      "build:remix": "cross-env NODE_ENV=production remix build",
+      "dev": "npm-run-all -p dev:*",
+      "dev:css": "pnpm run generate:css -- --watch",
+      "dev:remix": "cross-env NODE_ENV=development remix dev",
+      "generate:css": "npx tailwindcss -o ./app/styles/tailwind.css",
+      "start": "prisma migrate deploy && remix-serve build",
+      "build:worker": "esbuild ./app/entry.worker.ts --outfile=./public/entry.worker.js --minify --bundle --format=esm --define:process.env.NODE_ENV='\"production\"'",
+      "dev:worker": "esbuild ./app/entry.worker.ts --outfile=./public/entry.worker.js --bundle --format=esm --define:process.env.NODE_ENV='\"development\"' --watch"
+    },
+    "dependencies": {
+      "@capacitor/android": "^3.6.0",
+      "@capacitor/app": "^1.1.1",
+      "@capacitor/core": "^3.6.0",
+      "@capacitor/ios": "^3.6.0",
+      "@headlessui/react": "^1.6.5",
+      "@heroicons/react": "^1.0.6",
+      "@node-rs/bcrypt": "^1.6.1",
+      "@popperjs/core": "^2.11.5",
+      "@prisma/client": "^4.0.0",
+      "@remix-run/node": "^1.6.0",
+      "@remix-run/react": "^1.6.0",
+      "@remix-run/serve": "^1.6.0",
+      "@use-gesture/react": "^10.2.15",
+      "clsx": "^1.1.1",
+      "cross-env": "^7.0.3",
+      "dotenv": "^16.0.0",
+      "framer-motion": "^6.3.16",
+      "honeycomb-grid": "^3.1.8",
+      "immer": "^9.0.15",
+      "node-persist": "^3.1.0",
+      "npm-run-all": "^4.1.5",
+      "qs": "^6.10.5",
+      "react": "^17.0.2",
+      "react-awesome-button": "^6.5.1",
+      "react-copy-to-clipboard": "^5.1.0",
+      "react-dom": "^17.0.2",
+      "react-dom-confetti": "^0.2.0",
+      "react-google-button": "^0.7.2",
+      "react-hook-mighty-mouse": "^1.4.31",
+      "react-hot-toast": "^2.2.0",
+      "react-popper": "^2.3.0",
+      "react-snaplist-carousel": "^4.4.2",
+      "remix-auth": "^3.2.2",
+      "remix-auth-socials": "^1.0.2",
+      "remix-utils": "^3.3.0",
+      "seedrandom": "^3.0.5",
+      "tailwindcss-safe-area": "^0.2.2",
+      "tiny-invariant": "^1.2.0",
+      "uuid": "^8.3.2",
+      "web-push": "^3.4.5",
+      "zod": "^3.17.3"
+    },
+    "devDependencies": {
+      "@capacitor/cli": "^3.6.0",
+      "@remix-run/dev": "^1.6.0",
+      "@remix-run/eslint-config": "^1.6.0",
+      "@tailwindcss/forms": "^0.5.2",
+      "@types/node-persist": "^3.1.2",
+      "@types/qs": "^6.9.7",
+      "@types/react": "^17.0.45",
+      "@types/react-dom": "^17.0.17",
+      "@types/seedrandom": "^3.0.2",
+      "@types/uuid": "^8.3.4",
+      "esbuild": "^0.14.44",
+      "esbuild-register": "^3.3.3",
+      "eslint": "^8.15.0",
+      "npm-run-all": "^4.1.5",
+      "prisma": "^4.0.0",
+      "tailwindcss": "^3.1.3",
+      "typescript": "^4.6.4"
+    },
+    "engines": {
+      "node": ">=14"
+    },
+    "prisma": {
+      "seed": "node --require esbuild-register prisma/seed.ts"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
