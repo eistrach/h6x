@@ -1,5 +1,5 @@
 # base node image
-FROM node:16-bullseye-slim as base
+FROM node:18-bullseye-slim as base
 
 # Install openssl for Prisma
 RUN apt-get update && apt-get install -y openssl
@@ -11,7 +11,8 @@ RUN mkdir /app
 WORKDIR /app
 
 ADD package.json ./
-RUN npm install --production=false
+RUN npm i -g pnpm
+RUN pnpm i --production=false
 
 # Setup production node_modules
 FROM base as production-deps
@@ -22,7 +23,7 @@ WORKDIR /app
 COPY --from=deps /app/node_modules /app/node_modules
 COPY --from=deps /app/package-lock.json /app/package-lock.json
 ADD package.json ./
-RUN npm prune --production
+RUN pnpm prune --production
 
 # Build the app
 FROM base as build
@@ -39,7 +40,7 @@ ADD prisma .
 RUN npx prisma generate
 
 ADD . .
-RUN npm run build
+RUN pnpm run build
 
 # Finally, build the production image with minimal footprint
 FROM base
@@ -58,4 +59,4 @@ COPY --from=build /app/build /app/build
 COPY --from=build /app/public /app/public
 ADD . .
 
-CMD ["npm", "run", "start"]
+CMD ["pnpm", "run", "start"]

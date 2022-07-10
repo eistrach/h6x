@@ -1,4 +1,3 @@
-import { Modifier } from "react-popper";
 import { MaxUnitsToMove } from "./../../../config/rules";
 import seedrandom from "seedrandom";
 import { CellModes } from "~/config/rules";
@@ -36,6 +35,7 @@ const attackCellReducer = (
   let attackerUnits = cell.units - 1;
   let defenderUnits = targetCell.units;
 
+  // balance big differences between attacker and defender unit counts
   const differenceModifier =
     1 /
     (1 - (attackerUnits - defenderUnits) / (attackerUnits + defenderUnits) / 2);

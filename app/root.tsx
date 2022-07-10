@@ -37,7 +37,6 @@ export default function App() {
   const user = useOptionalUser();
   let location = useLocation();
   let matches = useMatches();
-
   React.useEffect(() => {
     let mounted = isMount;
     isMount = false;
@@ -76,8 +75,8 @@ export default function App() {
     <html lang="en">
       <AppUrlListener />
       <head>
-        <Meta />
-        <link rel="manifest" href="/resources/manifest.webmanifest" /> <Links />
+        <Meta /> <link rel="manifest" href="/resources/manifest.webmanifest" />
+        <Links />
       </head>
       <body className="h-full bg-gray-100 overscroll-none p-safe">
         <main className={clsx("overscroll-auto h-full", {})}>

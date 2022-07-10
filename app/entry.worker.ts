@@ -1,11 +1,15 @@
 /// <reference lib="WebWorker" />
 
 import { json } from "@remix-run/server-runtime";
-import type { AssetsManifest } from "@remix-run/react/dist/entry";
-import type { EntryRoute } from "@remix-run/react/dist/routes";
 
 export type {};
 declare let self: ServiceWorkerGlobalScope;
+
+const STATIC_ASSETS = ["/build/", "/icons/", "/"];
+
+const ASSET_CACHE = "asset-cache";
+const DATA_CACHE = "data-cache";
+const DOCUMENT_CACHE = "document-cache";
 
 function debug(...messages: any[]) {
   if (process.env.NODE_ENV === "development") {
@@ -21,102 +25,52 @@ async function handleActivate(event: ExtendableEvent) {
   debug("Service worker activated");
 }
 
-const ASSET_CACHE = "asset-cache";
-const DATA_CACHE = "data-cache";
-const DOCUMENT_CACHE = "document-cache";
-const STATIC_ASSETS = ["/build/", "/icons/"];
-
-async function handleSyncRemixManifest(event: ExtendableMessageEvent) {
-  console.debug("sync manifest");
+async function handleMessage(event: ExtendableMessageEvent) {
   const cachePromises: Map<string, Promise<void>> = new Map();
-  const [dataCache, documentCache, assetCache] = await Promise.all([
-    caches.open(DATA_CACHE),
-    caches.open(DOCUMENT_CACHE),
-    caches.open(ASSET_CACHE),
-  ]);
-  const manifest: AssetsManifest = event.data.manifest;
-  const routes = Object.values(manifest.routes);
 
-  for (const route of routes) {
-    if (route.id.includes("$")) {
-      console.debug("parametrized route", route.id);
-      continue;
+  if (event.data.type === "REMIX_NAVIGATION") {
+    const { isMount, location, matches, manifest } = event.data;
+    const documentUrl = location.pathname + location.search + location.hash;
+
+    const [dataCache, documentCache, existingDocument] = await Promise.all([
+      caches.open(DATA_CACHE),
+      caches.open(DOCUMENT_CACHE),
+      caches.match(documentUrl),
+    ]);
+
+    if (!existingDocument || !isMount) {
+      debug("Caching document for", documentUrl);
+      cachePromises.set(
+        documentUrl,
+        documentCache.add(documentUrl).catch((error) => {
+          debug(`Failed to cache document for ${documentUrl}:`, error);
+        }),
+      );
     }
 
-    cacheRoute(route);
+    if (isMount) {
+      for (const match of matches) {
+        if (manifest.routes[match.id].hasLoader) {
+          const params = new URLSearchParams(location.search);
+          params.set("_data", match.id);
+          let search = params.toString();
+          search = search ? `?${search}` : "";
+          const url = location.pathname + search + location.hash;
+          if (!cachePromises.has(url)) {
+            debug("Caching data for", url);
+            cachePromises.set(
+              url,
+              dataCache.add(url).catch((error) => {
+                debug(`Failed to cache data for ${url}:`, error);
+              }),
+            );
+          }
+        }
+      }
+    }
   }
 
   await Promise.all(cachePromises.values());
-
-  function cacheRoute(route: EntryRoute) {
-    const pathname = getPathname(route);
-    if (route.hasLoader) {
-      cacheLoaderData(route);
-    }
-
-    if (route.module) {
-      cachePromises.set(route.module, cacheAsset(route.module));
-    }
-
-    if (route.imports) {
-      for (const assetUrl of route.imports) {
-        debug(route.index, route.parentId, route.imports, route.module);
-        if (cachePromises.has(assetUrl)) {
-          continue;
-        }
-
-        cachePromises.set(assetUrl, cacheAsset(assetUrl));
-      }
-    }
-
-    cachePromises.set(
-      pathname,
-      documentCache.add(pathname).catch((error) => {
-        console.debug(`Failed to cache document ${pathname}:`, error);
-      })
-    );
-  }
-
-  function cacheLoaderData(route: EntryRoute) {
-    const pathname = getPathname(route);
-    const params = new URLSearchParams({ _data: route.id });
-    const search = `?${params.toString()}`;
-    const url = pathname + search;
-    if (!cachePromises.has(url)) {
-      console.debug("Caching data for", url);
-      cachePromises.set(
-        url,
-        dataCache.add(url).catch((error) => {
-          console.debug(`Failed to cache data for ${url}:`, error);
-        })
-      );
-    }
-  }
-
-  async function cacheAsset(assetUrl: string) {
-    if (await assetCache.match(assetUrl)) {
-      return;
-    }
-
-    console.debug("Caching asset", assetUrl);
-    return assetCache.add(assetUrl).catch((error) => {
-      console.debug(`Failed to cache asset ${assetUrl}:`, error);
-    });
-  }
-
-  function getPathname(route: EntryRoute) {
-    let pathname = "";
-    if (route.path && route.path.length > 0) {
-      pathname = "/" + route.path;
-    }
-    if (route.parentId) {
-      const parentPath = getPathname(manifest.routes[route.parentId]);
-      if (parentPath) {
-        pathname = parentPath + pathname;
-      }
-    }
-    return pathname;
-  }
 }
 
 async function handleFetch(event: FetchEvent): Promise<Response> {
@@ -150,10 +104,7 @@ async function handleFetch(event: FetchEvent): Promise<Response> {
       await cache.put(event.request, response.clone());
       return response;
     } catch (error) {
-      debug(
-        "Serving data from network failed, falling back to cache",
-        url.pathname + url.search
-      );
+      debug("Serving data from network failed, falling back to cache", url.pathname + url.search);
       const response = await caches.match(event.request);
       if (response) {
         response.headers.set("X-Remix-Worker", "yes");
@@ -165,33 +116,28 @@ async function handleFetch(event: FetchEvent): Promise<Response> {
         {
           status: 500,
           headers: { "X-Remix-Catch": "yes", "X-Remix-Worker": "yes" },
-        }
+        },
       );
     }
   }
 
   if (isDocumentGetRequest(event.request)) {
-    const url = new URL(event.request.url);
-    console.debug("Serving document from network", url.pathname);
-    return caches.open(DOCUMENT_CACHE).then((cache) =>
-      fetch(event.request.clone())
-        .then((response) => {
-          cache.put(event.request, response.clone());
-          return response;
-        })
-        .catch(async (error) => {
-          console.debug(
-            "Serving document from network failed, falling back to cache",
-            url.pathname
-          );
-          const response = await caches.match(event.request);
-          if (!response) {
-            throw error;
-          }
-          return response;
-        })
-    );
+    try {
+      debug("Serving document from network", url.pathname);
+      const response = await fetch(event.request);
+      const cache = await caches.open(DOCUMENT_CACHE);
+      await cache.put(event.request, response.clone());
+      return response;
+    } catch (error) {
+      debug("Serving document from network failed, falling back to cache", url.pathname);
+      const response = await caches.match(event.request);
+      if (response) {
+        return response;
+      }
+      throw error;
+    }
   }
+
   return fetch(event.request.clone());
 }
 
@@ -218,10 +164,7 @@ function isMethod(request: Request, methods: string[]) {
 }
 
 function isAssetRequest(request: Request) {
-  return (
-    isMethod(request, ["get"]) &&
-    STATIC_ASSETS.some((publicPath) => request.url.startsWith(publicPath))
-  );
+  return isMethod(request, ["get"]) && STATIC_ASSETS.some((publicPath) => request.url.startsWith(publicPath));
 }
 
 function isLoaderRequest(request: Request) {
@@ -242,8 +185,7 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("message", (event) => {
-  // event.waitUntil(handleMessage(event));
-  event.waitUntil(handleSyncRemixManifest(event));
+  event.waitUntil(handleMessage(event));
 });
 
 self.addEventListener("push", (event) => {
@@ -259,9 +201,7 @@ self.addEventListener("push", (event) => {
 self.addEventListener("fetch", (event) => {
   event.respondWith(
     (async () => {
-      const result = {} as
-        | { error: unknown; response: Response }
-        | { error: undefined; response: Response };
+      const result = {} as { error: unknown; response: Response } | { error: undefined; response: Response };
       try {
         result.response = await handleFetch(event);
       } catch (error) {
@@ -269,18 +209,13 @@ self.addEventListener("fetch", (event) => {
       }
 
       return appHandleFetch(event, result);
-    })()
+    })(),
   );
 });
 
 async function appHandleFetch(
   event: FetchEvent,
-  {
-    error,
-    response,
-  }:
-    | { error: unknown; response: Response }
-    | { error: undefined; response: Response }
+  { error, response }: { error: unknown; response: Response } | { error: undefined; response: Response },
 ): Promise<Response> {
   return response;
 }
