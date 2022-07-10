@@ -4,6 +4,7 @@ import {
   requireGameAndPlayer,
   requireGameState,
   startGame,
+  updateGameState,
 } from "../game.server";
 import { endTurnAction } from "./action";
 
@@ -39,10 +40,5 @@ export async function endTurn(id: string, senderPlayerId: string) {
     });
   }
 
-  return await prisma.game.update({
-    where: { id },
-    data: {
-      gameState: newState,
-    },
-  });
+  return updateGameState(game, newState);
 }

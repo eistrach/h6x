@@ -20,20 +20,20 @@ export type CellState = {
 
 export type CellStates = { [id: string]: CellState };
 
-export type PlayingState = {
+export type PlayingState<P = any> = {
   players: PlayerStates;
   playerIdSequence: string[];
   cells: CellStates;
-  actions: Action[];
+  causedBy: Action<P>;
   turn: number;
 };
 
-export type PreparationState = PlayingState & {
+export type PreparationState<P = any> = PlayingState<P> & {
   done: boolean;
 };
 
-export type Action = {
+export type Action<P extends any = any> = {
   name: string;
-  payload: any;
+  payload: P;
   turn: number;
 };

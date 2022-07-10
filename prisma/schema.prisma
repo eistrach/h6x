@@ -73,7 +73,7 @@ model Game {
 
   players Player[]
 
-  gameState Json?
+  states Json[]
 
   phase GamePhase @default(LOBBY)
 

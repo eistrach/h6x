@@ -51,14 +51,18 @@ export async function getGamesForUser(userId: string) {
         )
     );
 
-  return games.map((g) => ({
-    ...g,
-    gameState: g.gameState as PlayingState | null,
-    players: g.players.map((p) => ({
-      ...p,
-      preparationState: p.preparationState as PreparationState | null,
-    })),
-  }));
+  return games.map((g) => {
+    const lastState = g.states[g.states.length - 1] as PlayingState | null;
+    return {
+      ...g,
+      isFinished: lastState?.playerIdSequence.length === 1,
+      gameState: lastState,
+      players: g.players.map((p) => ({
+        ...p,
+        preparationState: p.preparationState as PreparationState | null,
+      })),
+    };
+  });
 }
 
 export async function getGame(id: string) {
@@ -88,9 +92,11 @@ export async function getGame(id: string) {
     return null;
   }
 
+  const lastState = game.states[game.states.length - 1] as PlayingState | null;
   return {
     ...game,
-    gameState: game.gameState as PlayingState | null,
+    isFinished: lastState?.playerIdSequence.length === 1,
+    gameState: lastState,
     players: game.players.map((p) => ({
       ...p,
       preparationState: p.preparationState as PreparationState | null,
@@ -153,6 +159,15 @@ export function requirePlayingState(game: Game) {
   }
 
   return state as PlayingState;
+}
+
+export async function updateGameState(game: Game, state: PlayingState) {
+  return prisma.game.update({
+    where: { id: game.id },
+    data: {
+      states: [...game.states, state],
+    },
+  });
 }
 
 export async function createGame(creatorId: string, mapId: string) {
@@ -244,7 +259,7 @@ export async function startPreparation(id: string, userId: string) {
       where: { id },
       data: {
         phase: "PREPARATION",
-        gameState: initializePlayingState(playerStates),
+        states: [...game.states, initializePlayingState(playerStates)],
       },
     });
   });
@@ -278,7 +293,7 @@ export async function startGame(id: string) {
       where: { id },
       data: {
         phase: "PLAYING",
-        gameState: initialGameState,
+        states: [initialGameState],
       },
     });
   });

@@ -117,18 +117,18 @@ export const initializePreparationState = (
     players,
     playerIdSequence: [currentPlayerId],
     cells,
-    actions: [],
+    causedBy: { name: "startPreparation", payload: {}, turn: 0 },
     done: false,
     turn: 0,
   };
 };
 
-export const initializePlayingState = (players: PlayerStates) => {
+export const initializePlayingState = (players: PlayerStates): PlayingState => {
   return {
     players,
     playerIdSequence: Object.keys(players),
     cells: {},
-    actions: [],
+    causedBy: { name: "startPreparation", payload: {}, turn: 0 },
     turn: 0,
   };
 };
@@ -136,7 +136,7 @@ export const initializePlayingState = (players: PlayerStates) => {
 export const updatePlayingState = (
   preparationStates: PreparationState[],
   initialGameState: PlayingState
-) => {
+): PlayingState => {
   const playerCells = preparationStates.flatMap((s) =>
     Object.values(s.cells).filter((c) => c.ownerId === s.playerIdSequence[0])
   );
@@ -148,9 +148,7 @@ export const updatePlayingState = (
   const state = {
     ...initialGameState,
     cells: normalizeCells([...playerCells, ...otherCells]),
-    actions: preparationStates.flatMap((s) =>
-      s.actions.map((a) => ({ ...a, turn: 0 }))
-    ),
+    causedBy: { name: "startGame", payload: {}, turn: 0 },
     turn: 1,
   };
 

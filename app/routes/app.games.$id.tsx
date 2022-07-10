@@ -1,4 +1,3 @@
-import { redirect } from "@remix-run/node";
 import { useActionData, useLoaderData } from "@remix-run/react";
 import { useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
@@ -19,6 +18,7 @@ import { CellModeIds } from "~/config/rules";
 import { buyUnit } from "~/domain/game/buyUnit/index.server";
 import { attackCell } from "~/domain/game/attackCell/index.server";
 import { endTurn } from "~/domain/game/endTurn/index.server";
+import { redirect } from "@remix-run/node";
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const gameId = requireParam(params, "id");
@@ -121,7 +121,10 @@ export const action = async ({ request, params }: ActionArgs) => {
 const GamePage = () => {
   const state = useLoaderData<GameWithState>();
   const { error } = useActionData() || {};
-  useDataRefreshOnInterval(1000, state.state.playerIdSequence.length === 1);
+  useDataRefreshOnInterval(
+    1000,
+    state.state.playerIdSequence.length === 1 || state.canTakeAction
+  );
 
   useEffect(() => {
     if (error) {

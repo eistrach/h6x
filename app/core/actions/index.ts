@@ -1,7 +1,7 @@
 import produce from "immer";
-import { PlayingState } from "./types";
+import { Action, PlayingState } from "./types";
 
-export const registerAction = <S extends PlayingState, P>(
+export const registerAction = <S extends PlayingState<P>, P extends any>(
   name: string,
   validations: ((state: S, opts: P) => void)[],
   action: (state: S, payload: P) => void
@@ -21,10 +21,16 @@ export function validate<T extends PlayingState, Payload>(
   return validations.forEach((fn) => fn(state, payload));
 }
 
-export const commitAction = (
+export const commitAction = <P>(
   state: PlayingState,
-  payload: any,
+  payload: P,
   name: string
 ) => {
-  state.actions.push({ name, payload, turn: state.turn });
+  state.causedBy = { name, payload, turn: state.turn };
 };
+
+export type ExtractAction<
+  ActionFunc extends ReturnType<typeof registerAction>,
+  S extends PlayingState = PlayingState,
+  P = Parameters<ActionFunc>[1]
+> = Action<P>;

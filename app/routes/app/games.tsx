@@ -80,15 +80,20 @@ const GameList = ({ games, title }: { games: LoaderData; title: string }) => {
 };
 
 const getActionableGames = (games: LoaderData, currentUserId: string) => {
-  return games.filter((game) => {
-    const players = game.players.filter((p) => p.userId === currentUserId);
-    return (
-      (game.phase === "PLAYING" &&
-        !!players.find((p) => game.gameState?.playerIdSequence[0] === p.id)) ||
-      (game.phase === "PREPARATION" &&
-        players.some((p) => !p.preparationState?.done))
-    );
-  });
+  return (
+    games?.filter((game) => {
+      if (game.isFinished) return false;
+      const players = game.players.filter((p) => p.userId === currentUserId);
+      return (
+        (game.phase === "PLAYING" &&
+          !!players.find(
+            (p) => game.gameState?.playerIdSequence[0] === p.id
+          )) ||
+        (game.phase === "PREPARATION" &&
+          players.some((p) => !p.preparationState?.done))
+      );
+    }) || []
+  );
 };
 
 const GamesPage = () => {
@@ -102,8 +107,12 @@ const GamesPage = () => {
   const lobbyGames = games.filter((game) => game.phase === "LOBBY");
   const runningGames = games.filter(
     (game) =>
-      game.phase !== "LOBBY" && !actionableGames.some((g) => g.id === game.id)
+      !game.isFinished &&
+      game.phase !== "LOBBY" &&
+      !actionableGames.some((g) => g.id === game.id)
   );
+
+  const finishedGames = games.filter((game) => game.isFinished);
 
   return (
     <>
@@ -113,6 +122,7 @@ const GamesPage = () => {
         <GameList games={actionableGames} title="Your Turn" />
         <GameList games={lobbyGames} title="Lobby" />
         <GameList games={runningGames} title="Waiting" />
+        <GameList games={finishedGames} title="Finished" />
       </div>
 
       <motion.div

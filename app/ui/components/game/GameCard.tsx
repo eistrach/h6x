@@ -47,6 +47,21 @@ const GameCard = ({ game }: GameCardProps) => {
   const creator = game.creator;
   const state = getState(game);
 
+  const players =
+    game.phase === "PLAYING"
+      ? [...game.players].sort((p1, p2) => {
+          const i1 = state!.playerIdSequence.indexOf(p2.id);
+          const i2 = state!.playerIdSequence.indexOf(p1.id);
+          if (i1 === -1 && i2 > -1) {
+            return 1;
+          }
+          if (i2 === -1 && i1 > -1) {
+            return -1;
+          }
+          return i1 - i2;
+        })
+      : game.players;
+
   return (
     <motion.li
       variants={{
@@ -86,7 +101,7 @@ const GameCard = ({ game }: GameCardProps) => {
                 className="text-primary-900 text-center w-6 h-6  rounded-full ring ring-white bg-gray-100"
               ></li>
             ))}
-            {game.players.map((player) => {
+            {players.map((player) => {
               const ring = state?.players
                 ? PlayerColors[state.players[player.id].index].ring
                 : "ring-white";

@@ -1,7 +1,11 @@
 import { buyUnitAction } from "./action";
 import { prisma } from "~/db.server";
 
-import { requireGameAndPlayer, requireGameState } from "../game.server";
+import {
+  requireGameAndPlayer,
+  requireGameState,
+  updateGameState,
+} from "../game.server";
 import { Point } from "~/core/math";
 
 export async function buyUnit(id: string, playerId: string, source: Point) {
@@ -26,10 +30,5 @@ export async function buyUnit(id: string, playerId: string, source: Point) {
     });
   }
 
-  return await prisma.game.update({
-    where: { id },
-    data: {
-      gameState: newState,
-    },
-  });
+  return updateGameState(game, newState);
 }
