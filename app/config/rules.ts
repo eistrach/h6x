@@ -21,7 +21,7 @@ export const CellModes = {
 
   defensive: {
     attackDice: "1d3",
-    defenseDice: "2d6",
+    defenseDice: "2d7",
     diamondsPerTurn: 1,
   },
 
