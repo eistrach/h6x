@@ -17,6 +17,7 @@ import clsx from "clsx";
 import GameFinishedOverlay from "./GameFinishedOverlay";
 import { useEffect } from "react";
 import { toId } from "~/core/utils";
+import { useGameStateTransitions } from "~/ui/hooks/useGameStateTransitions";
 
 const animationProps = {
   layout: true,
@@ -42,27 +43,11 @@ export default function GameView(props: GameWithState) {
   const directionalPopovers = useDirectionalPopovers();
 
   const transition = useTransition();
+  useGameStateTransitions(state, nextState, setSelectedCell);
 
   const disableActions = transition.state !== "idle";
   const isGameDone =
     state.playerIdSequence.length === 1 && isPlayingState(state);
-
-  useEffect(() => {
-    if (nextState?.causedBy.name === "attackCell") {
-      const payload = nextState.causedBy.payload as {
-        source: Point;
-        target: Point;
-      };
-      const sourceCell = nextState.cells[toId(payload.source)];
-      const targetCell = nextState.cells[toId(payload.target)];
-      const hasWon = sourceCell.ownerId === targetCell.ownerId;
-      if (hasWon) {
-        setSelectedCell(nextState.cells[toId(payload.target)], true);
-      }
-    } else if (!!nextState && "source" in nextState.causedBy.payload) {
-      setSelectedCell(state.cells[toId(nextState?.causedBy.payload.source)]);
-    }
-  }, [JSON.stringify(nextState)]);
 
   return (
     <div className="h-screen flex justify-center items-center flex-col">

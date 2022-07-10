@@ -129,8 +129,6 @@ const GamePage = () => {
   const state = useLoaderData<GameWithState>();
   const { error } = useActionData() || {};
 
-  const fetcher = useFetcher();
-
   const isPreparation = state.game.phase === "PREPARATION";
   const isDone = isPreparation && state.state.done;
 
@@ -143,17 +141,6 @@ const GamePage = () => {
           state.canTakeAction ||
           !!state.nextState))
   );
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      if (state.nextState)
-        fetcher.submit(
-          { _intent: "transitionToNextGameState" },
-          { method: "post" }
-        );
-    }, 500);
-    return () => clearTimeout(timeout);
-  }, [JSON.stringify(state.nextState)]);
 
   useEffect(() => {
     if (error) {
