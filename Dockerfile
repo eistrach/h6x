@@ -3,6 +3,7 @@ FROM node:18-bullseye-slim as base
 
 # Install openssl for Prisma
 RUN apt-get update && apt-get install -y openssl
+RUN npm i -g pnpm
 
 # Install all node_modules, including dev dependencies
 FROM base as deps
@@ -12,7 +13,6 @@ WORKDIR /app
 
 ADD package.json ./
 ADD .npmrc ./
-RUN npm i -g pnpm
 RUN pnpm i --production=false
 
 # Setup production node_modules
