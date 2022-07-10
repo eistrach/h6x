@@ -6,7 +6,7 @@ const AppUrlListener: React.FC<any> = () => {
   const navigate = useNavigate();
   useEffect(() => {
     App.addListener("appUrlOpen", (event: URLOpenListenerEvent) => {
-      const slug = event.url.split(".app").pop();
+      const slug = event.url.split(".io").pop();
       if (slug) {
         navigate(slug);
       }

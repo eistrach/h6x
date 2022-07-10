@@ -4,7 +4,10 @@
 	"webDir": "public/build",
 	"bundledWebRuntime": false,
 	"server": {
-		"url": "http://localhost:3000",
-		"cleartext": true
+		"url": "https://h6x.io",
+		"cleartext": true,
+		"allowNavigation": [
+			"*"
+		]
 	}
 }

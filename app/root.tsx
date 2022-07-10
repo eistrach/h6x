@@ -74,6 +74,7 @@ export default function App() {
 
   return (
     <html lang="en">
+      <AppUrlListener />
       <head>
         <Meta />
         <link rel="manifest" href="/resources/manifest.webmanifest" /> <Links />
@@ -82,7 +83,6 @@ export default function App() {
         <main className={clsx("overscroll-auto h-full", {})}>
           <Outlet />
         </main>
-        <AppUrlListener />
         <ScrollRestoration /> <Scripts /> <LiveReload />
       </body>
     </html>

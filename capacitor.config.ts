@@ -6,9 +6,8 @@ const config: CapacitorConfig = {
   webDir: "public/build",
   bundledWebRuntime: false,
   server: {
-    url: "http://localhost:3000",
+    url: "https://h6x.io",
     cleartext: true,
-    allowNavigation: ["*"],
   },
 };
 //qGZLN6aaA&iV4#
