@@ -53,7 +53,8 @@ export const editorCells = editorGrid.hexagon({
 
 export const cellCorners = editorCell().corners();
 
-export function compareCell(c1: Point, c2: Point) {
+export function compareCell(c1: Point | null, c2?: Point | null) {
+  if (!c1 && !c2) return true;
   if (!c1 || !c2) return false;
   return c1.x === c2.x && c1.y === c2.y;
 }

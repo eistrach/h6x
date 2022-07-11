@@ -1,25 +1,42 @@
+import { useTransition } from "@remix-run/react";
 import clsx from "clsx";
 import { motion } from "framer-motion";
+import { startExpiredKeysInterval } from "node-persist";
+import { useEffect, useRef, useState } from "react";
 import { CellModeSprites, NeutralColor, PlayerColors } from "~/config/graphics";
-import { CellState, PlayerStates } from "~/core/actions/types";
-import { MathCell, HEX_HEIGHT, HEX_WIDTH, HEX_STROKE_WIDTH } from "~/core/math";
+import { CellState, PlayerStates, PlayingState } from "~/core/actions/types";
+import {
+  MathCell,
+  HEX_HEIGHT,
+  HEX_WIDTH,
+  HEX_STROKE_WIDTH,
+  Point,
+  compareCell,
+} from "~/core/math";
+import { useAttackAnimation } from "~/ui/hooks/useAttackAnimation";
 
 type PlayerCellProps = {
+  state: PlayingState;
+  nextState?: PlayingState;
   cell: MathCell;
   playerCell: CellState;
   players: PlayerStates;
   onClick: (cell: CellState) => void;
   selected: boolean;
   popperRef?: React.Ref<SVGSVGElement>;
+  isTransitioning: boolean;
 };
 
 export default function PlayerCell({
+  state,
+  nextState,
   cell,
   playerCell,
   players,
   onClick,
   selected,
   popperRef,
+  isTransitioning,
 }: PlayerCellProps) {
   const { x, y } = cell.toPoint();
 
@@ -28,7 +45,30 @@ export default function PlayerCell({
 
   const Sprite = CellModeSprites[playerCell.activeModeId];
 
-  const anim = selected
+  const attackAnimation = useAttackAnimation(state, cell, isTransitioning);
+
+  const anim = attackAnimation
+    ? {
+        animate: {
+          x: [
+            0,
+            (attackAnimation.target.x - attackAnimation.source.x) * 0.7,
+            0,
+          ],
+          y: [
+            0,
+            (attackAnimation.target.y - attackAnimation.source.y) * 0.7,
+            0,
+          ],
+
+          scale: [1, 1.1, 1],
+        },
+        transition: {
+          duration: 0.3,
+          bounce: 1,
+        },
+      }
+    : selected
     ? {
         initial: { scale: 1 },
         animate: { scale: 0.9 },

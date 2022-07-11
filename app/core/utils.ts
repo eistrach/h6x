@@ -75,10 +75,11 @@ export function useDataRefreshOnInterval(
 ) {
   let { refresh } = useDataRefresh();
   useEffect(() => {
-    if (stop) return;
-    let interval = setInterval(refresh, intervalNumber);
+    let interval = setInterval(() => {
+      if (!stop) refresh();
+    }, intervalNumber);
     return () => clearInterval(interval);
-  }, [refresh, false]);
+  }, [refresh, stop]);
 }
 
 export const toId = (p: Point | Cell | CellState) => {

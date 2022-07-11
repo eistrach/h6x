@@ -20,7 +20,7 @@ import { buyUnit } from "~/domain/game/buyUnit/index.server";
 import { attackCell } from "~/domain/game/attackCell/index.server";
 import { endTurn } from "~/domain/game/endTurn/index.server";
 import { redirect } from "@remix-run/node";
-import { useHasTabFocus } from "~/ui/hooks/useTabFocus";
+import { useHasTabFocus } from "~/ui/hooks/useHasTabFocus";
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const gameId = requireParam(params, "id");

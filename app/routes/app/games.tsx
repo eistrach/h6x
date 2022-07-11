@@ -17,7 +17,7 @@ import { CogIcon } from "@heroicons/react/solid";
 import { InputTheme } from "~/ui/components/base/InputTheme";
 import { Disclosure } from "@headlessui/react";
 import clsx from "clsx";
-import { useHasTabFocus } from "~/ui/hooks/useTabFocus";
+import { useHasTabFocus } from "~/ui/hooks/useHasTabFocus";
 type LoaderData = UnpackData<typeof getGamesForUser>;
 
 export const loader = async ({ request }: LoaderArgs) => {

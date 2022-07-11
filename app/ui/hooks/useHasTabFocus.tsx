@@ -7,10 +7,11 @@ export const useHasTabFocus = () => {
     const handleChange = () => {
       setTabHasFocus(document.visibilityState === "visible");
     };
+
     document.addEventListener("visibilitychange", handleChange);
 
     return () => {
-      window.removeEventListener("visibilitychange", handleChange);
+      document.removeEventListener("visibilitychange", handleChange);
     };
   }, []);
 

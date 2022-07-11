@@ -1,5 +1,5 @@
 import { useFetcher } from "@remix-run/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { CellState, PlayingState } from "~/core/actions/types";
 import { Point } from "~/core/math";
 import { toId } from "~/core/utils";
@@ -14,14 +14,18 @@ export const useGameStateTransitions = (
   const currentStateId = JSON.stringify(state);
   const nextStateId = JSON.stringify(nextState);
 
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
   useEffect(() => {
+    if (!!nextState) setIsTransitioning(true);
     const timeout = setTimeout(() => {
       if (nextState)
         fetcher.submit(
           { _intent: "transitionToNextGameState" },
           { method: "post" }
         );
-    }, 500);
+      setIsTransitioning(false);
+    }, 400);
     return () => clearTimeout(timeout);
   }, [nextStateId]);
 
@@ -47,4 +51,6 @@ export const useGameStateTransitions = (
       setSelectedCell(null, true);
     }
   }, [currentStateId]);
+
+  return isTransitioning;
 };

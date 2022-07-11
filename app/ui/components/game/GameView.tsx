@@ -43,7 +43,11 @@ export default function GameView(props: GameWithState) {
   const directionalPopovers = useDirectionalPopovers();
 
   const transition = useTransition();
-  useGameStateTransitions(state, nextState, setSelectedCell);
+  const isTransitioning = useGameStateTransitions(
+    state,
+    nextState,
+    setSelectedCell
+  );
 
   const disableActions = transition.state !== "idle";
   const isGameDone =
@@ -79,6 +83,9 @@ export default function GameView(props: GameWithState) {
       </div>
 
       <GameMap
+        state={state}
+        nextState={nextState}
+        isTransitioning={isTransitioning}
         cells={state.cells}
         onClick={(c) => setSelectedCell(c)}
         selectedCell={selectedCell}
