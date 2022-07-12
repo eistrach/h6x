@@ -1,5 +1,6 @@
 import { useTransition } from "@remix-run/react";
 import { useState, useRef, useEffect } from "react";
+import { AnimationDelay } from "~/config/graphics";
 import { PlayingState } from "~/core/actions/types";
 import { asMathCell, compareCell, Point } from "~/core/math";
 
@@ -27,7 +28,7 @@ export const useAttackAnimation = (
     if (!!attackAnimation) {
       const timeout = setTimeout(() => {
         setAttackAnimation(null);
-      }, 1000);
+      }, AnimationDelay + 50);
       return () => clearTimeout(timeout);
     }
   }, [!!attackAnimation]);

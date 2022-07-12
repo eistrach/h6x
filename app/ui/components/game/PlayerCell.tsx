@@ -1,51 +1,53 @@
-import { useTransition } from "@remix-run/react";
 import clsx from "clsx";
 import { motion } from "framer-motion";
-import { startExpiredKeysInterval } from "node-persist";
-import { useEffect, useRef, useState } from "react";
 import { CellModeSprites, NeutralColor, PlayerColors } from "~/config/graphics";
-import { CellState, PlayerStates, PlayingState } from "~/core/actions/types";
 import {
   MathCell,
   HEX_HEIGHT,
   HEX_WIDTH,
   HEX_STROKE_WIDTH,
-  Point,
-  compareCell,
+  compareCell
 } from "~/core/math";
+import { toId } from "~/core/utils";
+import {
+  useCurrentHostileNeighbors,
+  useGameState
+} from "~/ui/context/GameContext";
+import { useSelectedCell } from "~/ui/context/SelectedCellContext";
+import { useIsTransitioningToNextState } from "~/ui/context/TransitionContext";
 import { useAttackAnimation } from "~/ui/hooks/useAttackAnimation";
+import { getAttackPopoverRef } from "./AttackPopovers";
 
 type PlayerCellProps = {
-  state: PlayingState;
-  nextState?: PlayingState;
-  cell: MathCell;
-  playerCell: CellState;
-  players: PlayerStates;
-  onClick: (cell: CellState) => void;
-  selected: boolean;
-  popperRef?: React.Ref<SVGSVGElement>;
-  isTransitioning: boolean;
+  position: MathCell;
 };
 
-export default function PlayerCell({
-  state,
-  nextState,
-  cell,
-  playerCell,
-  players,
-  onClick,
-  selected,
-  popperRef,
-  isTransitioning,
-}: PlayerCellProps) {
-  const { x, y } = cell.toPoint();
+export default function PlayerCell({ position }: PlayerCellProps) {
+  const { state, directionalPopovers } = useGameState();
+  const { selectedCell, setSelectedCell } = useSelectedCell();
+  const hostileNeighbors = useCurrentHostileNeighbors();
 
-  const owner = players[playerCell.ownerId];
+  const cellState = state.cells[toId(position)];
+  const isSelected = compareCell(cellState.position, selectedCell?.position);
+  const isTransitioningToNextState = useIsTransitioningToNextState();
+
+  const popperRef = getAttackPopoverRef(
+    position,
+    directionalPopovers,
+    hostileNeighbors
+  );
+  const { x, y } = position.toPoint();
+
+  const owner = state.players[cellState.ownerId];
   const color = (owner && PlayerColors[owner.index]) || NeutralColor;
 
-  const Sprite = CellModeSprites[playerCell.activeModeId];
+  const Sprite = CellModeSprites[cellState.activeModeId];
 
-  const attackAnimation = useAttackAnimation(state, cell, isTransitioning);
+  const attackAnimation = useAttackAnimation(
+    state,
+    position,
+    isTransitioningToNextState
+  );
 
   const anim = attackAnimation
     ? {
@@ -68,7 +70,7 @@ export default function PlayerCell({
           bounce: 1,
         },
       }
-    : selected
+    : isSelected
     ? {
         initial: { scale: 1 },
         animate: { scale: 0.9 },
@@ -84,13 +86,13 @@ export default function PlayerCell({
     <motion.g {...anim}>
       <g
         ref={popperRef}
-        strokeWidth={selected ? HEX_STROKE_WIDTH * 1.25 : HEX_STROKE_WIDTH}
+        strokeWidth={isSelected ? HEX_STROKE_WIDTH * 1.25 : HEX_STROKE_WIDTH}
         strokeLinejoin="round"
-        onClick={() => onClick(playerCell)}
+        onClick={() => setSelectedCell(cellState)}
         transform={`translate(${x - HEX_WIDTH / 2}, ${y - HEX_HEIGHT / 2}) `}
         className={clsx(color.fill, {
-          " stroke-white ": selected,
-          " stroke-gray-800 ": !selected,
+          " stroke-white ": isSelected,
+          " stroke-gray-800 ": !isSelected,
         })}
       >
         <Sprite className={clsx(color.fillSecondary, color.strokeSecondary)} />
@@ -103,7 +105,7 @@ export default function PlayerCell({
           fontSize="30"
           strokeWidth=".2"
         >
-          {playerCell.units}
+          {cellState.units}
         </text>
       </g>
     </motion.g>

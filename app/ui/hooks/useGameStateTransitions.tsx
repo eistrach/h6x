@@ -1,14 +1,14 @@
 import { useFetcher } from "@remix-run/react";
 import { useEffect, useState } from "react";
-import { CellState, PlayingState } from "~/core/actions/types";
+import { AnimationDelay } from "~/config/graphics";
 import { Point } from "~/core/math";
 import { toId } from "~/core/utils";
+import { useGameState } from "../context/GameContext";
+import { useSelectedCell } from "../context/SelectedCellContext";
 
-export const useGameStateTransitions = (
-  state: PlayingState,
-  nextState: PlayingState | undefined,
-  setSelectedCell: (cell: CellState | null, force?: boolean) => void
-) => {
+export const useGameStateTransitions = () => {
+  const { state, nextState } = useGameState();
+  const { setSelectedCell } = useSelectedCell();
   const fetcher = useFetcher();
 
   const currentStateId = JSON.stringify(state);
@@ -25,7 +25,7 @@ export const useGameStateTransitions = (
           { method: "post" }
         );
       setIsTransitioning(false);
-    }, 400);
+    }, AnimationDelay);
     return () => clearTimeout(timeout);
   }, [nextStateId]);
 

@@ -6,23 +6,24 @@ import { compareCell, CompassDirection, Point } from "~/core/math";
 import { IconButton } from "../base/IconButton";
 import { PopperPopover } from "../base/PopperPopover";
 import { SwordIcon } from "../icons/SwordIcon";
+import {
+  useCurrentHostileNeighbors,
+  useCurrentPlayer,
+  useGameState,
+  useIsSubmitting,
+} from "~/ui/context/GameContext";
+import { useSelectedCell } from "~/ui/context/SelectedCellContext";
 
 export type DirectionalPopovers = { [k in CompassDirection]: Popover };
 export type AttackableNeighbors = { [k in CompassDirection]?: CellState };
 
-export type AttackPopoversProps = {
-  playerId: string;
-  directionalPopovers: DirectionalPopovers;
-  sourceCell: CellState | null;
-  attackableNeighbors: AttackableNeighbors;
-  disabled?: boolean;
-};
-
 export const getAttackPopoverRef = (
   cell: Point,
   directionalPopovers: DirectionalPopovers,
-  attackableNeighbors: AttackableNeighbors
+  attackableNeighbors: AttackableNeighbors | null
 ) => {
+  if (!attackableNeighbors) return null;
+
   const [direction] = (Object.entries(attackableNeighbors).find(([_, c]) =>
     compareCell(c.position, cell)
   ) || []) as [CompassDirection, CellState];
@@ -31,13 +32,14 @@ export const getAttackPopoverRef = (
     : null;
 };
 
-const AttackPopovers = ({
-  playerId,
-  directionalPopovers,
-  sourceCell,
-  attackableNeighbors,
-  disabled,
-}: AttackPopoversProps) => {
+const AttackPopovers = () => {
+  const { directionalPopovers, nextState } = useGameState();
+  const attackableNeighbors = useCurrentHostileNeighbors();
+  const { selectedCell } = useSelectedCell();
+  const currentPlayer = useCurrentPlayer();
+  const isSubmitting = useIsSubmitting();
+
+  if (!attackableNeighbors || !!nextState) return null;
   return (
     <>
       {Object.entries(directionalPopovers).map(([k, p], i) => {
@@ -55,22 +57,44 @@ const AttackPopovers = ({
               method="post"
               className="w-6 h-6 flex items-center justify-center"
             >
-              <input type="hidden" name="_intent" value="attackCell" />
+              <input
+                type="hidden"
+                name="_intent"
+                value="attackCell"
+                onChange={() => {}}
+              />
               <input
                 type="hidden"
                 name="position[x]"
-                value={sourceCell?.position.x}
+                onChange={() => {}}
+                value={selectedCell?.position.x}
               />
               <input
                 type="hidden"
                 name="position[y]"
-                value={sourceCell?.position.y}
+                onChange={() => {}}
+                value={selectedCell?.position.y}
               />
-              <input type="hidden" name="playerId" value={playerId} />
-              <input type="hidden" name="target[x]" value={cell?.position.x} />
-              <input type="hidden" name="target[y]" value={cell?.position.y} />
+              <input
+                type="hidden"
+                name="playerId"
+                value={currentPlayer.id}
+                onChange={() => {}}
+              />
+              <input
+                type="hidden"
+                name="target[x]"
+                value={cell?.position.x}
+                onChange={() => {}}
+              />
+              <input
+                type="hidden"
+                name="target[y]"
+                value={cell?.position.y}
+                onChange={() => {}}
+              />
               <IconButton
-                disabled={disabled}
+                disabled={isSubmitting}
                 type="submit"
                 className="text-red-700"
                 iconCss="w-6 h-6"

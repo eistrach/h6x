@@ -1,18 +1,16 @@
-import { useActionData, useFetcher, useLoaderData } from "@remix-run/react";
+import { useActionData, useLoaderData } from "@remix-run/react";
 import { useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { z } from "zod";
-
 import { requireUser } from "~/domain/auth/session.server";
 import { ActionArgs, LoaderArgs, useDataRefreshOnInterval } from "~/core/utils";
 import { requireParam, validateForm } from "~/utils.server";
-
 import GameView from "~/ui/components/game/GameView";
 import {
   GameWithState,
   getGameWithState,
   startPreparation,
-  transitionToNextGameState,
+  transitionToNextGameState
 } from "~/domain/game/game.server";
 import { changeCellMode } from "~/domain/game/changeCellMode/index.server";
 import { CellModeIds } from "~/config/rules";
@@ -21,6 +19,9 @@ import { attackCell } from "~/domain/game/attackCell/index.server";
 import { endTurn } from "~/domain/game/endTurn/index.server";
 import { redirect } from "@remix-run/node";
 import { useHasTabFocus } from "~/ui/hooks/useHasTabFocus";
+import { GameContextProvider } from "~/ui/context/GameContext";
+import { SelectedCellProvider } from "~/ui/context/SelectedCellContext";
+import { TransitionContextProvider } from "~/ui/context/TransitionContext";
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const gameId = requireParam(params, "id");
@@ -149,13 +150,17 @@ const GamePage = () => {
   }, [error]);
 
   return (
-    <div>
-      <Toaster position="top-right" />
+    <GameContextProvider value={state}>
+      <SelectedCellProvider>
+        <TransitionContextProvider>
+          <Toaster position="top-right" />
 
-      <div className="min-h-full h-full">
-        <GameView {...state} />
-      </div>
-    </div>
+          <div className="min-h-full h-full">
+            <GameView />
+          </div>
+        </TransitionContextProvider>
+      </SelectedCellProvider>
+    </GameContextProvider>
   );
 };
 

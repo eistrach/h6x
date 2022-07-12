@@ -1,27 +1,24 @@
-import { User } from "@prisma/client";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
 import { PlayerColors } from "~/config/graphics";
-import { PlayerState, PlayerStates } from "~/core/actions/types";
+import {
+  useCurrentPlayer,
+  useCurrentUsers,
+  useGameState
+} from "~/ui/context/GameContext";
 
-export type PlayersInfoProps = {
-  currentPlayer: PlayerState;
-  players: PlayerStates;
-  playerSequenceIds: string[];
-  users: User[];
-};
+const PlayersInfo = () => {
+  const {
+    state: { playerIdSequence, players },
+  } = useGameState();
+  const currentPlayer = useCurrentPlayer();
+  const users = useCurrentUsers();
 
-const PlayersInfo = ({
-  currentPlayer,
-  players,
-  playerSequenceIds,
-  users,
-}: PlayersInfoProps) => {
   return (
     <div className="flex w-full justify-end items-center pt-4 pr-4">
       <ol className="flex-shrink-0 flex m-2 -space-x-1 items-center">
         <AnimatePresence>
-          {[...playerSequenceIds].reverse().map((id) => {
+          {[...playerIdSequence].reverse().map((id) => {
             const p = players[id];
             const color = PlayerColors[p.index];
 

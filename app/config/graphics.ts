@@ -76,3 +76,16 @@ export const NeutralColor = {
   fillSecondary: "fill-gray-100",
   strokeSecondary: "stroke-gray-100",
 };
+
+export const ListItemAnimationProps = {
+  layout: true,
+  initial: { opacity: 0, scale: 0 },
+  animate: {
+    opacity: 1,
+    scale: 1,
+    transition: { delay: 0.1, type: "spring" },
+  },
+  exit: { opacity: 0, scale: 0 },
+};
+
+export const AnimationDelay = 2000;

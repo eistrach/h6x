@@ -5,9 +5,9 @@ import { Link } from "../base/Link";
 import AwardSvg from "../svg/AwardSvg";
 import { InputTheme } from "../base/InputTheme";
 import { EmojiSadIcon } from "@heroicons/react/solid";
-import { ClientOnly } from "remix-utils";
 import Confetti from "react-dom-confetti";
 import { ArrowNarrowLeftIcon } from "@heroicons/react/outline";
+import { useGameState } from "~/ui/context/GameContext";
 
 const confettiConfig = {
   angle: 90,
@@ -23,16 +23,12 @@ const confettiConfig = {
   colors: ["#a864fd", "#29cdff", "#78ff44", "#ff718d", "#fdff6a"],
 };
 
-export default function GameFinishedOverlay({
-  won,
-  lost,
-}: {
-  won: boolean;
-  lost: boolean;
-}) {
+export default function GameFinishedOverlay() {
+  const { canTakeAction } = useGameState();
+
   const [showConfetti, setShowConfetti] = useState(false);
-  const title = won ? "Congratulations!" : "Try again!";
-  const description = won
+  const title = canTakeAction ? "Congratulations!" : "Try again!";
+  const description = canTakeAction
     ? "You have destroyed all your enemies."
     : "Unfortunately you were destroyed.";
 
@@ -40,10 +36,10 @@ export default function GameFinishedOverlay({
     setTimeout(() => {
       setShowConfetti(true);
     }, 100);
-  }, [won]);
+  }, [canTakeAction]);
 
   return (
-    <Transition.Root show={won || lost} as={Fragment}>
+    <Transition.Root show={true} as={Fragment}>
       <Dialog
         as="div"
         className="relative z-10"
@@ -80,7 +76,7 @@ export default function GameFinishedOverlay({
                       <Confetti active={showConfetti} config={confettiConfig} />
                     </div>
 
-                    {won ? (
+                    {canTakeAction ? (
                       <>
                         <AwardSvg
                           className="h-10 w-10 fill-primary-600 stroke-primary-600"
