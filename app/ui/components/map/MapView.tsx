@@ -1,4 +1,3 @@
-import { Cell } from "@prisma/client";
 import {
   MathCell,
   VIEWBOX_HEIGHT,
@@ -7,10 +6,11 @@ import {
   VIEWBOX_Y,
   editorCells,
 } from "~/core/math";
+import { Cell } from "~/domain/map.server";
 import HexView from "./CellView";
 
 type HexMapProps = {
-  cells: Omit<Cell, "id">[];
+  cells: Cell[];
   onSelect?: (cell: MathCell) => void;
 };
 

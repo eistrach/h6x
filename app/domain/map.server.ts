@@ -1,57 +1,72 @@
-import { Cell } from "@prisma/client";
+import { GameMap } from "@prisma/client";
 import { prisma } from "~/db.server";
 import { validateCellConnections } from "./validations";
 
+export const CellType = ["buff", "player"] as const;
+
+export type Cell = {
+  x: number;
+  y: number;
+  type: typeof CellType[number];
+};
+
+export type CellsHistory = {
+  cells: Cell[];
+}[];
+
+export const convertMap = (map: GameMap | null) =>
+  map && {
+    ...map,
+    cellsHistory: map.cellsHistory as CellsHistory,
+    cells: ((map.cellsHistory as CellsHistory)[map.cellsHistory.length - 1]
+      ?.cells || []) as Cell[],
+  };
+
+export const convertMaps = (maps: GameMap[]) => maps.map((m) => convertMap(m)!);
+
 export const getPublishedMaps = () => {
-  return prisma.hexMap.findMany({
-    where: {
-      published: true,
-    },
-    include: {
-      cells: true,
-    },
-  });
+  return prisma.gameMap
+    .findMany({
+      where: {
+        published: true,
+      },
+    })
+    .then(convertMaps);
 };
 
 export const getMapForId = (id: string) => {
-  return prisma.hexMap.findUnique({
-    where: {
-      id,
-    },
-    include: {
-      cells: true,
-    },
-  });
+  return prisma.gameMap
+    .findUnique({
+      where: {
+        id,
+      },
+    })
+    .then(convertMap);
 };
 
-export const getMapsForUser = (creatorId: string) => {
-  return prisma.hexMap.findMany({
+export const getMapsForUser = async (creatorId: string) => {
+  const maps = await prisma.gameMap.findMany({
     where: {
       creatorId,
     },
   });
+
+  return convertMaps(maps)!;
 };
 
 export const getMapForUser = async (id: string, creatorId: string) => {
-  const map = await prisma.hexMap.findFirst({
-    where: {
-      id,
-      creatorId,
-    },
-    include: {
-      cells: true,
-    },
-  });
-
-  if (!map) {
-    return null;
-  }
-
-  return map;
+  return await prisma.gameMap
+    .findFirst({
+      where: {
+        id,
+        creatorId,
+      },
+    })
+    .then(convertMap);
 };
 
 export const createMap = async (name: string, creatorId: string) => {
-  return prisma.hexMap.create({
+  return prisma.gameMap.create({
     data: {
       creatorId,
       name,
@@ -60,21 +75,26 @@ export const createMap = async (name: string, creatorId: string) => {
 };
 
 export const updateMap = async (
-  { id, cells }: { id: string; cells: Omit<Cell, "id">[] },
+  { id, cells }: { id: string; cells: Cell[] },
   creatorId: string
 ) => {
   if (!(await isMapCreator(id, creatorId))) {
     throw new Error("You are not the creator of this map");
   }
 
-  await updateCells(id, cells);
+  const map = await getMapForId(id);
 
-  await prisma.hexMap.update({
+  if (!map) {
+    throw new Error("Map not found");
+  }
+
+  await prisma.gameMap.update({
     where: {
       id,
     },
     data: {
       published: false,
+      cellsHistory: [...map.cellsHistory.slice(10), { cells }],
     },
   });
 
@@ -84,44 +104,37 @@ export const updateMap = async (
 export const toggleMapVisibility = async (
   id: string,
   creatorId: string,
-  cells: Omit<Cell, "id">[]
+  cells: Cell[]
 ) => {
   if (!(await isMapCreator(id, creatorId))) {
     throw new Error("You are not the creator of this map");
   }
 
-  const isPublished = await isMapPublished(id);
+  const map = await getMapForId(id);
 
-  if (!isPublished && !validateCellConnections(cells)) {
+  if (!map) {
+    throw new Error("Map not found");
+  }
+
+  const isPublished = map.published;
+
+  if (!validateCellConnections(cells)) {
     return null;
   }
 
-  await updateCells(id, cells);
-
-  return prisma.hexMap.update({
+  return prisma.gameMap.update({
     where: {
       id,
     },
     data: {
       published: !isPublished,
+      cellsHistory: [...map.cellsHistory.slice(10), { cells }],
     },
   });
 };
 
-export async function updateCells(mapId: string, cells: Omit<Cell, "id">[]) {
-  await prisma.cell.deleteMany({
-    where: {
-      mapId,
-    },
-  });
-
-  await prisma.cell.createMany({
-    data: cells,
-  });
-}
-
 export async function isMapCreator(mapId: string, userId: string) {
-  return !!(await prisma.hexMap.count({
+  return !!(await prisma.gameMap.count({
     where: {
       id: mapId,
       creatorId: userId,
@@ -131,7 +144,7 @@ export async function isMapCreator(mapId: string, userId: string) {
 
 export async function isMapPublished(mapId: string) {
   return (
-    await prisma.hexMap.findUnique({
+    await prisma.gameMap.findUnique({
       where: {
         id: mapId,
       },

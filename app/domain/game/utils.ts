@@ -1,4 +1,4 @@
-import { Cell } from "@prisma/client";
+import { Cell } from "../map.server";
 import {
   CellModeId,
   CellModes,
@@ -87,7 +87,7 @@ export const initializeCells = (
 ) => {
   const players = Object.values(playerStates);
   const availableCells = mapCells
-    .filter((cell) => cell.type === "PLAYER")
+    .filter((cell) => cell.type === "player")
     .map((value) => ({ value, sort: Math.random() }))
     .sort((a, b) => a.sort - b.sort)
     .map(({ value }) => value);

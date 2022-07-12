@@ -6,7 +6,7 @@ import type { DataFunctionArgs } from "@remix-run/node";
 import type { User } from "~/domain/user.server";
 import { useDataRefresh } from "remix-utils";
 import { Point } from "./math";
-import { Cell } from "@prisma/client";
+import { Cell } from "../map.server";
 import { CellState } from "./actions/types";
 
 /**

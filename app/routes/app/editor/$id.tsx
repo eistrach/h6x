@@ -1,4 +1,3 @@
-import { Cell, CellType } from "@prisma/client";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import { useState } from "react";
 import MapView from "~/ui/components/map/MapView";
@@ -12,6 +11,8 @@ import {
   validateForm,
 } from "~/utils.server";
 import {
+  Cell,
+  CellType,
   getMapForUser,
   toggleMapVisibility,
   updateMap,
@@ -34,8 +35,7 @@ const Schema = z.object({
       .object({
         x: z.preprocess(Number, z.number()),
         y: z.preprocess(Number, z.number()),
-        type: z.nativeEnum(CellType),
-        mapId: z.string().min(1),
+        type: z.enum(CellType),
       })
       .array()
     //.refine(validateCellConnections, "Invalid cell connections")
@@ -91,7 +91,7 @@ export type Tool = "add" | "remove";
 export default function EditorDetailPage() {
   const map = useLoaderData<LoaderData>();
   const result = useActionData<ErrorResult | null>();
-  const [cells, setCells] = useState<Omit<Cell, "id">[]>(map.cells);
+  const [cells, setCells] = useState<Cell[]>(map.cells);
   const [selectedTool, setSelectedTool] = useState<Tool>("add");
   const [isFill, setIsFill] = useState(false);
 
@@ -101,8 +101,7 @@ export default function EditorDetailPage() {
     const newCells = cells.map((c) => ({
       x: c.x,
       y: c.y,
-      type: "PLAYER" as const,
-      mapId: map.id,
+      type: "player" as const,
     }));
     setCells((oldCells) => [
       ...oldCells.filter((c) => !cellInGrid(c, cells)),

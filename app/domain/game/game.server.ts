@@ -1,8 +1,7 @@
-import { CellState, PlayerState, PlayingState } from "../../core/actions/types";
+import { PlayingState } from "../../core/actions/types";
 import { GamePhase, Player, Prisma, User } from "@prisma/client";
-import { getMapForId } from "../map.server";
+import { convertMap, getMapForId } from "../map.server";
 import { prisma } from "~/db.server";
-
 import { PreparationState } from "~/core/actions/types";
 import {
   getCurrentPlayer,
@@ -25,11 +24,7 @@ export async function getGamesForUser(userId: string) {
         game: {
           include: {
             creator: true,
-            map: {
-              include: {
-                cells: true,
-              },
-            },
+            map: true,
             players: {
               include: {
                 user: true,
@@ -55,6 +50,7 @@ export async function getGamesForUser(userId: string) {
     const lastState = g.states[g.states.length - 1] as PlayingState | null;
     return {
       ...g,
+      map: convertMap(g.map)!,
       isFinished: lastState?.playerIdSequence.length === 1,
       gameState: lastState,
       players: g.players.map((p) => ({
@@ -72,11 +68,7 @@ export async function getGame(id: string) {
     },
     include: {
       creator: true,
-      map: {
-        include: {
-          cells: true,
-        },
-      },
+      map: true,
       players: {
         include: {
           user: true,
@@ -95,6 +87,7 @@ export async function getGame(id: string) {
   const lastState = game.states[game.states.length - 1] as PlayingState | null;
   return {
     ...game,
+    map: convertMap(game.map)!,
     isFinished: lastState?.playerIdSequence.length === 1,
     gameState: lastState,
     players: game.players.map((p) => ({

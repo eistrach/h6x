@@ -1,7 +1,7 @@
-import { Cell } from "@prisma/client";
 import { asMathCell, cellInGrid, MathCell, asMathGrid } from "~/core/math";
+import { Cell } from "./map.server";
 
-export const validateCellConnections = (cells: Omit<Cell, "id">[]) => {
+export const validateCellConnections = (cells: Cell[]) => {
   const gridCells = cells.map((cell) => asMathCell(cell.x, cell.y));
   const grid = asMathGrid(gridCells);
   const queue = [grid[0]];

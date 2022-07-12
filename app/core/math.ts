@@ -1,4 +1,4 @@
-import { Cell } from "@prisma/client";
+import { Cell } from "../map.server";
 import {
   defineGrid,
   Hex,

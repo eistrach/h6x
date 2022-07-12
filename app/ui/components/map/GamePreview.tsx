@@ -1,4 +1,3 @@
-import { Cell } from "@prisma/client";
 import {
   asMathGrid,
   cellsToMathCells,
@@ -7,10 +6,11 @@ import {
   VIEWBOX_X,
   VIEWBOX_Y,
 } from "~/core/math";
+import { Cell } from "~/domain/map.server";
 import CellPreview from "./CellPreview";
 
 type GamePreviewProps = {
-  cells: Omit<Cell, "id">[];
+  cells: Cell[];
   className?: string;
   cellClassName?: string;
 };
