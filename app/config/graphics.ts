@@ -88,4 +88,4 @@ export const ListItemAnimationProps = {
   exit: { opacity: 0, scale: 0 },
 };
 
-export const AnimationDelay = 2000;
+export const AnimationDelay = 400;
