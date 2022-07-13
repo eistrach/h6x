@@ -27,6 +27,7 @@ export type PlayingState<P = any> = {
   causedBy: Action<P>;
   turn: number;
   done?: boolean;
+  stateId: number;
 };
 
 export type PreparationState<P = any> = PlayingState<P> & {

@@ -1,5 +1,5 @@
 import produce from "immer";
-import { Action, PlayingState } from "./types";
+import { PlayingState } from "./types";
 
 export const registerAction = <S extends PlayingState<P>, P extends any>(
   name: string,
@@ -26,11 +26,6 @@ export const commitAction = <P>(
   payload: P,
   name: string
 ) => {
+  state.stateId++;
   state.causedBy = { name, payload, turn: state.turn };
 };
-
-export type ExtractAction<
-  ActionFunc extends ReturnType<typeof registerAction>,
-  S extends PlayingState = PlayingState,
-  P = Parameters<ActionFunc>[1]
-> = Action<P>;

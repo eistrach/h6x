@@ -8,7 +8,7 @@ import { isPlayingState } from "~/domain/game/utils";
 import {
   useCurrentPlayer,
   useGameState,
-  useIsSubmitting,
+  useIsSubmitting
 } from "~/ui/context/GameContext";
 import { useSelectedCell } from "~/ui/context/SelectedCellContext";
 import { Button } from "../base/Button";

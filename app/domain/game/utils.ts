@@ -120,6 +120,7 @@ export const initializePreparationState = (
     causedBy: { name: "startPreparation", payload: {}, turn: 0 },
     done: false,
     turn: 0,
+    stateId: 0,
   };
 };
 
@@ -130,6 +131,7 @@ export const initializePlayingState = (players: PlayerStates): PlayingState => {
     cells: {},
     causedBy: { name: "startPreparation", payload: {}, turn: 0 },
     turn: 0,
+    stateId: 0,
   };
 };
 

@@ -157,14 +157,14 @@ export function requirePlayingState(game: Game) {
 export async function updateGameState(
   game: Game,
   state: PlayingState,
-  currentPlayer: Player
+  player: Player
 ) {
-  await prisma.player.update({
-    where: { id: currentPlayer.id },
-    data: {
-      lastSeenActionId: game.states.length,
-    },
-  });
+  // await prisma.player.update({
+  //   where: { id: currentPlayer.id },
+  //   data: {
+  //     lastSeenActionId: game.states.length,
+  //   },
+  // });
 
   return prisma.game.update({
     where: { id: game.id },
@@ -308,17 +308,20 @@ const getNextPlayerForUser = async (game: Game, userId: string) => {
   const orderedPlayerStates = game.gameState!.playerIdSequence.map(
     (id) => game.players.find((p) => p.id === id)!
   );
-  return orderedPlayerStates.find((p) => p.userId === userId)!;
+  return orderedPlayerStates.find((p) => p.userId === userId);
 };
 
-export const transitionToNextGameState = async (id: string, userId: string) => {
-  const game = await requireGame(id);
-  const player = await getNextPlayerForUser(game, userId);
+export const transitionToNextGameState = async (
+  id: string,
+  playerId: string
+) => {
+  const { game, player } = await requireGameAndPlayer(id, playerId);
 
   if (game.states.length - 1 === player.lastSeenActionId) {
+    console.log("done");
     return player;
   }
-
+  console.log("updating");
   return prisma.player.update({
     where: { id: player.id },
     data: {
@@ -356,17 +359,24 @@ export const getGameWithState = async (id: string, user: User) => {
     };
   }
 
-  const currentPlayerState = getCurrentPlayer(game.gameState!);
+  const player =
+    (await getNextPlayerForUser(game, user.id)) ||
+    game.players
+      .filter((p) => p.userId === user.id)
+      .reduce((p, c) =>
+        (p.lastSeenActionId || -1) > (c.lastSeenActionId || -1) ? p : c
+      );
 
-  const player = await getNextPlayerForUser(game, user.id);
   const lastSeenActionId = player.lastSeenActionId || 0;
 
   const isLatestState = game.states.length - 1 === lastSeenActionId;
 
   if (isLatestState) {
+    const currentPlayerState = getCurrentPlayer(game.gameState!);
     return {
       game,
       state: game.states[game.states.length - 1] as PlayingState,
+      playerId: player.id,
       canTakeAction: currentPlayerState?.userId === user.id,
     };
   }
@@ -374,12 +384,13 @@ export const getGameWithState = async (id: string, user: User) => {
   const state = game.states[lastSeenActionId!] as PlayingState;
 
   const nextState = game.states[lastSeenActionId! + 1] as PlayingState;
-
+  const currentPlayerState = getCurrentPlayer(state);
   return {
     game,
     state,
     nextState,
-    canTakeAction: false,
+    playerId: player.id,
+    canTakeAction: currentPlayerState?.userId === user.id,
   };
 };
 

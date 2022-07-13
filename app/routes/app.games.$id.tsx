@@ -10,7 +10,7 @@ import {
   GameWithState,
   getGameWithState,
   startPreparation,
-  transitionToNextGameState
+  transitionToNextGameState,
 } from "~/domain/game/game.server";
 import { changeCellMode } from "~/domain/game/changeCellMode/index.server";
 import { CellModeIds } from "~/config/rules";
@@ -75,6 +75,7 @@ const Schema = z.union([
   }),
   z.object({
     _intent: z.literal("transitionToNextGameState"),
+    playerId: z.string().min(1),
   }),
 ]);
 export const action = async ({ request, params }: ActionArgs) => {
@@ -117,7 +118,8 @@ export const action = async ({ request, params }: ActionArgs) => {
         await endTurn(gameId, result.data.playerId);
         break;
       case "transitionToNextGameState":
-        await transitionToNextGameState(gameId, user.id);
+        console.log("transsss");
+        await transitionToNextGameState(gameId, result.data.playerId);
     }
     return redirect(`/app/games/${gameId}`);
   } catch (err) {

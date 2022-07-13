@@ -11,14 +11,14 @@ import { toId } from "~/core/utils";
 import { useGameState } from "~/ui/context/GameContext";
 
 const GameMap = () => {
-  const { state } = useGameState();
+  const { state, nextState } = useGameState();
   const grid = useGrid(Object.values(state.cells));
 
   const backCells = grid.filter(
     (cell) =>
-      state?.causedBy?.payload &&
-      "source" in state.causedBy.payload &&
-      !compareCell(cell, state.causedBy.payload.source)
+      nextState?.causedBy?.payload &&
+      "source" in nextState.causedBy.payload &&
+      !compareCell(cell, nextState.causedBy.payload.source)
   );
 
   const frontCells = grid.filter(

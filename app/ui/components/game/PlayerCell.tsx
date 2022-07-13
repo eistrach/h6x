@@ -6,16 +6,15 @@ import {
   HEX_HEIGHT,
   HEX_WIDTH,
   HEX_STROKE_WIDTH,
-  compareCell
+  compareCell,
 } from "~/core/math";
 import { toId } from "~/core/utils";
 import {
   useCurrentHostileNeighbors,
-  useGameState
+  useGameState,
 } from "~/ui/context/GameContext";
 import { useSelectedCell } from "~/ui/context/SelectedCellContext";
-import { useIsTransitioningToNextState } from "~/ui/context/TransitionContext";
-import { useAttackAnimation } from "~/ui/hooks/useAttackAnimation";
+import { useGameTransition } from "~/ui/context/TransitionContext";
 import { getAttackPopoverRef } from "./AttackPopovers";
 
 type PlayerCellProps = {
@@ -29,7 +28,7 @@ export default function PlayerCell({ position }: PlayerCellProps) {
 
   const cellState = state.cells[toId(position)];
   const isSelected = compareCell(cellState.position, selectedCell?.position);
-  const isTransitioningToNextState = useIsTransitioningToNextState();
+  const t = useGameTransition();
 
   const popperRef = getAttackPopoverRef(
     position,
@@ -43,33 +42,10 @@ export default function PlayerCell({ position }: PlayerCellProps) {
 
   const Sprite = CellModeSprites[cellState.activeModeId];
 
-  const attackAnimation = useAttackAnimation(
-    state,
-    position,
-    isTransitioningToNextState
-  );
+  const animation = t && t !== "selectingCell" && t.getMotionProps(position);
 
-  const anim = attackAnimation
-    ? {
-        animate: {
-          x: [
-            0,
-            (attackAnimation.target.x - attackAnimation.source.x) * 0.7,
-            0,
-          ],
-          y: [
-            0,
-            (attackAnimation.target.y - attackAnimation.source.y) * 0.7,
-            0,
-          ],
-
-          scale: [1, 1.1, 1],
-        },
-        transition: {
-          duration: 0.3,
-          bounce: 1,
-        },
-      }
+  const anim = animation
+    ? animation
     : isSelected
     ? {
         initial: { scale: 1 },
@@ -91,6 +67,7 @@ export default function PlayerCell({ position }: PlayerCellProps) {
         onClick={() => setSelectedCell(cellState)}
         transform={`translate(${x - HEX_WIDTH / 2}, ${y - HEX_HEIGHT / 2}) `}
         className={clsx(color.fill, {
+          "fill-white": !!animation,
           " stroke-white ": isSelected,
           " stroke-gray-800 ": !isSelected,
         })}
