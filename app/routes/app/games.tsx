@@ -108,7 +108,7 @@ const getActionableGames = (games: LoaderData, currentUserId: string) => {
 const GamesPage = () => {
   const tabFocused = useHasTabFocus();
   useDataRefreshOnInterval(1000, !tabFocused);
-  const games = useLoaderData<LoaderData>();
+  const games = useLoaderData<LoaderData>() || [];
   const outlet = useOutlet();
   const user = useUser();
 
