@@ -83,7 +83,7 @@ export const ListItemAnimationProps = {
   animate: {
     opacity: 1,
     scale: 1,
-    transition: { delay: 0.1, type: "spring" },
+    transition: { delay: 0.1 },
   },
   exit: { opacity: 0, scale: 0 },
 };
