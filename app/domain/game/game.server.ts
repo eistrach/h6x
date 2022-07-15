@@ -159,12 +159,12 @@ export async function updateGameState(
   state: PlayingState,
   player: Player
 ) {
-  // await prisma.player.update({
-  //   where: { id: currentPlayer.id },
-  //   data: {
-  //     lastSeenActionId: game.states.length,
-  //   },
-  // });
+  await prisma.player.update({
+    where: { id: player.id },
+    data: {
+      lastSeenActionId: game.states.length,
+    },
+  });
 
   return prisma.game.update({
     where: { id: game.id },
@@ -321,7 +321,7 @@ export const transitionToNextGameState = async (
     console.log("done");
     return player;
   }
-  console.log("updating");
+
   return prisma.player.update({
     where: { id: player.id },
     data: {

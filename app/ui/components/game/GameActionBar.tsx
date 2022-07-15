@@ -1,5 +1,5 @@
 import { CheckCircleIcon } from "@heroicons/react/solid";
-import { Form } from "@remix-run/react";
+import { Form} from "@remix-run/react";
 import clsx from "clsx";
 import { motion } from "framer-motion";
 import { ListItemAnimationProps } from "~/config/graphics";
@@ -19,6 +19,7 @@ const GameActionBar = () => {
   const disableActions = useIsSubmitting();
   const canUseBuyActions = selectedCell?.isOwnCell;
   const currentPlayer = useCurrentPlayer();
+
   if (!canTakeAction) return null;
   return (
     <div className=" ">

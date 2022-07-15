@@ -1,5 +1,4 @@
-import { useFetcher } from "@remix-run/react";
-import { MotionProps } from "framer-motion";
+import { useFetcher, useTransition } from "@remix-run/react";
 import {
   createContext,
   PropsWithChildren,
@@ -8,29 +7,26 @@ import {
   useState,
 } from "react";
 import {
+  AttackTransitionDelay,
   CellSelectionDelay,
-  getTransitionForAction,
+  DefaultTransitionDelay,
 } from "~/config/animations";
-import { compareCell, Point } from "~/core/math";
+import { compareCell } from "~/core/math";
 import { toId } from "~/core/utils";
+import { usePrevious } from "../hooks/usePrevious";
 import { useGameState } from "./GameContext";
 import { useSelectedCell } from "./SelectedCellContext";
 
-export const TransitionContext = createContext<
-  | null
-  | "selectingCell"
-  | { getMotionProps: (cell: Point) => MotionProps | null }
->(null);
+export const TransitionContext = createContext<null | string>(null);
 export const TransitionContextProvider = ({
   children,
 }: PropsWithChildren<{}>) => {
   const { state, nextState, playerId } = useGameState();
-  const [transition, setTransition] = useState<
-    | null
-    | "selectingCell"
-    | { getMotionProps: (cell: Point) => MotionProps | null }
-  >(null);
+  const [transition, setTransition] = useState<null | string>(null);
   const { selectedCell, setSelectedCell } = useSelectedCell();
+
+  const remixTransition = useTransition();
+  const previousRemixTransition = usePrevious(remixTransition);
 
   const fetcher = useFetcher();
 
@@ -46,46 +42,17 @@ export const TransitionContextProvider = ({
 
   const playAnimations = async () => {
     await selectCellIfNeeded();
-    const anim = getTransitionForAction(nextState!.causedBy.name);
+    await wait(DefaultTransitionDelay);
 
-    const motionForSource = anim.onTransition?.sourceCell?.(
-      nextState?.causedBy.payload
-    );
-    const motionForTarget = anim.onTransition?.targetCell?.(
-      nextState?.causedBy.payload
-    );
+    setTransition(nextState?.causedBy.name || null);
 
-    const getMotionProps = (cell: Point) => {
-      if (compareCell(cell, nextState?.causedBy.payload.source)) {
-        return motionForSource || null;
-      }
-      if (compareCell(cell, nextState?.causedBy.payload.target)) {
-        return motionForTarget || null;
-      }
-      return null;
-    };
-
-    setTransition({ getMotionProps });
-    await wait(anim.onTransition.duration);
+    const delay =
+      nextState?.causedBy.name === "attackCell"
+        ? AttackTransitionDelay + 10
+        : 0;
+    await wait(delay);
     setTransition(null);
-
     gotoNextState();
-
-    const wonAttack =
-      nextState?.causedBy.name === "attackCell" &&
-      nextState.cells[toId(nextState.causedBy.payload.target)]?.ownerId ===
-        nextState.cells[toId(nextState.causedBy.payload.source)]?.ownerId;
-
-    if (wonAttack) {
-      await wait(CellSelectionDelay);
-    }
-
-    if (wonAttack) {
-      setSelectedCell(
-        nextState.cells[toId(nextState.causedBy.payload.target)],
-        true
-      );
-    }
   };
 
   const selectCellIfNeeded = async () => {
@@ -102,6 +69,21 @@ export const TransitionContextProvider = ({
     if (!nextState) return;
     playAnimations();
   }, [nextState?.stateId]);
+
+  useEffect(() => {
+    if (
+      remixTransition.state === "idle" &&
+      previousRemixTransition?.state === "loading"
+    ) {
+      if (state.causedBy.name === "attackCell") {
+        const targetPosition = state.causedBy.payload.target;
+        const targetCell = state.cells[toId(targetPosition)];
+        if (targetCell?.ownerId === selectedCell?.ownerId) {
+          setSelectedCell(targetCell, true);
+        }
+      }
+    }
+  }, [previousRemixTransition]);
 
   return (
     <TransitionContext.Provider value={transition}>

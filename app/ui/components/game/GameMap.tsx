@@ -9,16 +9,19 @@ import {
 import PlayerCell from "./PlayerCell";
 import { toId } from "~/core/utils";
 import { useGameState } from "~/ui/context/GameContext";
+import { useSelectedCell } from "~/ui/context/SelectedCellContext";
 
 const GameMap = () => {
   const { state, nextState } = useGameState();
   const grid = useGrid(Object.values(state.cells));
+  const { selectedCell } = useSelectedCell();
 
   const backCells = grid.filter(
     (cell) =>
-      nextState?.causedBy?.payload &&
-      "source" in nextState.causedBy.payload &&
-      !compareCell(cell, nextState.causedBy.payload.source)
+      (nextState?.causedBy?.payload &&
+        "source" in nextState.causedBy.payload &&
+        !compareCell(cell, nextState.causedBy.payload.source)) ||
+      !compareCell(cell, selectedCell?.position)
   );
 
   const frontCells = grid.filter(

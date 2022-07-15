@@ -1,5 +1,4 @@
 import { isPlayingState } from "./../utils";
-import { isPlainObject } from "immer/dist/internal";
 import { CellModeId } from "~/config/rules";
 import { registerAction } from "~/core/actions";
 import { PlayingState } from "~/core/actions/types";
@@ -38,7 +37,7 @@ export const canAffordModeChange = (state: PlayingState) => {
 };
 
 export const changeCellModeAction = registerAction(
-  "changeCellType",
+  "changeCellMode",
   [isSendersTurn, canAffordModeChange, isPlayerCellOwner, isDifferentMode],
   changeCellModeReducer
 );

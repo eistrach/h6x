@@ -14,7 +14,7 @@ import {
   useGameState,
 } from "~/ui/context/GameContext";
 import { useSelectedCell } from "~/ui/context/SelectedCellContext";
-import { useGameTransition } from "~/ui/context/TransitionContext";
+import { useCellAnimation } from "~/ui/hooks/useCellAnimation";
 import { getAttackPopoverRef } from "./AttackPopovers";
 
 type PlayerCellProps = {
@@ -22,13 +22,13 @@ type PlayerCellProps = {
 };
 
 export default function PlayerCell({ position }: PlayerCellProps) {
-  const { state, directionalPopovers } = useGameState();
+  const { state, directionalPopovers, nextState } = useGameState();
   const { selectedCell, setSelectedCell } = useSelectedCell();
   const hostileNeighbors = useCurrentHostileNeighbors();
 
   const cellState = state.cells[toId(position)];
   const isSelected = compareCell(cellState.position, selectedCell?.position);
-  const t = useGameTransition();
+  const controls = useCellAnimation(position);
 
   const popperRef = getAttackPopoverRef(
     position,
@@ -42,24 +42,8 @@ export default function PlayerCell({ position }: PlayerCellProps) {
 
   const Sprite = CellModeSprites[cellState.activeModeId];
 
-  const animation = t && t !== "selectingCell" && t.getMotionProps(position);
-
-  const anim = animation
-    ? animation
-    : isSelected
-    ? {
-        initial: { scale: 1 },
-        animate: { scale: 0.9 },
-        transition: {
-          duration: 0.5,
-          repeat: Infinity,
-          repeatType: "reverse" as const,
-        },
-      }
-    : {};
-
   return (
-    <motion.g {...anim}>
+    <motion.g animate={controls}>
       <g
         ref={popperRef}
         strokeWidth={isSelected ? HEX_STROKE_WIDTH * 1.25 : HEX_STROKE_WIDTH}
@@ -67,7 +51,7 @@ export default function PlayerCell({ position }: PlayerCellProps) {
         onClick={() => setSelectedCell(cellState)}
         transform={`translate(${x - HEX_WIDTH / 2}, ${y - HEX_HEIGHT / 2}) `}
         className={clsx(color.fill, {
-          "fill-white": !!animation,
+          //"fill-white": !!animation,
           " stroke-white ": isSelected,
           " stroke-gray-800 ": !isSelected,
         })}

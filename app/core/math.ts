@@ -1,4 +1,3 @@
-import { Cell } from "../map.server";
 import {
   defineGrid,
   Hex,
@@ -6,6 +5,7 @@ import {
   extendHex,
   FlatCompassDirection,
 } from "honeycomb-grid";
+import { Cell } from "~/domain/map.server";
 
 export const HEX_RADIUS = 50;
 export const HEX_SPACING = 5;
@@ -53,7 +53,10 @@ export const editorCells = editorGrid.hexagon({
 
 export const cellCorners = editorCell().corners();
 
-export function compareCell(c1: Point | null, c2?: Point | null) {
+export function compareCell(
+  c1: Point | null | undefined,
+  c2?: Point | null | undefined
+) {
   if (!c1 && !c2) return true;
   if (!c1 || !c2) return false;
   return c1.x === c2.x && c1.y === c2.y;
@@ -65,7 +68,7 @@ export function cellInGrid(cell: Point, grid: Point[]) {
 
 export const getAllCellsInArea = (
   cell: Point,
-  cells: Omit<Cell, "id">[],
+  cells: Cell[],
   fill: boolean = false
 ) => {
   const gridCells = cells.map((cell) => asMathCell(cell.x, cell.y));
@@ -96,15 +99,15 @@ export const getAllCellsInArea = (
   return checkedCells;
 };
 
-export const cellsToMathCells = (cells: Omit<Cell, "id">[]) => {
+export const cellsToMathCells = (cells: Cell[]) => {
   return cells.map((cell) => asMathCell(cell.x, cell.y));
 };
 
-export const cellsToPoints = (cells: Omit<Cell, "id">[]) => {
+export const cellsToPoints = (cells: Cell[]) => {
   return cells.map(cellToPoint);
 };
 
-export const cellToPoint = (cell: Omit<Cell, "id">) => {
+export const cellToPoint = (cell: Cell) => {
   return {
     x: cell.x,
     y: cell.y,
