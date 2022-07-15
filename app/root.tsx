@@ -6,7 +6,7 @@ import {
   Meta,
   Outlet,
   Scripts,
-  ScrollRestoration
+  ScrollRestoration,
 } from "@remix-run/react";
 import styles from "./styles/tailwind.css";
 import fontStyles from "./styles/rubik.css";
@@ -16,6 +16,7 @@ import { getUser } from "./domain/auth/session.server";
 let isMount = true;
 import clsx from "clsx";
 import AppUrlListener from "./ui/components/base/AppUrlListener";
+import React from "react";
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: styles },
   { rel: "stylesheet", href: fontStyles },
@@ -36,39 +37,39 @@ export default function App() {
   const user = useOptionalUser();
   let location = useLocation();
   let matches = useMatches();
-  // React.useEffect(() => {
-  //   let mounted = isMount;
-  //   isMount = false;
-  //   if ("serviceWorker" in navigator) {
-  //     if (navigator.serviceWorker.controller) {
-  //       navigator.serviceWorker.controller?.postMessage({
-  //         type: "REMIX_NAVIGATION",
-  //         isMount: mounted,
-  //         location,
-  //         matches,
-  //         manifest: window.__remixManifest,
-  //       });
-  //     } else {
-  //       let listener = async () => {
-  //         await navigator.serviceWorker.ready;
-  //         navigator.serviceWorker.controller?.postMessage({
-  //           type: "REMIX_NAVIGATION",
-  //           isMount: mounted,
-  //           location,
-  //           matches,
-  //           manifest: window.__remixManifest,
-  //         });
-  //       };
-  //       navigator.serviceWorker.addEventListener("controllerchange", listener);
-  //       return () => {
-  //         navigator.serviceWorker.removeEventListener(
-  //           "controllerchange",
-  //           listener
-  //         );
-  //       };
-  //     }
-  //   }
-  // }, [location]);
+  React.useEffect(() => {
+    let mounted = isMount;
+    isMount = false;
+    if ("serviceWorker" in navigator) {
+      if (navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller?.postMessage({
+          type: "REMIX_NAVIGATION",
+          isMount: mounted,
+          location,
+          matches,
+          manifest: window.__remixManifest,
+        });
+      } else {
+        let listener = async () => {
+          await navigator.serviceWorker.ready;
+          navigator.serviceWorker.controller?.postMessage({
+            type: "REMIX_NAVIGATION",
+            isMount: mounted,
+            location,
+            matches,
+            manifest: window.__remixManifest,
+          });
+        };
+        navigator.serviceWorker.addEventListener("controllerchange", listener);
+        return () => {
+          navigator.serviceWorker.removeEventListener(
+            "controllerchange",
+            listener
+          );
+        };
+      }
+    }
+  }, [location]);
 
   return (
     <html lang="en">
