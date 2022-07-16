@@ -52,6 +52,7 @@ export const useCellAnimation = (position: Point) => {
 
   // handle anim during replay/transition
   useEffect(() => {
+    if (!gameTransition) return;
     if (!compareCell(position, selectedCell?.position)) {
       return;
     }

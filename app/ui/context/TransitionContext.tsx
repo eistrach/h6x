@@ -31,7 +31,6 @@ export const TransitionContextProvider = ({
   const fetcher = useFetcher();
 
   const gotoNextState = () => {
-    console.log("tonextstate");
     fetcher.submit(
       {
         _intent: "transitionToNextGameState",
@@ -42,7 +41,6 @@ export const TransitionContextProvider = ({
   };
 
   const playAnimations = async () => {
-    console.log("start playback");
     await selectCellIfNeeded();
     await wait(DefaultTransitionDelay);
 
