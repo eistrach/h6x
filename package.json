@@ -21,6 +21,8 @@
     "@capacitor/ios": "^3.6.0",
     "@headlessui/react": "^1.6.6",
     "@heroicons/react": "^1.0.6",
+    "@metronome-sh/express": "^5.5.5",
+    "@metronome-sh/react": "^5.5.5",
     "@node-rs/bcrypt": "^1.6.1",
     "@popperjs/core": "^2.11.5",
     "@prisma/client": "^4.0.0",

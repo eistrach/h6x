@@ -11,12 +11,15 @@ import {
 import styles from "./styles/tailwind.css";
 import fontStyles from "./styles/rubik.css";
 import customStyles from "./styles/custom.css";
-import { LoaderArgs, useOptionalUser } from "./core/utils";
+import { LoaderArgs } from "./core/utils";
 import { getUser } from "./domain/auth/session.server";
-let isMount = true;
 import clsx from "clsx";
 import AppUrlListener from "./ui/components/base/AppUrlListener";
 import React from "react";
+import { MetronomeLinks } from "@metronome-sh/react";
+
+let isMount = true;
+
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: styles },
   { rel: "stylesheet", href: fontStyles },
@@ -34,7 +37,6 @@ export const loader = async ({ request }: LoaderArgs) => {
   return { user };
 };
 export default function App() {
-  const user = useOptionalUser();
   let location = useLocation();
   let matches = useMatches();
   React.useEffect(() => {
@@ -77,6 +79,7 @@ export default function App() {
       <head>
         <Meta /> <link rel="manifest" href="/resources/manifest.webmanifest" />
         <Links />
+        <MetronomeLinks />
       </head>
       <body className="h-full bg-gray-100 overscroll-none p-safe">
         <main className={clsx("overscroll-auto h-full", {})}>
