@@ -47,7 +47,7 @@ const ProfileMenu = () => {
               <Menu.Item>
                 {({ active }) => (
                   <Link
-                    to="/app/editor"
+                    to="/editor"
                     type="submit"
                     className={clsx(
                       active ? "bg-gray-100" : "bg-white",

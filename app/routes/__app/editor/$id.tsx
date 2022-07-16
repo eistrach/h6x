@@ -68,7 +68,7 @@ export const action = async ({ request }: ActionArgs) => {
       break;
   }
 
-  return redirect(`/app/editor/${result.data.id}`);
+  return redirect(`/editor/${result.data.id}`);
 };
 
 export const loader = async ({ request, params }: LoaderArgs) => {

@@ -1,6 +1,6 @@
 import { RadioGroup } from "@headlessui/react";
 import clsx from "clsx";
-import { Tool } from "~/routes/app/editor/$id";
+import { Tool } from "~/routes/editor/$id";
 
 import CellPreview from "../map/CellPreview";
 import CellView from "../map/CellView";

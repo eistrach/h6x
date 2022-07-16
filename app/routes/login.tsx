@@ -12,7 +12,7 @@ import { GoogleIcon } from "~/ui/components/icons/GoogleIcon";
 
 export const loader = async ({ request }: LoaderArgs) => {
   return await authenticator.isAuthenticated(request, {
-    successRedirect: "/app/games",
+    successRedirect: "/games",
   });
 };
 

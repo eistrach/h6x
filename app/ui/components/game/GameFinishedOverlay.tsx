@@ -104,7 +104,7 @@ export default function GameFinishedOverlay() {
                 </div>
                 <div className="mt-5 sm:mt-6  ">
                   <Link
-                    to="/app/games"
+                    to="/games"
                     theme={InputTheme.Stretched}
                     LeftIcon={ArrowNarrowLeftIcon}
                   >

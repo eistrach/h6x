@@ -9,7 +9,7 @@ import { redirect } from "@remix-run/node";
 type LoaderData = UnpackData<typeof getGamesForUser>;
 
 export const loader = ({ request }: LoaderArgs) => {
-  if (request.url.endsWith("/app")) return redirect("/app/games");
+  if (request.url.endsWith("/app")) return redirect("/games");
   return null;
 };
 

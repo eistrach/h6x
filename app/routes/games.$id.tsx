@@ -30,7 +30,7 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   const result = await getGameWithState(gameId, user);
 
   if (!result) {
-    redirect(`/app/games`);
+    redirect(`/games`);
   }
 
   return result;
@@ -121,7 +121,7 @@ export const action = async ({ request, params }: ActionArgs) => {
         console.log("transsss");
         await transitionToNextGameState(gameId, result.data.playerId);
     }
-    return redirect(`/app/games/${gameId}`);
+    return redirect(`/games/${gameId}`);
   } catch (err) {
     console.log(err);
     return { error: (err as any).toString() };
@@ -142,7 +142,7 @@ const GamePage = () => {
       (!isDone &&
         (state.state.playerIdSequence.length === 1 ||
           state.canTakeAction ||
-          !!state.nextState))
+          !!state.state))
   );
 
   useEffect(() => {

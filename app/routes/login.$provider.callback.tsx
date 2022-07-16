@@ -12,7 +12,7 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     });
     const cookie = request.headers.get("Cookie");
 
-    const redirectUrl = (await redirectCookie.parse(cookie)) || "/app/games";
+    const redirectUrl = (await redirectCookie.parse(cookie)) || "/games";
 
     let session = await sessionStorage.getSession(
       request.headers.get("cookie")

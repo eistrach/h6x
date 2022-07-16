@@ -2,7 +2,7 @@ import { ArrowLeftIcon } from "@heroicons/react/solid";
 import { redirect } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
 import { motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useRef} from "react";
 import { z } from "zod";
 import { Button } from "~/ui/components/base/Button";
 import { Link } from "~/ui/components/base/Link";
@@ -13,12 +13,11 @@ import { requireUser } from "~/domain/auth/session.server";
 import { ActionArgs, LoaderArgs, UnpackData } from "~/core/utils";
 import { validateForm } from "~/utils.server";
 import GamePreview from "~/ui/components/map/GamePreview";
-import { LinksFunction } from "@remix-run/react/routeModules";
 import {
   SnapItem,
   SnapList,
   useDragToScroll,
-  useVisibleElements,
+  useVisibleElements
 } from "react-snaplist-carousel";
 
 const Schema = z.object({
@@ -35,7 +34,7 @@ export const action = async ({ request }: ActionArgs) => {
   }
 
   await createGame(user.id, result.data.selectedMapId);
-  return redirect(`/app/games`);
+  return redirect(`/games`);
 };
 
 type LoaderData = UnpackData<typeof getPublishedMaps>;
@@ -116,7 +115,7 @@ const CreateGamePage = () => {
               motionProps={{ layoutId: "leftButton" }}
               theme={InputTheme.OutlinedBlack}
               LeftIcon={ArrowLeftIcon}
-              to="/app/games"
+              to="/games"
             >
               Back
             </Link>
