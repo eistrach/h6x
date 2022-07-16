@@ -1,5 +1,5 @@
 import { CheckCircleIcon } from "@heroicons/react/solid";
-import { Form} from "@remix-run/react";
+import { Form } from "@remix-run/react";
 import clsx from "clsx";
 import { motion } from "framer-motion";
 import { ListItemAnimationProps } from "~/config/graphics";
@@ -8,7 +8,7 @@ import { isPlayingState } from "~/domain/game/utils";
 import {
   useCurrentPlayer,
   useGameState,
-  useIsSubmitting
+  useIsSubmitting,
 } from "~/ui/context/GameContext";
 import { useSelectedCell } from "~/ui/context/SelectedCellContext";
 import { Button } from "../base/Button";

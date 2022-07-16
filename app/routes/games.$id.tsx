@@ -118,7 +118,6 @@ export const action = async ({ request, params }: ActionArgs) => {
         await endTurn(gameId, result.data.playerId);
         break;
       case "transitionToNextGameState":
-        console.log("transsss");
         await transitionToNextGameState(gameId, result.data.playerId);
     }
     return redirect(`/games/${gameId}`);
@@ -140,7 +139,7 @@ const GamePage = () => {
     1000,
     !tabFocused ||
       (!isDone &&
-        (state.state.playerIdSequence.length === 1 ||
+        (state?.state?.playerIdSequence.length === 1 ||
           state.canTakeAction ||
           !!state.state))
   );

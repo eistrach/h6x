@@ -318,7 +318,6 @@ export const transitionToNextGameState = async (
   const { game, player } = await requireGameAndPlayer(id, playerId);
 
   if (game.states.length - 1 === player.lastSeenActionId) {
-    console.log("done");
     return player;
   }
 
