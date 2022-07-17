@@ -4,7 +4,7 @@ import { PlayerColors } from "~/config/graphics";
 import {
   useCurrentPlayer,
   useCurrentUsers,
-  useGameState
+  useGameState,
 } from "~/ui/context/GameContext";
 
 const PlayersInfo = () => {
@@ -23,7 +23,7 @@ const PlayersInfo = () => {
             const color = PlayerColors[p.index];
 
             const user = users.find((u) => u.id === p.userId)!;
-            const isCurrentPlayer = p.id === currentPlayer.id;
+            const isCurrentPlayer = p.id === currentPlayer?.id;
             return (
               <motion.li
                 initial={{ opacity: 0, scale: 0 }}

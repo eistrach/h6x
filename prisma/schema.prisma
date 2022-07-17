@@ -68,9 +68,11 @@ model Game {
 
   phase GamePhase @default(LOBBY)
 
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @default(now()) @updatedAt
-  timeouts  PlayerTimeout[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  minutesToTimeout Int             @default(10)
+  timeouts         PlayerTimeout[]
 }
 
 model PlayerTimeout {

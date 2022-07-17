@@ -17,7 +17,9 @@ import { compareCell } from "~/core/math";
 import { toId } from "~/core/utils";
 import { Game } from "./game.server";
 
-export const getCurrentPlayer = (state: PlayingState): PlayerState => {
+export const getCurrentPlayer = (
+  state: PlayingState
+): PlayerState | undefined => {
   return state.players[state.playerIdSequence[0]];
 };
 
@@ -34,8 +36,10 @@ export const getAllCellsForPlayer = (state: PlayingState, playerId: string) => {
 
 export const calculateDiamondsForPlayer = (
   state: PlayingState,
-  player: PlayerState
+  player: PlayerState | undefined
 ) => {
+  if (!player) return 0;
+
   const cells = getAllCellsForPlayer(state, player.id);
   const diamonds = cells.reduce((acc, cell) => {
     return acc + cell.mode.diamondsPerTurn;
@@ -165,7 +169,9 @@ export const updatePlayingState = (
 
   Object.keys(state.players).forEach((id) => (state.players[id].diamonds = 0));
   const diamonds = calculateDiamondsForPlayer(state, getCurrentPlayer(state));
-  state.players[state.playerIdSequence[0]].diamonds = diamonds;
+
+  if (state.playerIdSequence.length)
+    state.players[state.playerIdSequence[0]].diamonds = diamonds;
 
   return state;
 };

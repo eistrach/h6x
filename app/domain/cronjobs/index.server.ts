@@ -10,7 +10,13 @@ export const startCronjobs = () => {
   started = true;
   console.log("Scheduling cronjobs");
   CronJobs.forEach((cronjob) => {
-    const scheduledJob = CronJob.schedule(cronjob.cron, cronjob.task);
+    const scheduledJob = CronJob.schedule(cronjob.cron, async () => {
+      try {
+        await cronjob.task();
+      } catch (e) {
+        console.error(e);
+      }
+    });
     scheduledJob.start();
   });
 };

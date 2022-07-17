@@ -2,7 +2,7 @@ import { ArrowLeftIcon } from "@heroicons/react/solid";
 import { redirect } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
 import { motion } from "framer-motion";
-import { useRef} from "react";
+import { useRef } from "react";
 import { z } from "zod";
 import { Button } from "~/ui/components/base/Button";
 import { Link } from "~/ui/components/base/Link";
@@ -17,11 +17,12 @@ import {
   SnapItem,
   SnapList,
   useDragToScroll,
-  useVisibleElements
+  useVisibleElements,
 } from "react-snaplist-carousel";
 
 const Schema = z.object({
   selectedMapId: z.string().min(1),
+  playerTimeout: z.preprocess(Number, z.number()),
 });
 export const action = async ({ request }: ActionArgs) => {
   const [user, result] = await Promise.all([
@@ -33,7 +34,11 @@ export const action = async ({ request }: ActionArgs) => {
     return result;
   }
 
-  await createGame(user.id, result.data.selectedMapId);
+  await createGame(
+    user.id,
+    result.data.selectedMapId,
+    result.data.playerTimeout
+  );
   return redirect(`/games`);
 };
 
@@ -81,7 +86,7 @@ const CreateGamePage = () => {
           className=" flex flex-col justify-between h-full  gap-2 x"
         >
           <p className="text-xl font-bold">Create Map</p>
-          <div className="flex w-full items-center">
+          <div className="flex w-full items-center flex-col justify-between h-full">
             <SnapList direction="horizontal" ref={mapList}>
               {" "}
               {maps?.map((map) => (
@@ -106,9 +111,18 @@ const CreateGamePage = () => {
                 </SnapItem>
               ))}
             </SnapList>
+
             {selectedMapId && (
               <input type="hidden" name="selectedMapId" value={selectedMapId} />
             )}
+            <label>
+              Timeout Minutes
+              <input
+                className="p-2 m-2"
+                name="playerTimeout"
+                defaultValue="10"
+              />
+            </label>
           </div>
           <div className="flex justify-between items-center">
             <Link

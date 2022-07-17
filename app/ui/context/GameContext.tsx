@@ -4,11 +4,11 @@ import { CellState } from "~/core/actions/types";
 import {
   cellsAreNeighbors,
   compareCell,
-  getNeighboringCells,
+  getNeighboringCells
 } from "~/core/math";
 import { UnpackData } from "~/core/utils";
 import { GameWithState } from "~/domain/game/game.server";
-import { getCurrentPlayer, isPlayingState } from "~/domain/game/utils";
+import { getCurrentPlayer} from "~/domain/game/utils";
 import { useDirectionalPopovers } from "../hooks/useDirectionalPopovers";
 import { useSelectedCell } from "./SelectedCellContext";
 
@@ -64,7 +64,7 @@ export const useCurrentHostileNeighbors = () => {
           getNeighboringCells(selectedCell.position, Object.values(state.cells))
         ).filter(([, targetCell]) => {
           return (
-            targetCell.ownerId !== currentPlayer.id && canAttack(targetCell)
+            targetCell.ownerId !== currentPlayer?.id && canAttack(targetCell)
           );
         })
       )
@@ -77,8 +77,8 @@ export const useCurrentUsers = () => {
 };
 
 export const useIsGameFinished = () => {
-  const { state } = useGameState();
-  return state.playerIdSequence.length === 1 && isPlayingState(state);
+  const { game } = useGameState();
+  return game.phase === "FINISHED";
 };
 
 export const useIsSubmitting = () => {

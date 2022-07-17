@@ -1,7 +1,8 @@
 import { addMinutes } from "date-fns";
-import { PreparationState } from "~/core/actions/types";
+import { PlayingState, PreparationState } from "~/core/actions/types";
 import { prisma } from "~/db.server";
 import {
+  finishGame,
   requireGameAndPlayer,
   requireGameState,
   startGame,
@@ -29,22 +30,24 @@ export async function kickPlayer(id: string, playerId: string) {
         .map((p) => p.preparationState as PreparationState)
         .every((state) => state.done);
 
-    if (setupDone) {
-      return await startGame(id);
-    }
-
     await prisma.playerTimeout.delete({
       where: {
         playerId: player.id,
       },
     });
 
-    return await prisma.player.update({
+    const updatedPlayer = await prisma.player.update({
       where: { id: player.id },
       data: {
         preparationState: newState,
       },
     });
+
+    if (setupDone) {
+      return await startGame(id);
+    }
+
+    return updatedPlayer;
   }
 
   await prisma.playerTimeout.deleteMany({
@@ -57,9 +60,17 @@ export async function kickPlayer(id: string, playerId: string) {
     data: {
       gameId: game.id,
       playerId: newState.playerIdSequence[0],
-      timeoutAt: addMinutes(Date.now(), 10),
+      timeoutAt: addMinutes(Date.now(), game.minutesToTimeout),
     },
   });
 
-  return updateGameState(game, newState, player);
+  const updatedGame = await updateGameState(game, newState, player);
+  const latestGameState = updatedGame.states[
+    updatedGame.states.length - 1
+  ] as PlayingState;
+  if (latestGameState.playerIdSequence.length < 2) {
+    return await finishGame(id);
+  }
+
+  return updatedGame;
 }

@@ -52,7 +52,7 @@ export async function getGamesForUser(userId: string) {
     return {
       ...g,
       map: convertMap(g.map)!,
-      isFinished: lastState?.playerIdSequence.length === 1,
+      isFinished: g.phase === GamePhase.FINISHED,
       gameState: lastState,
       players: g.players.map((p) => ({
         ...p,
@@ -175,7 +175,11 @@ export async function updateGameState(
   });
 }
 
-export async function createGame(creatorId: string, mapId: string) {
+export async function createGame(
+  creatorId: string,
+  mapId: string,
+  minutesToTimeout: number
+) {
   const map = await getMapForId(mapId);
 
   if (!map) {
@@ -186,6 +190,7 @@ export async function createGame(creatorId: string, mapId: string) {
     data: {
       creatorId,
       mapId,
+      minutesToTimeout,
       players: {
         create: [
           {
@@ -267,7 +272,7 @@ export async function startPreparation(id: string, userId: string) {
         timeouts: {
           create: createdPlayers.map((p) => ({
             playerId: p.id,
-            timeoutAt: addMinutes(Date.now(), 10),
+            timeoutAt: addMinutes(Date.now(), game.minutesToTimeout),
           })),
         },
         states: [...game.states, initializePlayingState(playerStates)],
@@ -288,39 +293,56 @@ export async function startGame(id: string) {
     game.gameState as PlayingState
   );
 
-  return await prisma.$transaction(async (prisma) => {
-    await Promise.all([
-      ...game.players.map((p) =>
-        prisma.player.update({
+  return await prisma.$transaction(async (transaction) => {
+    await Promise.all(
+      game.players.map((p) =>
+        transaction.player.update({
           where: { id: p.id },
           data: {
             preparationState: Prisma.JsonNull,
             lastSeenActionId: 0,
           },
         })
-      ),
-      prisma.playerTimeout.deleteMany({
+      )
+    );
+
+    if (initialGameState.playerIdSequence.length) {
+      await transaction.playerTimeout.deleteMany({
         where: {
           playerId: {
             not: initialGameState.playerIdSequence[0],
           },
         },
-      }),
+      });
 
-      prisma.playerTimeout.update({
+      await transaction.playerTimeout.update({
         where: {
           playerId: initialGameState.playerIdSequence[0],
         },
         data: {
-          timeoutAt: addMinutes(Date.now(), 10),
+          timeoutAt: addMinutes(Date.now(), game.minutesToTimeout),
         },
-      }),
-    ]);
+      });
 
-    return await prisma.game.update({
+      return await transaction.game.update({
+        where: { id },
+        data: {
+          phase: "PLAYING",
+          states: [initialGameState],
+        },
+      });
+    }
+
+    await transaction.playerTimeout.deleteMany({
+      where: {
+        gameId: id,
+      },
+    });
+
+    return await transaction.game.update({
       where: { id },
       data: {
-        phase: "PLAYING",
+        phase: "FINISHED",
         states: [initialGameState],
       },
     });
@@ -351,6 +373,23 @@ export const transitionToNextGameState = async (
         player.lastSeenActionId! + 1,
         game.states.length - 1
       ),
+    },
+  });
+};
+
+export const finishGame = async (id: string) => {
+  await requireGame(id, ["PLAYING"]);
+
+  await prisma.playerTimeout.deleteMany({
+    where: {
+      gameId: id,
+    },
+  });
+
+  return await prisma.game.update({
+    where: { id },
+    data: {
+      phase: "FINISHED",
     },
   });
 };

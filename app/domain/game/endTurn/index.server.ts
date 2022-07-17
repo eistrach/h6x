@@ -57,7 +57,7 @@ export async function endTurn(id: string, senderPlayerId: string) {
     data: {
       gameId: game.id,
       playerId: newState.playerIdSequence[0],
-      timeoutAt: addMinutes(Date.now(), 10),
+      timeoutAt: addMinutes(Date.now(), game.minutesToTimeout),
     },
   });
 

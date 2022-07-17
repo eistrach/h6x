@@ -50,8 +50,8 @@ export const useSelectedCell = () => {
       ...ctx.selectedCell,
       mode: CellModes[ctx.selectedCell.activeModeId],
       isOwnCell:
-        ctx.selectedCell.ownerId === currentPlayer.id &&
-        currentPlayer.userId === user.id,
+        ctx.selectedCell.ownerId === currentPlayer?.id &&
+        currentPlayer?.userId === user.id,
     },
   };
 };
