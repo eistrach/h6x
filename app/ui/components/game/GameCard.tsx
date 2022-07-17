@@ -48,7 +48,7 @@ const GameCard = ({ game }: GameCardProps) => {
   const state = getState(game);
 
   const players =
-    game.phase === "PLAYING"
+    game.phase === "PLAYING" || game.phase === "FINISHED"
       ? [...game.players].sort((p1, p2) => {
           const i1 = state!.playerIdSequence.indexOf(p2.id);
           const i2 = state!.playerIdSequence.indexOf(p1.id);
