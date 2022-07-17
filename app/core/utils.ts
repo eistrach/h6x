@@ -1,13 +1,17 @@
 import seedrandom from "seedrandom";
-import { useMatches } from "@remix-run/react";
+import {
+  useMatches,
+  useLoaderData as useRemixLoaderData,
+} from "@remix-run/react";
 import { useEffect, useMemo } from "react";
-import type { DataFunctionArgs } from "@remix-run/node";
-
-import type { User } from "~/domain/user.server";
+import { DataFunctionArgs, json as remixJson } from "@remix-run/node";
+import { User } from "~/domain/user.server";
 import { useDataRefresh } from "remix-utils";
 import { Point } from "./math";
-import { Cell } from "../map.server";
 import { CellState } from "./actions/types";
+import { Cell } from "~/domain/map.server";
+import { deserialize, serialize } from "superjson";
+import { SuperJSONResult } from "superjson/dist/types";
 
 /**
  * This base hook is used in other hooks to quickly search for specific data
@@ -98,3 +102,13 @@ export type UnpackArray<T> = T extends (infer U)[] ? U : T;
 
 export type LoaderArgs = DataFunctionArgs;
 export type ActionArgs = DataFunctionArgs;
+
+export const json = <T>(obj: T, init?: number | ResponseInit) => {
+  const data = serialize(obj);
+  return remixJson(data, init);
+};
+
+export const useLoaderData = <T>() => {
+  const data = useRemixLoaderData<SuperJSONResult>();
+  return deserialize<T>(data);
+};

@@ -1,9 +1,15 @@
-import { useActionData, useLoaderData } from "@remix-run/react";
+import { useActionData } from "@remix-run/react";
 import { useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { z } from "zod";
 import { requireUser } from "~/domain/auth/session.server";
-import { ActionArgs, LoaderArgs, useDataRefreshOnInterval } from "~/core/utils";
+import {
+  ActionArgs,
+  json,
+  LoaderArgs,
+  useDataRefreshOnInterval,
+  useLoaderData,
+} from "~/core/utils";
 import { requireParam, validateForm } from "~/utils.server";
 import GameView from "~/ui/components/game/GameView";
 import {
@@ -33,7 +39,7 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     redirect(`/games`);
   }
 
-  return result;
+  return json(result);
 };
 
 const Schema = z.union([

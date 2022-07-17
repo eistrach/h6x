@@ -8,6 +8,7 @@ const {
   createMetronomeGetLoadContext,
   registerMetronome,
 } = require("@metronome-sh/express");
+const build = require("./build");
 
 const BUILD_DIR = path.join(process.cwd(), "build");
 
@@ -55,6 +56,8 @@ app.all(
       })
 );
 const port = process.env.PORT || 3000;
+
+build.routes.root.module.startCronjobs();
 
 app.listen(port, () => {
   console.log(`Express server listening on port ${port}`);

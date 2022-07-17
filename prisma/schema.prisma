@@ -23,6 +23,9 @@ model User {
   createdMaps  GameMap[]
   createdGames Game[]
   players      Player[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }
 
 model GameMap {
@@ -37,6 +40,9 @@ model GameMap {
 
   games Game[]
 
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
   @@index([creatorId])
 }
 
@@ -44,6 +50,7 @@ enum GamePhase {
   LOBBY
   PREPARATION
   PLAYING
+  FINISHED
 }
 
 model Game {
@@ -61,6 +68,17 @@ model Game {
 
   phase GamePhase @default(LOBBY)
 
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @default(now()) @updatedAt
+  timeouts  PlayerTimeout[]
+}
+
+model PlayerTimeout {
+  gameId    String
+  game      Game     @relation(fields: [gameId], references: [id])
+  playerId  String   @id @unique
+  player    Player   @relation(fields: [playerId], references: [id])
+  timeoutAt DateTime
 }
 
 model Player {
@@ -74,4 +92,9 @@ model Player {
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  playerTimeout PlayerTimeout?
 }

@@ -12,6 +12,7 @@ import {
   updatePlayingState,
 } from "./utils";
 import { UnpackArray, UnpackData } from "~/core/utils";
+import { addMinutes } from "date-fns";
 
 export type Game = UnpackArray<UnpackData<typeof getGamesForUser>>;
 export async function getGamesForUser(userId: string) {
@@ -250,7 +251,7 @@ export async function startPreparation(id: string, userId: string) {
   }));
 
   return await prisma.$transaction(async (prisma) => {
-    await Promise.all(
+    const createdPlayers = await Promise.all(
       players.map(({ user, ...p }) =>
         prisma.player.update({
           where: { id: p.id },
@@ -263,6 +264,12 @@ export async function startPreparation(id: string, userId: string) {
       where: { id },
       data: {
         phase: "PREPARATION",
+        timeouts: {
+          create: createdPlayers.map((p) => ({
+            playerId: p.id,
+            timeoutAt: addMinutes(Date.now(), 10),
+          })),
+        },
         states: [...game.states, initializePlayingState(playerStates)],
       },
     });
@@ -282,8 +289,8 @@ export async function startGame(id: string) {
   );
 
   return await prisma.$transaction(async (prisma) => {
-    await Promise.all(
-      game.players.map((p) =>
+    await Promise.all([
+      ...game.players.map((p) =>
         prisma.player.update({
           where: { id: p.id },
           data: {
@@ -291,8 +298,24 @@ export async function startGame(id: string) {
             lastSeenActionId: 0,
           },
         })
-      )
-    );
+      ),
+      prisma.playerTimeout.deleteMany({
+        where: {
+          playerId: {
+            not: initialGameState.playerIdSequence[0],
+          },
+        },
+      }),
+
+      prisma.playerTimeout.update({
+        where: {
+          playerId: initialGameState.playerIdSequence[0],
+        },
+        data: {
+          timeoutAt: addMinutes(Date.now(), 10),
+        },
+      }),
+    ]);
 
     return await prisma.game.update({
       where: { id },

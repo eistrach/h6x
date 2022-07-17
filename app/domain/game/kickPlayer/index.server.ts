@@ -7,25 +7,25 @@ import {
   startGame,
   updateGameState,
 } from "../game.server";
-import { endTurnAction } from "./action";
+import { kickPlayerAction } from "./action";
 
-export async function endTurn(id: string, senderPlayerId: string) {
-  const { game, player } = await requireGameAndPlayer(id, senderPlayerId, [
+export async function kickPlayer(id: string, playerId: string) {
+  const { game, player } = await requireGameAndPlayer(id, playerId, [
     "PREPARATION",
     "PLAYING",
   ]);
 
   const state = requireGameState(game, player);
 
-  const newState = endTurnAction(state, {
-    senderPlayerId,
+  const newState = kickPlayerAction(state, {
+    playerId,
   });
 
   if ("done" in newState) {
     const setupDone =
       newState.done &&
       game.players
-        .filter((p) => p.id !== senderPlayerId)
+        .filter((p) => p.id !== playerId)
         .map((p) => p.preparationState as PreparationState)
         .every((state) => state.done);
 

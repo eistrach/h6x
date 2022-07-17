@@ -140,15 +140,24 @@ export const updatePlayingState = (
   initialGameState: PlayingState
 ): PlayingState => {
   const playerCells = preparationStates.flatMap((s) =>
-    Object.values(s.cells).filter((c) => c.ownerId === s.playerIdSequence[0])
+    Object.values(s.cells).filter(
+      (c) => c.ownerId === s.playerIdSequence[0] || c.ownerId === "kicked"
+    )
   );
 
   const otherCells = Object.values(preparationStates[0].cells).filter(
     (c) => !playerCells.some((pc) => compareCell(pc.position, c.position))
   );
 
+  const availablePlayerIds = [
+    ...new Set(preparationStates.flatMap((ps) => ps.playerIdSequence)),
+  ];
+
   const state = {
     ...initialGameState,
+    playerIdSequence: initialGameState.playerIdSequence.filter((id) =>
+      availablePlayerIds.includes(id)
+    ),
     cells: normalizeCells([...playerCells, ...otherCells]),
     causedBy: { name: "startGame", payload: {}, turn: 0 },
     turn: 1,
@@ -175,7 +184,7 @@ export const isPlayingState = (
 };
 
 export const getState = (game: Game): PlayingState | null => {
-  if (game.phase === "PLAYING") {
+  if (game.phase === "PLAYING" || game.phase === "FINISHED") {
     return game.gameState!;
   }
 

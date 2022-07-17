@@ -17,6 +17,7 @@ import clsx from "clsx";
 import AppUrlListener from "./ui/components/base/AppUrlListener";
 import React from "react";
 import { MetronomeLinks } from "@metronome-sh/react";
+export { startCronjobs } from "./domain/cronjobs/index.server";
 
 let isMount = true;
 
@@ -32,6 +33,7 @@ export const meta: MetaFunction = () => ({
   viewport: "width=device-width,initial-scale=1, viewport-fit=cover",
   "apple-mobile-web-app-status-bar-style": "black-translucent",
 });
+
 export const loader = async ({ request }: LoaderArgs) => {
   const user = await getUser(request);
   return { user };

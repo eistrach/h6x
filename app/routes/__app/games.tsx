@@ -1,12 +1,14 @@
-import { useLoaderData, useOutlet } from "@remix-run/react";
+import { useOutlet } from "@remix-run/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "~/ui/components/base/Link";
 import { getGamesForUser } from "~/domain/game/game.server";
 import { requireUser } from "~/domain/auth/session.server";
 import {
+  json,
   LoaderArgs,
   UnpackData,
   useDataRefreshOnInterval,
+  useLoaderData,
   useUser,
 } from "~/core/utils";
 import { ChevronDownIcon } from "@heroicons/react/outline";
@@ -18,12 +20,13 @@ import { InputTheme } from "~/ui/components/base/InputTheme";
 import { Disclosure } from "@headlessui/react";
 import clsx from "clsx";
 import { useHasTabFocus } from "~/ui/hooks/useHasTabFocus";
+
 type LoaderData = UnpackData<typeof getGamesForUser>;
 
 export const loader = async ({ request }: LoaderArgs) => {
   const user = await requireUser(request);
   const games = await getGamesForUser(user.id);
-  return games;
+  return json(games);
 };
 
 const GameList = ({
