@@ -1,4 +1,4 @@
-import { PlayerTimeoutJob } from "./PlayerTimeoutJob.server";
+import { PlayerTimeoutJob } from "./playerTimeoutJob.server";
 import CronJob from "node-cron";
 
 export const CronJobs = [PlayerTimeoutJob];
