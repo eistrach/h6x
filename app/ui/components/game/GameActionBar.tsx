@@ -1,4 +1,4 @@
-import { CheckCircleIcon } from "@heroicons/react/solid";
+import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import { Form } from "@remix-run/react";
 import clsx from "clsx";
 import { motion } from "framer-motion";
@@ -67,7 +67,7 @@ const GameActionBar = () => {
               <div className="grid grid-cols-2 md:grid-cols-5  gap-2">
                 {Object.keys(CellModes).map((cellModeId) => {
                   return (
-                    <motion.div {...ListItemAnimationProps} key={cellModeId}>
+                    <motion.div key={cellModeId} {...ListItemAnimationProps}>
                       <Form method="post">
                         <input
                           type="hidden"

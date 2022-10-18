@@ -4,11 +4,11 @@ import { CellState } from "~/core/actions/types";
 import {
   cellsAreNeighbors,
   compareCell,
-  getNeighboringCells
+  getNeighboringCells,
 } from "~/core/math";
 import { UnpackData } from "~/core/utils";
 import { GameWithState } from "~/domain/game/game.server";
-import { getCurrentPlayer} from "~/domain/game/utils";
+import { getCurrentPlayer } from "~/domain/game/utils";
 import { useDirectionalPopovers } from "../hooks/useDirectionalPopovers";
 import { useSelectedCell } from "./SelectedCellContext";
 

@@ -28,9 +28,9 @@ export default function MapView({ cells, onSelect }: HexMapProps) {
       <g>
         {editorCells.map((cell) => (
           <HexView
+            key={cell.toString()}
             onSelect={onSelect}
             fill={isFilled(cell.x, cell.y)}
-            key={cell.toString()}
             cell={cell}
           />
         ))}

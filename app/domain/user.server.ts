@@ -11,7 +11,9 @@ export async function getUserByEmail(email: string) {
   return prisma.user.findUnique({ where: { email } });
 }
 
-export async function createOrUpdateUser(user: Omit<User, "id">) {
+export async function createOrUpdateUser(
+  user: Omit<User, "id" | "updatedAt" | "createdAt">
+) {
   return prisma.user.upsert({
     where: { email: user.email },
     create: user,

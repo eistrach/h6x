@@ -26,6 +26,7 @@ const PlayersInfo = () => {
             const isCurrentPlayer = p.id === currentPlayer?.id;
             return (
               <motion.li
+                key={p.id}
                 initial={{ opacity: 0, scale: 0 }}
                 animate={{
                   opacity: 1,
@@ -34,7 +35,6 @@ const PlayersInfo = () => {
                 }}
                 layout
                 exit={{ opacity: 0, scale: 0 }}
-                key={p.id}
                 className="flex  flex-col justify-center items-center"
               >
                 <div

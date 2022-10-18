@@ -1,9 +1,6 @@
 import { RadioGroup } from "@headlessui/react";
 import clsx from "clsx";
-import { Tool } from "~/routes/editor/$id";
-
-import CellPreview from "../map/CellPreview";
-import CellView from "../map/CellView";
+import { Tool } from "~/routes/__app/editor/$id";
 
 export default function TileSelection({
   selectedTool,

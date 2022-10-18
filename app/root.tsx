@@ -16,7 +16,6 @@ import { getUser } from "./domain/auth/session.server";
 import clsx from "clsx";
 import AppUrlListener from "./ui/components/base/AppUrlListener";
 import React from "react";
-import { MetronomeLinks } from "@metronome-sh/react";
 export { startCronjobs } from "./domain/cronjobs/index.server";
 
 let isMount = true;
@@ -81,7 +80,6 @@ export default function App() {
       <head>
         <Meta /> <link rel="manifest" href="/resources/manifest.webmanifest" />
         <Links />
-        <MetronomeLinks />
       </head>
       <body className="h-full bg-gray-100 overscroll-none p-safe">
         <main className={clsx("overscroll-auto h-full", {})}>

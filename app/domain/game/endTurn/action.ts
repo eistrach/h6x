@@ -1,4 +1,3 @@
-import { isPlayingState } from "./../utils";
 import { isSendersTurn } from "./../../../core/actions/validations";
 import { ModeChangesPerTurn } from "~/config/rules";
 import { registerAction } from "~/core/actions";

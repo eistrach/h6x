@@ -1,4 +1,4 @@
-import { ArrowLeftIcon } from "@heroicons/react/solid";
+import { ArrowLeftIcon } from "@heroicons/react/24/solid";
 import { Form } from "@remix-run/react";
 import { motion } from "framer-motion";
 import { Button } from "~/ui/components/base/Button";

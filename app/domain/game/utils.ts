@@ -17,10 +17,8 @@ import { compareCell } from "~/core/math";
 import { toId } from "~/core/utils";
 import { Game } from "./game.server";
 
-export const getCurrentPlayer = (
-  state: PlayingState
-): PlayerState | undefined => {
-  return state.players[state.playerIdSequence[0]];
+export const getCurrentPlayer = (state: PlayingState): PlayerState => {
+  return state.players[state.playerIdSequence[0]]!;
 };
 
 export const getNextPlayer = (state: PlayingState): PlayerState | null => {

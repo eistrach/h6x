@@ -11,11 +11,11 @@ import {
   useLoaderData,
   useUser,
 } from "~/core/utils";
-import { ChevronDownIcon } from "@heroicons/react/outline";
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
 
-import { PlusIcon } from "@heroicons/react/solid";
+import { PlusIcon } from "@heroicons/react/24/solid";
 import GameCard from "~/ui/components/game/GameCard";
-import { CogIcon } from "@heroicons/react/solid";
+import { CogIcon } from "@heroicons/react/24/solid";
 import { InputTheme } from "~/ui/components/base/InputTheme";
 import { Disclosure } from "@headlessui/react";
 import clsx from "clsx";

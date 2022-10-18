@@ -8,13 +8,13 @@ import {
 } from "~/core/utils";
 import { Button } from "../base/Button";
 import GamePreview from "../map/GamePreview";
-import { ShareIcon, XIcon } from "@heroicons/react/solid";
-import { PlayIcon } from "@heroicons/react/solid";
+import { ShareIcon, XMarkIcon } from "@heroicons/react/24/solid";
+import { PlayIcon } from "@heroicons/react/24/solid";
 import { InputTheme } from "../base/InputTheme";
 import clsx from "clsx";
 import { Form } from "@remix-run/react";
 import { Link } from "../base/Link";
-import { DuplicateIcon } from "@heroicons/react/solid";
+import { DocumentDuplicateIcon } from "@heroicons/react/24/solid";
 import { motion } from "framer-motion";
 import { ClientOnly } from "remix-utils";
 import { getState } from "~/domain/game/utils";
@@ -126,7 +126,7 @@ const GameCard = ({ game }: GameCardProps) => {
                   </div>
                   {lost && (
                     <span className="text-xs text-gray-800 absolute inset-0 flex justify-center items-center">
-                      <XIcon className="h-8 w-8 " />
+                      <XMarkIcon className="h-8 w-8 " />
                     </span>
                   )}
                 </li>
@@ -155,7 +155,7 @@ const GameCard = ({ game }: GameCardProps) => {
               <Button
                 onClick={handleShare}
                 theme={InputTheme.Link}
-                LeftIcon={canShare ? ShareIcon : DuplicateIcon}
+                LeftIcon={canShare ? ShareIcon : DocumentDuplicateIcon}
               >
                 {canShare ? "Invite" : "Copy link"}
               </Button>

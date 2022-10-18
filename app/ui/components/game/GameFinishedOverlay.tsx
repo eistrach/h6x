@@ -4,9 +4,9 @@ import { Dialog, Transition } from "@headlessui/react";
 import { Link } from "../base/Link";
 import AwardSvg from "../svg/AwardSvg";
 import { InputTheme } from "../base/InputTheme";
-import { EmojiSadIcon } from "@heroicons/react/solid";
+import { FaceFrownIcon } from "@heroicons/react/24/solid";
 import Confetti from "react-dom-confetti";
-import { ArrowNarrowLeftIcon } from "@heroicons/react/outline";
+import { ArrowSmallLeftIcon } from "@heroicons/react/24/outline";
 import { useGameState } from "~/ui/context/GameContext";
 
 const confettiConfig = {
@@ -84,7 +84,7 @@ export default function GameFinishedOverlay() {
                         />
                       </>
                     ) : (
-                      <EmojiSadIcon
+                      <FaceFrownIcon
                         className="h-10 w-10  text-primary-600 "
                         aria-hidden="true"
                       />
@@ -106,7 +106,7 @@ export default function GameFinishedOverlay() {
                   <Link
                     to="/games"
                     theme={InputTheme.Stretched}
-                    LeftIcon={ArrowNarrowLeftIcon}
+                    LeftIcon={ArrowSmallLeftIcon}
                   >
                     Go back to games
                   </Link>

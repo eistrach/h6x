@@ -1,4 +1,5 @@
-import { Link, RemixLinkProps } from "@remix-run/react/components";
+import { Link } from "@remix-run/react";
+import { RemixLinkProps } from "@remix-run/react/dist/components";
 import { HTMLMotionProps, motion } from "framer-motion";
 
 import { buttonHoverMotion } from "./Button";

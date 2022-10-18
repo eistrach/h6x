@@ -1,5 +1,5 @@
 import { RadioGroup } from "@headlessui/react";
-import { PencilAltIcon, PencilIcon } from "@heroicons/react/solid";
+import { PencilSquareIcon, PencilIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
 
 export default function ToolSelection({
@@ -40,7 +40,7 @@ export default function ToolSelection({
                     checked ? checkedShadowStyles : "bg-gray-200"
                   )}
                 />
-                <PencilAltIcon className={defaultStyles} />
+                <PencilSquareIcon className={defaultStyles} />
               </div>
             )}
           </RadioGroup.Option>

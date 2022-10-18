@@ -1,4 +1,4 @@
-import { DiscordStrategy, GoogleStrategy } from "remix-auth-socials";
+import { GoogleStrategy } from "remix-auth-socials";
 import { z } from "zod";
 import { createOrUpdateUser } from "~/domain/user.server";
 import { env } from "../../environment.server";

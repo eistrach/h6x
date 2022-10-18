@@ -1,4 +1,4 @@
-import { ArrowLeftIcon } from "@heroicons/react/solid";
+import { ArrowLeftIcon } from "@heroicons/react/24/solid";
 import { redirect } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
 import { motion } from "framer-motion";
@@ -63,10 +63,6 @@ const CreateGamePage = () => {
   const selectedMapId = maps?.[selectedMapIndex]?.id;
 
   const { isDragging } = useDragToScroll({ ref: mapList });
-
-  const getMapForId = (id: string | null) => {
-    return maps?.find((map) => map.id === id) || null;
-  };
 
   return (
     <>
