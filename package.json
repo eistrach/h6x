@@ -2,6 +2,10 @@
   "private": true,
   "sideEffects": false,
   "scripts": {
+    "setup": "npm-run-all setup:*",
+    "setup:install": "npm i",
+    "setup:css": "npm run generate:css",
+    "setup:prisma": "npx prisma migrate reset",
     "build": "npm-run-all build:*",
     "build:css": "npm run generate:css -- --minify",
     "build:remix": "cross-env NODE_ENV=production remix build",
