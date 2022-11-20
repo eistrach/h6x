@@ -8,7 +8,6 @@ import { InputTheme } from "~/ui/components/base/InputTheme";
 import { z } from "zod";
 import { validateForm } from "~/utils.server";
 import { badRequest } from "remix-utils";
-import { GoogleIcon } from "~/ui/components/icons/GoogleIcon";
 
 export const loader = async ({ request }: LoaderArgs) => {
   return await authenticator.isAuthenticated(request, {
@@ -17,7 +16,7 @@ export const loader = async ({ request }: LoaderArgs) => {
 };
 
 const schema = z.object({
-  provider: z.enum(["discord", "google"]),
+  provider: z.enum(["discord"]),
 });
 export const action = async ({ request }: ActionArgs) => {
   const result = await validateForm(request, schema);
@@ -48,16 +47,6 @@ const LoginPage = () => {
           LeftIcon={DiscordIcon}
         >
           Sign in with Discord
-        </Button>
-
-        <Button
-          name="provider"
-          value="google"
-          theme={InputTheme.Google}
-          type="submit"
-          LeftIcon={GoogleIcon}
-        >
-          Sign in with Google
         </Button>
       </div>
     </Form>

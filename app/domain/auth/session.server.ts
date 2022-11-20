@@ -6,7 +6,6 @@ import { Authenticator } from "remix-auth";
 
 import { getUserById } from "~/domain/user.server";
 import { env } from "../../environment.server";
-import { googleStrategy } from "./google.server";
 
 export const sessionStorage = createCookieSessionStorage({
   cookie: {
@@ -21,7 +20,7 @@ export const sessionStorage = createCookieSessionStorage({
 });
 
 export const authenticator = new Authenticator<string>(sessionStorage);
-authenticator.use(discortStrategy).use(googleStrategy);
+authenticator.use(discortStrategy);
 
 export const isAdmin = (user: User) => {
   return (env.ADMIN_EMAILS || "")
