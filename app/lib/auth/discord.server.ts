@@ -1,6 +1,6 @@
 import { DiscordStrategy } from "remix-auth-socials";
 import { z } from "zod";
-import { createOrUpdateUser } from "~/domain/user.server";
+import { getOrCreateDiscordUser, linkUserToDiscord } from "~/lib/user.server";
 import { env } from "../../environment.server";
 
 const schema = z.object({
@@ -18,11 +18,7 @@ export const discortStrategy = new DiscordStrategy(
     callbackURL: env.DISCORD_CALLBACK_URL,
   },
   async ({ profile }) => {
-    console.debug(profile);
-
     const result = await schema.safeParseAsync(profile.__json);
-
-    console.debug(result);
 
     if (!result.success) {
       throw new Error(
@@ -34,12 +30,19 @@ export const discortStrategy = new DiscordStrategy(
       ? `https://cdn.discordapp.com/avatars/${result.data.id}/${result.data.avatar}.png`
       : null;
 
-    const user = await createOrUpdateUser({
+    const customProfile = {
+      id: result.data.id,
       email: result.data.email || "",
-      username: `${result.data.username}#${result.data.discriminator}`,
+      username: result.data.username,
+      discriminator: result.data.discriminator,
       avatarUrl,
-      displayName: result.data.username,
-    });
+    };
+
+    let user = await getOrCreateDiscordUser(customProfile);
+
+    if (!user.discordId) {
+      user = await linkUserToDiscord(user, customProfile);
+    }
 
     return user.id;
   }

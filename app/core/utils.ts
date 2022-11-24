@@ -1,17 +1,8 @@
 import seedrandom from "seedrandom";
-import {
-  useMatches,
-  useLoaderData as useRemixLoaderData,
-} from "@remix-run/react";
+import { useMatches } from "@remix-run/react";
 import { useEffect, useMemo } from "react";
-import { DataFunctionArgs, json as remixJson } from "@remix-run/node";
-import { User } from "~/domain/user.server";
+import { User } from "~/lib/user.server";
 import { useDataRefresh } from "remix-utils";
-import { Point } from "./math";
-import { CellState } from "./actions/types";
-import { Cell } from "~/domain/map.server";
-import { deserialize, serialize } from "superjson";
-import { SuperJSONResult } from "superjson/dist/types";
 
 /**
  * This base hook is used in other hooks to quickly search for specific data
@@ -85,30 +76,3 @@ export function useDataRefreshOnInterval(
     return () => clearInterval(interval);
   }, [refresh, stop]);
 }
-
-export const toId = (p: Point | Cell | CellState) => {
-  if ("x" in p && "y" in p) {
-    return `${p.x}-${p.y}`;
-  }
-  return `${p.position.x}-${p.position.y}`;
-};
-
-export type UnpackData<F extends (...args: any) => any> = Exclude<
-  Awaited<ReturnType<F>>,
-  Response
->;
-
-export type UnpackArray<T> = T extends (infer U)[] ? U : T;
-
-export type LoaderArgs = DataFunctionArgs;
-export type ActionArgs = DataFunctionArgs;
-
-export const json = <T>(obj: T, init?: number | ResponseInit) => {
-  const data = serialize(obj);
-  return remixJson(data, init);
-};
-
-export const useLoaderData = <T>() => {
-  const data = useRemixLoaderData<SuperJSONResult>();
-  return deserialize<T>(data);
-};

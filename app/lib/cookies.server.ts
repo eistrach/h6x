@@ -1,5 +1,5 @@
 import { createCookie } from "@remix-run/node";
-import { env } from "./environment.server";
+import { env } from "../environment.server";
 
 export const redirectCookie = createCookie("__redirect", {
   httpOnly: true,

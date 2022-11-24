@@ -11,92 +11,230 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id String @id @default(cuid())
-
-  username String @unique
-  email    String @unique
-
-  displayName String
-  avatarUrl   String?
-
-  createdMaps  GameMap[]
-  createdGames Game[]
-  players      Player[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
+enum TileType {
+  Player
+  Buff
 }
 
-model GameMap {
-  id        String @id @default(cuid())
-  name      String
-  creatorId String
-  creator   User   @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+enum GamePhase {
+  Waiting
+  Preparing
+  Playing
+  Finished
+}
 
-  published Boolean @default(false)
+enum EliminationReason {
+  Eliminated
+  Surrendered
+  Timeout
+}
 
-  cellsHistory Json[]
+enum SupportedCellMode {
+  Offensive
+  Defensive
+  Productive
+}
+
+enum SupportedPreparationActions {
+  BuyUnit
+  ChangeCellMode
+}
+
+enum SupportedGameActions {
+  AttackCell
+  BuyUnit
+  ChangeCellMode
+  EliminatePlayer
+  EndTurn
+}
+
+model User {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  nickname String
+
+  username String?   @unique
+  password Password?
+
+  discordId String? @unique
+
+  createdMaps  HexMap[]
+  createdGames Game[]   @relation(name: "creatorRel")
 
   games Game[]
 
+  players           GamePlayer[]
+  preparationStates PreparationState[]
+  preparationCells  PreparationCell[]
+}
+
+model Password {
+  hash String
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String @unique
+}
+
+model HexMap {
+  id        String   @id @default(cuid())
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
+  updatedAt DateTime @updatedAt
+
+  name String
+
+  creator   User   @relation(fields: [creatorId], references: [id])
+  creatorId String
+
+  games Game[]
+
+  tiles HexMapTile[]
+
+  published Boolean
 
   @@index([creatorId])
 }
 
-enum GamePhase {
-  LOBBY
-  PREPARATION
-  PLAYING
-  FINISHED
+model HexMapTile {
+  x Int
+  y Int
+
+  map   HexMap? @relation(fields: [mapId], references: [id])
+  mapId String?
+
+  type TileType @default(Player)
+
+  @@id([x, y])
 }
 
 model Game {
-  id String @id @default(cuid())
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  map   GameMap @relation(fields: [mapId], references: [id])
+  map   HexMap @relation(fields: [mapId], references: [id])
   mapId String
 
+  creator   User   @relation(name: "creatorRel", fields: [creatorId], references: [id])
   creatorId String
-  creator   User   @relation(fields: [creatorId], references: [id], onDelete: Cascade)
 
-  players Player[]
+  members User[]
 
-  states Json[]
+  minutesUntilTimeout Int @default(60)
 
-  phase GamePhase @default(LOBBY)
+  gameStates  GameState[]
+  gameActions GameAction[]
 
+  preparationStates PreparationState[]
+
+  phase GamePhase @default(Waiting)
+}
+
+model PreparationState {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  minutesToTimeout Int             @default(10)
-  timeouts         PlayerTimeout[]
-}
-
-model PlayerTimeout {
-  gameId    String
-  game      Game     @relation(fields: [gameId], references: [id])
-  playerId  String   @id @unique
-  player    Player   @relation(fields: [playerId], references: [id])
-  timeoutAt DateTime
-}
-
-model Player {
-  id String @id @default(cuid())
-
-  lastSeenActionId Int?
-  preparationState Json?
-
+  index  Int
+  game   Game   @relation(fields: [gameId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   gameId String
-  game   Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
 
+  user   User   @relation(fields: [userId], references: [id])
   userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  diamonds Int
+  cells    PreparationCell[]
+
+  actions PreparationAction[]
+
+  done Boolean @default(false)
+
+  @@id([index, gameId])
+}
+
+model PreparationCell {
+  x Int
+  y Int
+
+  state   PreparationState @relation(fields: [stateId, gameId], references: [index, gameId], onDelete: Cascade, onUpdate: Cascade)
+  gameId  String
+  stateId Int
+
+  activeModeCode SupportedCellMode @default(Defensive)
+  units          Int
+
+  owner   User?   @relation(fields: [ownerId], references: [id])
+  ownerId String?
+
+  @@id([x, y, stateId, gameId])
+}
+
+model PreparationAction {
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
 
-  playerTimeout PlayerTimeout?
+  sequenceId Int
+  code       SupportedPreparationActions
+  payload    Json
+
+  state   PreparationState @relation(fields: [stateId, gameId], references: [index, gameId], onDelete: Cascade, onUpdate: Cascade)
+  stateId Int
+  gameId  String
+
+  @@id([sequenceId, stateId, gameId])
+}
+
+model GameState {
+  id      Int          @id
+  game    Game         @relation(fields: [gameId], references: [id])
+  gameId  String
+  players GamePlayer[]
+  cells   GameCell[]
+  actions GameAction[]
+}
+
+model GamePlayer {
+  index   Int
+  stateId Int
+
+  state GameState @relation(fields: [stateId], references: [id])
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  diamonds             Int
+  availableModeChanges Int
+  cells                GameCell[]
+
+  eliminationReason EliminationReason?
+
+  @@id([index, stateId])
+}
+
+model GameCell {
+  x       Int
+  y       Int
+  stateId Int
+  state   GameState @relation(fields: [stateId], references: [id])
+
+  owner      GamePlayer? @relation(fields: [ownerIndex, stateId], references: [index, stateId])
+  ownerIndex Int?
+
+  activeModeCode String
+  units          Int
+
+  @@id([x, y, stateId])
+}
+
+model GameAction {
+  sequenceId Int
+  code       String
+  payload    Json
+
+  nextState   GameState @relation(fields: [nextStateId], references: [id])
+  nextStateId Int
+
+  game   Game   @relation(fields: [gameId], references: [id])
+  gameId String
+
+  @@id([sequenceId, gameId])
 }

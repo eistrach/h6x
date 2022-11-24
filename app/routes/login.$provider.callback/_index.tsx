@@ -1,8 +1,8 @@
 import { LoaderArgs } from "~/core/utils";
-import { authenticator, sessionStorage } from "~/domain/auth/session.server";
+import { authenticator, sessionStorage } from "~/lib/auth/session.server";
 import { redirect } from "@remix-run/node";
-import { requireParam } from "~/utils.server";
-import { redirectCookie } from "~/cookies";
+import { requireParam } from "~/lib/validation.server";
+import { redirectCookie } from "~/lib/cookies.server";
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const provider = requireParam(params, "provider");

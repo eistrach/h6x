@@ -28,8 +28,6 @@ export const validateForm = async <Schema extends z.ZodTypeAny>(
   const form = await request.clone().formData();
   const data = qs.parse(new URLSearchParams(form as any).toString());
 
-  console.debug(data);
-
   const result = await schema.safeParseAsync(data);
 
   if (!result.success) {

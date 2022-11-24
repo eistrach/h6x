@@ -1,13 +1,13 @@
 import { Form } from "@remix-run/react";
-import { ActionArgs, LoaderArgs } from "~/core/utils";
-import { authenticator } from "~/domain/auth/session.server";
+import { authenticator } from "~/lib/auth/session.server";
 import { Button } from "~/ui/components/base/Button";
 import { DiscordIcon } from "~/ui/components/icons/DiscordIcon";
 import { LogoIcon } from "~/ui/components/icons/LogoIcon";
 import { InputTheme } from "~/ui/components/base/InputTheme";
 import { z } from "zod";
-import { validateForm } from "~/utils.server";
+import { validateForm } from "~/lib/validation.server";
 import { badRequest } from "remix-utils";
+import { LoaderArgs, ActionArgs } from "@remix-run/node";
 
 export const loader = async ({ request }: LoaderArgs) => {
   return await authenticator.isAuthenticated(request, {
@@ -39,6 +39,9 @@ const LoginPage = () => {
         <span className="font-extrabold text-6xl">h6x</span>
       </div>
       <div className="flex flex-col gap-8">
+        <div>
+          <input></input>
+        </div>
         <Button
           name="provider"
           value="discord"

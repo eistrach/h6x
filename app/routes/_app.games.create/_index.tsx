@@ -1,28 +1,27 @@
 import { ArrowLeftIcon } from "@heroicons/react/24/solid";
-import { redirect } from "@remix-run/node";
-import { Form, useLoaderData } from "@remix-run/react";
+import { ActionArgs, LoaderArgs, redirect } from "@remix-run/node";
+import { Form } from "@remix-run/react";
 import { motion } from "framer-motion";
 import { useRef } from "react";
 import { z } from "zod";
 import { Button } from "~/ui/components/base/Button";
 import { Link } from "~/ui/components/base/Link";
 import { InputTheme } from "~/ui/components/base/InputTheme";
-import { createGame } from "~/domain/game/game.server";
-import { getPublishedMaps } from "~/domain/map.server";
-import { requireUser } from "~/domain/auth/session.server";
-import { ActionArgs, LoaderArgs, UnpackData } from "~/core/utils";
-import { validateForm } from "~/utils.server";
-import GamePreview from "~/ui/components/map/GamePreview";
+import { requireUser } from "~/lib/auth/session.server";
+import { validateForm } from "~/lib/validation.server";
 import {
   SnapItem,
   SnapList,
   useDragToScroll,
   useVisibleElements,
 } from "react-snaplist-carousel";
+import { createNewGame } from "~/game/game.server";
+import { typedjson, useTypedLoaderData } from "remix-typedjson";
+import { getAllPublishedMaps } from "~/game/map.servert";
 
 const Schema = z.object({
-  selectedMapId: z.string().min(1),
-  playerTimeout: z.preprocess(Number, z.number()),
+  mapId: z.string().min(1),
+  minutesUntilTimeout: z.preprocess(Number, z.number()),
 });
 export const action = async ({ request }: ActionArgs) => {
   const [user, result] = await Promise.all([
@@ -34,23 +33,19 @@ export const action = async ({ request }: ActionArgs) => {
     return result;
   }
 
-  await createGame(
-    user.id,
-    result.data.selectedMapId,
-    result.data.playerTimeout
-  );
+  await createNewGame(user, result.data);
+
   return redirect(`/games`);
 };
 
-type LoaderData = UnpackData<typeof getPublishedMaps>;
 export const loader = async ({ request }: LoaderArgs) => {
-  const user = await requireUser(request);
-  const maps = await getPublishedMaps();
-  return maps;
+  await requireUser(request);
+  const maps = await getAllPublishedMaps();
+  return typedjson({ maps });
 };
 
 const CreateGamePage = () => {
-  const maps = useLoaderData<LoaderData>();
+  const { maps } = useTypedLoaderData<typeof loader>();
   const mapList = useRef(null);
   const selectedMapIndex = useVisibleElements(
     {
@@ -60,7 +55,7 @@ const CreateGamePage = () => {
     (elements) => elements[0]
   );
 
-  const selectedMapId = maps?.[selectedMapIndex]?.id;
+  const selectedMapId = maps[selectedMapIndex]?.id;
 
   const { isDragging } = useDragToScroll({ ref: mapList });
 
@@ -97,11 +92,12 @@ const CreateGamePage = () => {
                   width="auto"
                 >
                   <div className="flex flex-col items-center justify-center">
-                    <GamePreview
+                    {/* <GamePreview
                       cells={map.cells}
                       className="w-64 h-64 bg-gradient-to-br shadow-md from-primary-200/80 to-primary-400/80  rounded-full"
                       cellClassName="stroke-gray-900 fill-white"
-                    />
+                    /> */}
+                    <div className="w-64 h-64 bg-gradient-to-br shadow-md from-primary-200/80 to-primary-400/80  rounded-full"></div>
                     <p className="mt-2 font-semibold">{map.name}</p>
                   </div>
                 </SnapItem>
@@ -109,13 +105,13 @@ const CreateGamePage = () => {
             </SnapList>
 
             {selectedMapId && (
-              <input type="hidden" name="selectedMapId" value={selectedMapId} />
+              <input type="hidden" name="mapId" value={selectedMapId} />
             )}
             <label>
               Timeout Minutes
               <input
                 className="p-2 m-2"
-                name="playerTimeout"
+                name="minutesUntilTimeout"
                 defaultValue="10"
               />
             </label>

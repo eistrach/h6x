@@ -1,11 +1,11 @@
-import { redirectCookie } from "./../../cookies";
+import { redirectCookie } from "../cookies.server";
 import { discortStrategy } from "./discord.server";
 import { User } from "@prisma/client";
 import { createCookieSessionStorage, redirect } from "@remix-run/node";
 import { Authenticator } from "remix-auth";
 
-import { getUserById } from "~/domain/user.server";
 import { env } from "../../environment.server";
+import { getUserForId } from "~/lib/user.server";
 
 export const sessionStorage = createCookieSessionStorage({
   cookie: {
@@ -26,7 +26,7 @@ export const isAdmin = (user: User) => {
   return (env.ADMIN_EMAILS || "")
     .split(",")
     .map((email) => email.trim())
-    .includes(user.email);
+    .includes(user.nickname);
 };
 
 export async function requireUser(request: Request) {
@@ -40,7 +40,7 @@ export async function requireUser(request: Request) {
     });
   }
 
-  const user = await getUserById(userId);
+  const user = await getUserForId(userId);
 
   if (!user) {
     await authenticator.logout(request, { redirectTo: "/login" });
@@ -66,7 +66,7 @@ export async function getUser(request: Request) {
     return null;
   }
 
-  const user = await getUserById(userId);
+  const user = await getUserForId(userId);
 
   if (!user) {
     return null;

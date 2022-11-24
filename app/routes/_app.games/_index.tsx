@@ -1,32 +1,22 @@
 import { useOutlet } from "@remix-run/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "~/ui/components/base/Link";
-import { getGamesForUser } from "~/domain/game/game.server";
-import { requireUser } from "~/domain/auth/session.server";
-import {
-  json,
-  LoaderArgs,
-  UnpackData,
-  useDataRefreshOnInterval,
-  useLoaderData,
-  useUser,
-} from "~/core/utils";
+import { requireUser } from "~/lib/auth/session.server";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
-
 import { PlusIcon } from "@heroicons/react/24/solid";
 import GameCard from "~/ui/components/game/GameCard";
 import { CogIcon } from "@heroicons/react/24/solid";
 import { InputTheme } from "~/ui/components/base/InputTheme";
 import { Disclosure } from "@headlessui/react";
 import clsx from "clsx";
-import { useHasTabFocus } from "~/ui/hooks/useHasTabFocus";
-
-type LoaderData = UnpackData<typeof getGamesForUser>;
+import { typedjson, useTypedLoaderData } from "remix-typedjson";
+import { Game, getGamesForUser } from "~/game/game.server";
+import { LoaderArgs } from "@remix-run/node";
 
 export const loader = async ({ request }: LoaderArgs) => {
   const user = await requireUser(request);
-  const games = await getGamesForUser(user.id);
-  return json(games);
+  const games = await getGamesForUser(user);
+  return typedjson(games);
 };
 
 const GameList = ({
@@ -34,7 +24,7 @@ const GameList = ({
   title,
   defaultOpen = true,
 }: {
-  games: LoaderData;
+  games: Game[];
   title: string;
   defaultOpen?: boolean;
 }) => {
@@ -91,51 +81,16 @@ const GameList = ({
   );
 };
 
-const getActionableGames = (games: LoaderData, currentUserId: string) => {
-  return (
-    games?.filter((game) => {
-      if (game.isFinished) return false;
-      const players = game.players.filter((p) => p.userId === currentUserId);
-      return (
-        (game.phase === "PLAYING" &&
-          !!players.find(
-            (p) => game.gameState?.playerIdSequence[0] === p.id
-          )) ||
-        (game.phase === "PREPARATION" &&
-          players.some((p) => !p.preparationState?.done))
-      );
-    }) || []
-  );
-};
-
 const GamesPage = () => {
-  const tabFocused = useHasTabFocus();
-  useDataRefreshOnInterval(5000, !tabFocused);
-  const games = useLoaderData<LoaderData>() || [];
+  const games = useTypedLoaderData<typeof loader>() || [];
   const outlet = useOutlet();
-  const user = useUser();
-
-  const actionableGames = getActionableGames(games, user.id);
-
-  const lobbyGames = games.filter((game) => game.phase === "LOBBY");
-  const runningGames = games.filter(
-    (game) =>
-      !game.isFinished &&
-      game.phase !== "LOBBY" &&
-      !actionableGames.some((g) => g.id === game.id)
-  );
-
-  const finishedGames = games.filter((game) => game.isFinished);
 
   return (
     <>
       <AnimatePresence initial={false}>{outlet}</AnimatePresence>
 
       <div className=" px-6  mb-16 flex flex-col ">
-        <GameList games={actionableGames} title="Your Turn" />
-        <GameList games={lobbyGames} title="Lobby" />
-        <GameList games={runningGames} title="Waiting" />
-        <GameList games={finishedGames} title="Finished" defaultOpen={false} />
+        <GameList games={games} title="Games" />
       </div>
 
       <motion.div
