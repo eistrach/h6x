@@ -1,55 +1,49 @@
+import { SupportedCellMode } from "@prisma/client";
 import clsx from "clsx";
 import { motion } from "framer-motion";
-import { CellModeSprites, NeutralColor, PlayerColors } from "~/config/graphics";
 import {
-  MathCell,
+  BASE_HEX_STROKE_WIDTH,
+  HexCell,
   HEX_HEIGHT,
   HEX_WIDTH,
-  HEX_STROKE_WIDTH,
-  compareCell,
-} from "~/core/math";
-import { toId } from "~/core/utils";
-import {
-  useCurrentHostileNeighbors,
-  useGameState,
-} from "~/ui/context/GameContext";
+} from "~/game/game";
 import { useSelectedCell } from "~/ui/context/SelectedCellContext";
-import { useCellAnimation } from "~/ui/hooks/useCellAnimation";
-import { getAttackPopoverRef } from "./AttackPopovers";
+import AttackerSvg from "../svg/AttackerSvg";
+import DefenderSvg from "../svg/DefenderSvg";
+import FarmerSvg from "../svg/FarmerSvg";
 
 type PlayerCellProps = {
-  position: MathCell;
+  cell: HexCell;
 };
 
-export default function PlayerCell({ position }: PlayerCellProps) {
-  const { state, directionalPopovers, nextState } = useGameState();
+const CellModeSprites = {
+  Offensive: AttackerSvg,
+  Defensive: DefenderSvg,
+  Productive: FarmerSvg,
+} satisfies {
+  [key in keyof typeof SupportedCellMode]: React.FC<
+    React.SVGProps<SVGSVGElement>
+  >;
+};
+
+export default function PlayerCell({ cell }: PlayerCellProps) {
   const { selectedCell, setSelectedCell } = useSelectedCell();
-  const hostileNeighbors = useCurrentHostileNeighbors();
+  const color = useColor(cell);
 
-  const cellState = state.cells[toId(position)];
-  const isSelected = compareCell(cellState.position, selectedCell?.position);
-  const controls = useCellAnimation(position);
-
-  const popperRef = getAttackPopoverRef(
-    position,
-    directionalPopovers,
-    hostileNeighbors
-  );
-  const { x, y } = position.toPoint();
-
-  const owner = state.players[cellState.ownerId];
-  const color = (owner && PlayerColors[owner.index]) || NeutralColor;
-
-  const Sprite = CellModeSprites[cellState.activeModeId];
+  const isSelected = cell.compare(selectedCell);
+  const Sprite = CellModeSprites[cell.state.activeModeCode];
 
   return (
-    <motion.g animate={controls}>
+    <motion.g>
       <g
-        ref={popperRef}
-        strokeWidth={isSelected ? HEX_STROKE_WIDTH * 1.25 : HEX_STROKE_WIDTH}
+        strokeWidth={
+          isSelected ? BASE_HEX_STROKE_WIDTH * 1.25 : BASE_HEX_STROKE_WIDTH
+        }
         strokeLinejoin="round"
-        onClick={() => setSelectedCell(cellState)}
-        transform={`translate(${x - HEX_WIDTH / 2}, ${y - HEX_HEIGHT / 2}) `}
+        onClick={() => setSelectedCell(cell)}
+        transform={`translate(${cell.x - HEX_WIDTH / 2}, ${
+          cell.y - HEX_HEIGHT / 2
+        }) `}
         className={clsx(color.fill, {
           //"fill-white": !!animation,
           " stroke-white ": isSelected,
@@ -66,9 +60,13 @@ export default function PlayerCell({ position }: PlayerCellProps) {
           fontSize="30"
           strokeWidth=".2"
         >
-          {cellState.units}
+          {cell.state.units}
         </text>
       </g>
     </motion.g>
   );
+}
+
+function useColor(cell: HexCell): any {
+  throw new Error("Function not implemented.");
 }

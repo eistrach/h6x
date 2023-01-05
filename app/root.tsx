@@ -1,5 +1,5 @@
 import { useLocation, useMatches } from "@remix-run/react";
-import type { LinksFunction, MetaFunction } from "@remix-run/node";
+import type { LinksFunction, LoaderArgs, MetaFunction } from "@remix-run/node";
 import {
   Links,
   LiveReload,
@@ -11,7 +11,6 @@ import {
 import styles from "./styles/tailwind.css";
 import fontStyles from "./styles/rubik.css";
 import customStyles from "./styles/custom.css";
-import { LoaderArgs } from "./core/utils";
 import { getUser } from "./lib/auth/session.server";
 import clsx from "clsx";
 import AppUrlListener from "./ui/components/base/AppUrlListener";

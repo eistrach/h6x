@@ -13,14 +13,14 @@ import { CellModeIds } from "~/config/rules";
 import { ActionArgs, LoaderArgs, redirect } from "@remix-run/node";
 import { GameContextProvider } from "~/ui/context/GameContext";
 import { SelectedCellProvider } from "~/ui/context/SelectedCellContext";
-import { TransitionContextProvider } from "~/ui/context/TransitionContext";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
+import { getGameState } from "~/game/game.server";
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const gameId = requireParam(params, "id");
   const user = await requireUser(request);
 
-  const result = {};
+  const result = await getGameState(gameId, user);
 
   if (!result) {
     redirect(`/games`);
@@ -36,8 +36,8 @@ const Schema = z.union([
   z.object({
     _intent: z.literal("changeCellMode"),
     position: z.object({
-      x: z.preprocess(Number, z.number()),
-      y: z.preprocess(Number, z.number()),
+      q: z.preprocess(Number, z.number()),
+      r: z.preprocess(Number, z.number()),
     }),
     cellModeId: z.enum(CellModeIds),
     playerId: z.string().min(1),
@@ -53,12 +53,12 @@ const Schema = z.union([
   z.object({
     _intent: z.literal("attackCell"),
     position: z.object({
-      x: z.preprocess(Number, z.number()),
-      y: z.preprocess(Number, z.number()),
+      q: z.preprocess(Number, z.number()),
+      r: z.preprocess(Number, z.number()),
     }),
     target: z.object({
-      x: z.preprocess(Number, z.number()),
-      y: z.preprocess(Number, z.number()),
+      q: z.preprocess(Number, z.number()),
+      r: z.preprocess(Number, z.number()),
     }),
     playerId: z.string().min(1),
   }),
@@ -118,13 +118,11 @@ const GamePage = () => {
   return (
     <GameContextProvider value={state}>
       <SelectedCellProvider>
-        <TransitionContextProvider>
-          <Toaster position="top-right" />
+        <Toaster position="top-right" />
 
-          <div className="min-h-full h-full">
-            <GameView />
-          </div>
-        </TransitionContextProvider>
+        <div className="min-h-full h-full">
+          <GameView />
+        </div>
       </SelectedCellProvider>
     </GameContextProvider>
   );

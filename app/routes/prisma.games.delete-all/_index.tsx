@@ -1,6 +1,6 @@
 import { ActionFunction, LoaderFunction, redirect } from "@remix-run/node";
-import { prisma } from "~/db.server";
 import { requireUser } from "~/lib/auth/session.server";
+import { prisma } from "~/lib/db.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
   await requireUser(request);

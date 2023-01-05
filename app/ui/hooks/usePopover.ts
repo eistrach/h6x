@@ -1,4 +1,3 @@
-import { UnpackData } from "~/core/utils";
 import { useState } from "react";
 import { Modifier, usePopper } from "react-popper";
 
@@ -34,5 +33,3 @@ export const usePopover = <Modifiers>(
     attributes,
   };
 };
-
-export type Popover = UnpackData<typeof usePopover>;

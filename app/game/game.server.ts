@@ -1,6 +1,7 @@
 import type { User } from "@prisma/client";
 import { prisma } from "~/lib/db.server";
 import { ExtractReturnType } from "~/lib/type-helpers";
+import { getPreparationState, PreparationState } from "./preparing.server";
 
 export type Game = ExtractReturnType<typeof getGamesForUser>;
 
@@ -70,4 +71,37 @@ export const joinGame = async (gameId: string, user: User) => {
       members: true,
     },
   });
+};
+
+export type GameState =
+  | PreparationState
+  | { phase: "Finished"; canTakeAction: false }
+  | { phase: "Waiting"; canTakeAction: false };
+
+export const getGameState = async (
+  gameId: string,
+  user: User
+): Promise<GameState> => {
+  const { phase } = (await prisma.game.findUnique({
+    where: { id: gameId },
+    select: { phase: true },
+  })) || { phase: null };
+  switch (phase) {
+    case "Waiting":
+      return {
+        phase: "Waiting",
+        canTakeAction: false,
+      };
+    case "Preparing":
+      return await getPreparationState(gameId, user);
+    case "Playing":
+      throw Error("Not implemented");
+    case "Finished":
+      return {
+        phase: "Finished",
+        canTakeAction: false,
+      };
+    default:
+      throw Error("Unknown phase");
+  }
 };

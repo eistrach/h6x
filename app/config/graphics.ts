@@ -1,15 +1,3 @@
-import AttackerSvg from "~/ui/components/svg/AttackerSvg";
-import DefaultSvg from "~/ui/components/svg/DefaultSvg";
-import DefenderSvg from "~/ui/components/svg/DefenderSvg";
-import FarmerSvg from "~/ui/components/svg/FarmerSvg";
-
-export const CellModeSprites = {
-  average: DefaultSvg,
-  offensive: AttackerSvg,
-  defensive: DefenderSvg,
-  productive: FarmerSvg,
-};
-
 export const PlayerColors = [
   {
     fill: "fill-red-400",

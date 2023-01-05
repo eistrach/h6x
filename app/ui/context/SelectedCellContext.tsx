@@ -1,28 +1,31 @@
-import { createContext, PropsWithChildren, useContext, useState } from "react";
-import { CellModes } from "~/config/rules";
-import { CellState } from "~/core/actions/types";
-import { Point } from "~/core/math";
-import { toId, useUser } from "~/core/utils";
-import { useCurrentPlayer, useGameState } from "./GameContext";
+import { HexCoordinates } from "honeycomb-grid";
+import {
+  createContext,
+  PropsWithChildren,
+  useContext,
+  useMemo,
+  useState,
+} from "react";
+import { HexCell } from "~/game/game";
+import { useGrid } from "./GameContext";
 
 export const SelectedCellContext = createContext<{
-  selectedCell: CellState | null;
-  setSelectedCell: (cell: CellState | null, force?: boolean) => void;
+  selectedCell: HexCell | null;
+  setSelectedCell: (cell: HexCell | null, force?: boolean) => void;
 }>({ selectedCell: null, setSelectedCell: () => {} });
 
 export const SelectedCellProvider = ({ children }: PropsWithChildren<{}>) => {
-  const {
-    nextState,
-    state: { cells },
-  } = useGameState();
-  const [selectedCellPosition, setSelectedCellPosition] =
-    useState<Point | null>();
+  const animating = false;
+  const grid = useGrid();
 
-  const setSelectedCell = (cell: CellState | null, force = false) => {
-    if (force || !nextState) setSelectedCellPosition(cell?.position);
+  const [selectedCoordinates, setSelectedCoordinates] =
+    useState<HexCoordinates>();
+
+  const setSelectedCell = (cell: HexCell | null, force = false) => {
+    if (force || !animating) setSelectedCoordinates(cell?.coordinates);
   };
 
-  if (!selectedCellPosition)
+  if (!selectedCoordinates)
     return (
       <SelectedCellContext.Provider
         value={{ selectedCell: null, setSelectedCell }}
@@ -30,7 +33,8 @@ export const SelectedCellProvider = ({ children }: PropsWithChildren<{}>) => {
         {children}
       </SelectedCellContext.Provider>
     );
-  const selectedCell = cells[toId(selectedCellPosition)];
+
+  const selectedCell = grid.getHex(selectedCoordinates) || null;
 
   return (
     <SelectedCellContext.Provider value={{ selectedCell, setSelectedCell }}>
@@ -40,18 +44,17 @@ export const SelectedCellProvider = ({ children }: PropsWithChildren<{}>) => {
 };
 
 export const useSelectedCell = () => {
-  const ctx = useContext(SelectedCellContext)!;
-  const currentPlayer = useCurrentPlayer();
-  const user = useUser();
+  return useContext(SelectedCellContext);
+};
 
-  return {
-    ...ctx,
-    selectedCell: ctx.selectedCell && {
-      ...ctx.selectedCell,
-      mode: CellModes[ctx.selectedCell.activeModeId],
-      isOwnCell:
-        ctx.selectedCell.ownerId === currentPlayer?.id &&
-        currentPlayer?.userId === user.id,
-    },
-  };
+export const useActiveHostileCells = () => {
+  const { selectedCell } = useSelectedCell();
+  const grid = useGrid();
+
+  const hostileNeighbors = useMemo(() => {
+    if (!selectedCell) return [];
+    return grid.hostileNeighborsOf(selectedCell);
+  }, [selectedCell?.id]);
+
+  return hostileNeighbors;
 };

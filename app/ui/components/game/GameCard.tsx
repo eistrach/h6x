@@ -1,11 +1,3 @@
-import { PropsWithChildren } from "react";
-import { getGamesForUser } from "~/domain/game/game.server";
-import {
-  copyTextToClipboard,
-  UnpackArray,
-  UnpackData,
-  useUser,
-} from "~/core/utils";
 import { Button } from "../base/Button";
 import GamePreview from "../map/GamePreview";
 import { ShareIcon, XMarkIcon } from "@heroicons/react/24/solid";
@@ -19,12 +11,10 @@ import { motion } from "framer-motion";
 import { ClientOnly } from "remix-utils";
 import { getState } from "~/domain/game/utils";
 import { PlayerColors } from "~/config/graphics";
+import { useUser } from "~/lib/user";
+import { copyTextToClipboard } from "~/lib/utils";
 
-export type GameCardProps = PropsWithChildren<{
-  game: UnpackArray<UnpackData<typeof getGamesForUser>>;
-}>;
-
-const GameCard = ({ game }: GameCardProps) => {
+const GameCard = ({ game }: any) => {
   const user = useUser();
   const canShare =
     typeof window !== "undefined" &&
@@ -36,7 +26,7 @@ const GameCard = ({ game }: GameCardProps) => {
     if (canShare) {
       navigator.share({
         title: "Send h6x game invite",
-        text: `${user.displayName} has invited you to play h6x!`,
+        text: `${user.nickname} has invited you to play h6x!`,
         url: shareUrl,
       });
     } else {
@@ -101,7 +91,7 @@ const GameCard = ({ game }: GameCardProps) => {
                 className="text-primary-900 text-center w-6 h-6  rounded-full ring ring-white bg-gray-100"
               ></li>
             ))}
-            {players.map((player) => {
+            {players.map((player: any) => {
               const ring = state?.players
                 ? PlayerColors[state.players[player.id].index].ring
                 : "ring-white";

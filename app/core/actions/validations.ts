@@ -1,7 +1,7 @@
 import { getCurrentPlayer } from "~/domain/game/utils";
 
 import { Point } from "../math";
-import { toId } from "../utils";
+import { toId } from "../../lib/utils";
 import { PlayingState } from "./types";
 
 export const isSendersTurn = (

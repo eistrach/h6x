@@ -60,6 +60,8 @@ model User {
 
   discordId String? @unique
 
+  avatarUrl String?
+
   createdMaps  HexMap[]
   createdGames Game[]   @relation(name: "creatorRel")
 
@@ -97,15 +99,15 @@ model HexMap {
 }
 
 model HexMapTile {
-  x Int
-  y Int
+  q Int
+  r Int
 
   map   HexMap? @relation(fields: [mapId], references: [id])
   mapId String?
 
   type TileType @default(Player)
 
-  @@id([x, y])
+  @@id([q, r])
 }
 
 model Game {
@@ -153,8 +155,8 @@ model PreparationState {
 }
 
 model PreparationCell {
-  x Int
-  y Int
+  q Int
+  r Int
 
   state   PreparationState @relation(fields: [stateId, gameId], references: [index, gameId], onDelete: Cascade, onUpdate: Cascade)
   gameId  String
@@ -166,7 +168,7 @@ model PreparationCell {
   owner   User?   @relation(fields: [ownerId], references: [id])
   ownerId String?
 
-  @@id([x, y, stateId, gameId])
+  @@id([q, r, stateId, gameId])
 }
 
 model PreparationAction {
@@ -211,8 +213,8 @@ model GamePlayer {
 }
 
 model GameCell {
-  x       Int
-  y       Int
+  q       Int
+  r       Int
   stateId Int
   state   GameState @relation(fields: [stateId], references: [id])
 
@@ -222,7 +224,7 @@ model GameCell {
   activeModeCode String
   units          Int
 
-  @@id([x, y, stateId])
+  @@id([q, r, stateId])
 }
 
 model GameAction {

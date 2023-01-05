@@ -1,10 +1,10 @@
 import { Outlet } from "@remix-run/react";
 import { Link as RemixLink } from "@remix-run/react";
-import { useUser } from "~/core/utils";
 
 import { LogoIcon } from "~/ui/components/icons/LogoIcon";
 import ProfileMenu from "~/ui/components/base/ProfileMenu";
 import { LoaderArgs, redirect } from "@remix-run/node";
+import { useUser } from "~/lib/user";
 
 export const loader = ({ request }: LoaderArgs) => {
   if (request.url.endsWith("/app")) return redirect("/games");

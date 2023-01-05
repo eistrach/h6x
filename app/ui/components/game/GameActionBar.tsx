@@ -1,26 +1,29 @@
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
+import { SupportedCellMode } from "@prisma/client";
 import { Form } from "@remix-run/react";
 import clsx from "clsx";
 import { motion } from "framer-motion";
 import { ListItemAnimationProps } from "~/config/graphics";
-import { UnitCost, CellModes } from "~/config/rules";
-import { isPlayingState } from "~/domain/game/utils";
+import { UnitCost } from "~/config/rules";
+import { useUser } from "~/lib/user";
 import {
-  useCurrentPlayer,
+  useAvailableDiamonds,
+  useAvailableModeChanges,
   useGameState,
-  useIsSubmitting,
 } from "~/ui/context/GameContext";
 import { useSelectedCell } from "~/ui/context/SelectedCellContext";
 import { Button } from "../base/Button";
 
 const GameActionBar = () => {
-  const { state, canTakeAction } = useGameState();
+  const state = useGameState();
   const { selectedCell } = useSelectedCell();
-  const disableActions = useIsSubmitting();
-  const canUseBuyActions = selectedCell?.isOwnCell;
-  const currentPlayer = useCurrentPlayer();
+  const isAnimating = false;
+  const canUseBuyActions = selectedCell?.state.isCurrentPlayersCell;
+  const currentUser = useUser();
+  const diamonds = useAvailableDiamonds();
+  const availableModeChanges = useAvailableModeChanges();
 
-  if (!canTakeAction) return null;
+  if (!state.canTakeAction) return null;
   return (
     <div className=" ">
       <motion.div
@@ -30,7 +33,7 @@ const GameActionBar = () => {
         )}
       >
         <div className="px-4 py-4">
-          {canUseBuyActions && selectedCell && (
+          {canUseBuyActions && (
             <motion.div
               layout
               className="flex flex-col gap-8 justify-center items-center"
@@ -39,24 +42,17 @@ const GameActionBar = () => {
                 <Form method="post">
                   <input
                     type="hidden"
-                    name="position[x]"
-                    value={selectedCell?.position.x}
+                    name="position[q]"
+                    value={selectedCell?.q}
                   />
                   <input
                     type="hidden"
-                    name="position[y]"
-                    value={selectedCell?.position.y}
+                    name="position[r]"
+                    value={selectedCell?.r}
                   />
-                  <input
-                    type="hidden"
-                    name="playerId"
-                    value={currentPlayer.id}
-                  />
+                  <input type="hidden" name="userId" value={currentUser.id} />
                   <Button
-                    disabled={
-                      disableActions ||
-                      (!!selectedCell.mode && currentPlayer.diamonds < UnitCost)
-                    }
+                    disabled={isAnimating || diamonds < UnitCost}
                     name="_intent"
                     value="buyUnit"
                   >
@@ -65,24 +61,24 @@ const GameActionBar = () => {
                 </Form>
               </motion.div>
               <div className="grid grid-cols-2 md:grid-cols-5  gap-2">
-                {Object.keys(CellModes).map((cellModeId) => {
+                {Object.keys(SupportedCellMode).map((cellModeId) => {
                   return (
                     <motion.div key={cellModeId} {...ListItemAnimationProps}>
                       <Form method="post">
                         <input
                           type="hidden"
-                          name="position[x]"
-                          value={selectedCell?.position.x}
+                          name="position[q]"
+                          value={selectedCell?.q}
                         />
                         <input
                           type="hidden"
-                          name="playerId"
-                          value={currentPlayer.id}
+                          name="userId"
+                          value={currentUser.id}
                         />
                         <input
                           type="hidden"
-                          name="position[y]"
-                          value={selectedCell?.position.y}
+                          name="position[r]"
+                          value={selectedCell?.r}
                         />
                         <input
                           type="hidden"
@@ -93,11 +89,7 @@ const GameActionBar = () => {
                           type="submit"
                           name="_intent"
                           value="changeCellMode"
-                          disabled={
-                            disableActions ||
-                            (isPlayingState(state) &&
-                              currentPlayer.availableModeChanges <= 0)
-                          }
+                          disabled={isAnimating || availableModeChanges === 0}
                         >
                           {cellModeId}
                         </Button>
@@ -112,18 +104,16 @@ const GameActionBar = () => {
             layout
             className=" flex justify-between items-center w-full h-min mt-auto"
           >
-            {isPlayingState(state) ? (
-              <span>
-                Available mode changes: {currentPlayer.availableModeChanges}
-              </span>
-            ) : (
+            {availableModeChanges === "unlimited" ? (
               <span>You may change as many cells as you want</span>
+            ) : (
+              <span>Available mode changes: {availableModeChanges}</span>
             )}
             <Form method="post" className="ml-auto">
-              <input type="hidden" name="playerId" value={currentPlayer.id} />
+              <input type="hidden" name="userId" value={currentUser.id} />
               <Button
                 iconClasses="h-8 w-8"
-                disabled={disableActions}
+                disabled={isAnimating}
                 RightIcon={CheckCircleIcon}
                 name="_intent"
                 value="endTurn"

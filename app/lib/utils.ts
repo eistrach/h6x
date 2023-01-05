@@ -1,8 +1,7 @@
 import seedrandom from "seedrandom";
-import { useMatches } from "@remix-run/react";
 import { useEffect, useMemo } from "react";
-import { User } from "~/lib/user.server";
 import { useDataRefresh } from "remix-utils";
+import { useMatches } from "@remix-run/react";
 
 /**
  * This base hook is used in other hooks to quickly search for specific data
@@ -19,32 +18,6 @@ export function useMatchesData(
     [matchingRoutes, id]
   );
   return route?.data;
-}
-
-function isUser(user: any): user is User & { isAdmin: boolean } {
-  return user && typeof user === "object" && typeof user.email === "string";
-}
-
-export function useOptionalUser(): (User & { isAdmin: boolean }) | undefined {
-  const data = useMatchesData("root");
-  if (!data || !isUser(data.user)) {
-    return undefined;
-  }
-  return data.user;
-}
-
-export function useUser(): User & { isAdmin: boolean } {
-  const maybeUser = useOptionalUser();
-  if (!maybeUser) {
-    throw new Error(
-      "No user found in root loader, but user is required by useUser. If user is optional, try useOptionalUser instead."
-    );
-  }
-  return maybeUser;
-}
-
-export function validateEmail(email: unknown): email is string {
-  return typeof email === "string" && email.length > 3 && email.includes("@");
 }
 
 export async function copyTextToClipboard(text: string) {

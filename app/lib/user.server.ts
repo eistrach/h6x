@@ -41,6 +41,7 @@ export const getOrCreateDiscordUser = async (profile: DiscordProfile) => {
   return prisma.user.create({
     data: {
       nickname: profile.username,
+      avatarUrl: profile.avatarUrl,
     },
   });
 };

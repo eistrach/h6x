@@ -1,6 +1,5 @@
 import { Link } from "@remix-run/react";
 import PlayersInfo from "./PlayersInfo";
-import AttackPopovers from "./AttackPopovers";
 import GameMap from "./GameMap";
 import { LogoIcon } from "../icons/LogoIcon";
 import GameFinishedOverlay from "./GameFinishedOverlay";
@@ -12,7 +11,6 @@ export default function GameView() {
   return (
     <div className="h-screen flex justify-center items-center flex-col">
       {isGameFinished && <GameFinishedOverlay />}
-      <AttackPopovers />
 
       <div className="fixed z-10 left-0 right-0 top-0 rounded-b-2xl backdrop-blur-sm  h-20 bg-gray-200/50 px-safe pt-safe flex justify-between items-center">
         <Link

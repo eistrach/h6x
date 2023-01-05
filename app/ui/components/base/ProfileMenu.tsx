@@ -2,7 +2,7 @@ import { Menu, Transition } from "@headlessui/react";
 import { Form, Link } from "@remix-run/react";
 import clsx from "clsx";
 import { Fragment } from "react";
-import { useUser } from "~/core/utils";
+import { useUser } from "~/lib/user";
 
 const ProfileMenu = () => {
   const user = useUser();
@@ -13,12 +13,8 @@ const ProfileMenu = () => {
           <span className="sr-only">Open user menu</span>
 
           <div className="flex flex-col items-end">
-            <span className="font-bold  text-stone-900">
-              {user.displayName}
-            </span>
-            <span className="text-xs text-gray-500">
-              #{user.username.split("#")[1]}
-            </span>
+            <span className="font-bold  text-stone-900">{user.nickname}</span>
+            <span className="text-xs text-gray-500">SecondaryName</span>
           </div>
           <div className="w-10 h-10 ring-white ring-2 shadow-md rounded-full bg-white">
             {!!user.avatarUrl ? (
@@ -27,7 +23,7 @@ const ProfileMenu = () => {
                 className="object-cover rounded-full"
               ></img>
             ) : (
-              <span>{user.displayName[0]}</span>
+              <span>{user.nickname[0]}</span>
             )}
           </div>
         </Menu.Button>

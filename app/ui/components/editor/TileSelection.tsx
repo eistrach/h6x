@@ -1,13 +1,12 @@
 import { RadioGroup } from "@headlessui/react";
 import clsx from "clsx";
-import { Tool } from "~/routes.old/__app/editor/$id";
 
 export default function TileSelection({
   selectedTool,
   setSelectedTool,
 }: {
-  selectedTool: Tool;
-  setSelectedTool: (tool: Tool) => void;
+  selectedTool: any;
+  setSelectedTool: (tool: any) => void;
 }) {
   const defaultStyles = "w-8 h-8 rounded-full";
   const defaultShadowStyles =

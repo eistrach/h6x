@@ -4,7 +4,7 @@ import { registerAction } from "~/core/actions";
 import { PlayingState } from "~/core/actions/types";
 import { isSendersTurn, isPlayerCellOwner } from "~/core/actions/validations";
 import { Point } from "~/core/math";
-import { toId } from "~/core/utils";
+import { toId } from "~/lib/utils";
 import { getCurrentPlayer } from "../utils";
 
 const changeCellModeReducer = (

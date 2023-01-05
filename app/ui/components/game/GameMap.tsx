@@ -1,32 +1,14 @@
-import { useGrid } from "~/ui/hooks/useGrid";
+import PlayerCell from "./PlayerCell";
 import {
-  compareCell,
+  HexCell,
   VIEWBOX_HEIGHT,
   VIEWBOX_WIDTH,
   VIEWBOX_X,
-  VIEWBOX_Y,
-} from "~/core/math";
-import PlayerCell from "./PlayerCell";
-import { toId } from "~/core/utils";
-import { useGameState } from "~/ui/context/GameContext";
-import { useSelectedCell } from "~/ui/context/SelectedCellContext";
+  VIEWBOX_Y
+} from "~/game/game";
 
 const GameMap = () => {
-  const { state, nextState } = useGameState();
-  const grid = useGrid(Object.values(state.cells));
-  const { selectedCell } = useSelectedCell();
-
-  const backCells = grid.filter(
-    (cell) =>
-      (nextState?.causedBy?.payload &&
-        "source" in nextState.causedBy.payload &&
-        !compareCell(cell, nextState.causedBy.payload.source)) ||
-      !compareCell(cell, selectedCell?.position)
-  );
-
-  const frontCells = grid.filter(
-    (cell) => !backCells.find((c2) => compareCell(c2, cell))
-  );
+  const cells: HexCell[] = [];
 
   return (
     <svg
@@ -36,8 +18,8 @@ const GameMap = () => {
       preserveAspectRatio="xMidYMid"
     >
       <g>
-        {[...backCells, ...frontCells].map((position) => {
-          return <PlayerCell key={toId(position)} position={position} />;
+        {cells.map((cell) => {
+          return <PlayerCell key={cell.id} cell={cell} />;
         })}
       </g>
     </svg>

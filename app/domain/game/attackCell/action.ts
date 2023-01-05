@@ -5,7 +5,7 @@ import { registerAction } from "~/core/actions";
 import { PlayingState } from "~/core/actions/types";
 import { isSendersTurn, isPlayerCellOwner } from "~/core/actions/validations";
 import { cellsAreNeighbors, Point } from "~/core/math";
-import { randomIntFromInterval, toId } from "~/core/utils";
+import { randomIntFromInterval, toId } from "~/lib/utils";
 import { getAllCellsForPlayer } from "../utils";
 
 export const throwDice = (rng: seedrandom.PRNG, dice: string) => {

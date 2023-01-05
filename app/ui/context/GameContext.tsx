@@ -1,34 +1,16 @@
-import { useTransition } from "@remix-run/react";
-import { createContext, PropsWithChildren, useContext } from "react";
-import { CellState } from "~/core/actions/types";
-import {
-  cellsAreNeighbors,
-  compareCell,
-  getNeighboringCells,
-} from "~/core/math";
-import { UnpackData } from "~/core/utils";
-import { GameWithState } from "~/domain/game/game.server";
-import { getCurrentPlayer } from "~/domain/game/utils";
-import { useDirectionalPopovers } from "../hooks/useDirectionalPopovers";
-import { useSelectedCell } from "./SelectedCellContext";
+import { GamePlayer } from "@prisma/client";
+import { createContext, PropsWithChildren, useContext, useMemo } from "react";
+import { HexCell, HexGrid } from "~/game/game";
+import { GameState } from "~/game/game.server";
 
-export const GameContext = createContext<
-  | (GameWithState & {
-      directionalPopovers: UnpackData<typeof useDirectionalPopovers>;
-    })
-  | undefined
->(undefined);
+export const GameContext = createContext<GameState | undefined>(undefined);
 
 export const GameContextProvider = ({
   value,
   children,
-}: PropsWithChildren<{ value: GameWithState | undefined }>) => {
-  const directionalPopovers = useDirectionalPopovers();
-
+}: PropsWithChildren<{ value: GameState | undefined }>) => {
   return (
-    <GameContext.Provider
-      value={value ? { ...value, directionalPopovers } : undefined}
-    >
+    <GameContext.Provider value={value ? { ...value } : undefined}>
       {children}
     </GameContext.Provider>
   );
@@ -38,50 +20,46 @@ export const useGameState = () => {
   return useContext(GameContext)!;
 };
 
-export const useCurrentPlayer = () => {
-  const { state } = useGameState();
-  return getCurrentPlayer(state);
-};
+export const useGrid = () => {
+  const state = useGameState();
 
-export const useCurrentHostileNeighbors = () => {
-  const { selectedCell } = useSelectedCell();
-  const { game, state } = useGameState();
-  const currentPlayer = useCurrentPlayer();
-
-  const canAttack = (target: CellState) => {
-    return (
-      selectedCell &&
-      selectedCell.units > 1 &&
-      cellsAreNeighbors(selectedCell.position, target.position) &&
-      !compareCell(selectedCell.position, target.position) &&
-      selectedCell.ownerId !== target.ownerId
-    );
-  };
-
-  return selectedCell?.isOwnCell && game.phase === "PLAYING"
-    ? Object.fromEntries(
-        Object.entries(
-          getNeighboringCells(selectedCell.position, Object.values(state.cells))
-        ).filter(([, targetCell]) => {
-          return (
-            targetCell.ownerId !== currentPlayer?.id && canAttack(targetCell)
-          );
-        })
+  const grid = useMemo(() => {
+    if (state.phase != "Preparing") return null;
+    const cells = state.cells.map((cell) =>
+      HexCell.create(
+        { q: cell.q, r: cell.r },
+        { ...cell, isCurrentPlayersCell: true }
       )
-    : null;
+    );
+    return new HexGrid(HexCell, cells);
+  }, [state]);
+
+  if (!grid) throw new Error("Grid is not available");
+
+  return grid;
 };
 
-export const useCurrentUsers = () => {
-  const { game } = useGameState();
-  return game.players.map((player) => player.user);
+export const useCurrentPlayer = () => {
+  return null as GamePlayer | null;
+};
+
+export const useAvailableDiamonds = () => {
+  const state = useGameState();
+
+  if (state.phase === "Preparing") return state.diamonds;
+
+  return 0;
+};
+
+export const useAvailableModeChanges = () => {
+  const state = useGameState();
+
+  if (state.phase === "Preparing") return "unlimited";
+
+  return 0;
 };
 
 export const useIsGameFinished = () => {
-  const { game } = useGameState();
-  return game.phase === "FINISHED";
-};
-
-export const useIsSubmitting = () => {
-  const transition = useTransition();
-  return transition.state !== "idle";
+  const state = useGameState();
+  return state.phase === "Finished";
 };

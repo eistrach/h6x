@@ -11,7 +11,7 @@ import {
   initializePreparationState,
   updatePlayingState,
 } from "./utils";
-import { UnpackArray, UnpackData } from "~/core/utils";
+import { UnpackArray, UnpackData } from "~/lib/utils";
 import { addMinutes } from "date-fns";
 
 export type Game = UnpackArray<UnpackData<typeof getGamesForUser>>;

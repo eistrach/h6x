@@ -14,7 +14,7 @@ import {
   PreparationState,
 } from "~/core/actions/types";
 import { compareCell } from "~/core/math";
-import { toId } from "~/core/utils";
+import { toId } from "~/lib/utils";
 import { Game } from "./game.server";
 
 export const getCurrentPlayer = (state: PlayingState): PlayerState => {
