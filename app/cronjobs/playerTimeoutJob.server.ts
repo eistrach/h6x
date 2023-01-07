@@ -1,4 +1,4 @@
-import { kickTimedOutPlayers } from "../timeouts.server";
+import { kickTimedOutPlayers } from "../domain/timeouts.server";
 
 export const PlayerTimeoutJob = {
   cron: "* */1 * * * *",

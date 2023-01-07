@@ -1,21 +1,20 @@
 import { useHover } from "@use-gesture/react";
 import clsx from "clsx";
 import {
-  MathCell,
+  BASE_HEX_STROKE_WIDTH,
+  HexCell,
   HEX_HEIGHT,
   HEX_WIDTH,
-  cellCorners,
-  HEX_STROKE_WIDTH,
-} from "~/core/math";
+} from "~/game/game";
 
 type CellViewProps = {
-  cell: MathCell;
+  cell: HexCell;
   fill: boolean;
-  onSelect?: (cell: MathCell) => void;
+  onSelect?: (cell: HexCell) => void;
 };
 
 export default function CellView({ cell, fill, onSelect }: CellViewProps) {
-  const { x, y } = cell.toPoint();
+  const { x, y } = cell;
   const bindHover = useHover(({ pressed, down }) => {
     (pressed || down) && onSelect?.(cell);
   });
@@ -32,8 +31,8 @@ export default function CellView({ cell, fill, onSelect }: CellViewProps) {
     >
       <polygon
         stroke="#000000"
-        strokeWidth={HEX_STROKE_WIDTH}
-        points={cellCorners
+        strokeWidth={BASE_HEX_STROKE_WIDTH}
+        points={cell.corners
           .map((corner) => `${corner.x},${corner.y}`)
           .join(" ")}
       />

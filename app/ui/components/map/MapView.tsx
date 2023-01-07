@@ -1,17 +1,14 @@
 import {
-  MathCell,
+  HexCell,
   VIEWBOX_HEIGHT,
   VIEWBOX_WIDTH,
   VIEWBOX_X,
   VIEWBOX_Y,
-  editorCells,
-} from "~/core/math";
-import { Cell } from "~/domain/map.server";
-import HexView from "./CellView";
+} from "~/game/game";
 
 type HexMapProps = {
-  cells: Cell[];
-  onSelect?: (cell: MathCell) => void;
+  cells: HexCell[];
+  onSelect?: (cell: HexCell) => void;
 };
 
 export default function MapView({ cells, onSelect }: HexMapProps) {
@@ -25,16 +22,7 @@ export default function MapView({ cells, onSelect }: HexMapProps) {
       viewBox={`${VIEWBOX_X}, ${VIEWBOX_Y}, ${VIEWBOX_WIDTH}, ${VIEWBOX_HEIGHT}`}
       preserveAspectRatio="xMidYMid"
     >
-      <g>
-        {editorCells.map((cell) => (
-          <HexView
-            key={cell.toString()}
-            onSelect={onSelect}
-            fill={isFilled(cell.x, cell.y)}
-            cell={cell}
-          />
-        ))}
-      </g>
+      <g></g>
     </svg>
   );
 }

@@ -1,8 +1,5 @@
-import { prisma } from "~/lib/db.server";
-import { kickPlayer } from "./game/kickPlayer/index.server";
-
 export const kickTimedOutPlayers = async () => {
-  const timeouts = await prisma.playerTimeout.findMany({
+  /* const timeouts = await prisma.playerTimeout.findMany({
     include: {
       player: true,
       game: true,
@@ -26,5 +23,5 @@ export const kickTimedOutPlayers = async () => {
 
   if (kicked) {
     console.info(`Kicked ${kicked} players`);
-  }
+  } */
 };

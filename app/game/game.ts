@@ -66,6 +66,10 @@ export class HexCell extends defineHex({
 }
 
 export class HexGrid extends Grid<HexCell> {
+  static fromCells(cells: HexCell[]) {
+    return new HexGrid(HexCell, cells);
+  }
+
   neighborsOf(cell: HexCell) {
     return Directions.map((direction) =>
       this.neighborOf(cell, direction, { allowOutside: false })

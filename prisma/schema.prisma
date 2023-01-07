@@ -2,8 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["interactiveTransactions"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -40,7 +39,7 @@ enum SupportedPreparationActions {
   ChangeCellMode
 }
 
-enum SupportedGameActions {
+enum SupportedPlayingActions {
   AttackCell
   BuyUnit
   ChangeCellMode
@@ -65,11 +64,10 @@ model User {
   createdMaps  HexMap[]
   createdGames Game[]   @relation(name: "creatorRel")
 
-  games Game[]
-
-  players           GamePlayer[]
+  players           Player[]
   preparationStates PreparationState[]
   preparationCells  PreparationCell[]
+  playingUsers      PlayingUser[]
 }
 
 model Password {
@@ -110,6 +108,20 @@ model HexMapTile {
   @@id([q, r])
 }
 
+model PlayingUser {
+  game   Game   @relation(fields: [gameId], references: [id])
+  gameId String
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  currentSequenceId Int @default(0)
+
+  eliminationReason EliminationReason?
+
+  @@id([gameId, userId])
+}
+
 model Game {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
@@ -121,16 +133,16 @@ model Game {
   creator   User   @relation(name: "creatorRel", fields: [creatorId], references: [id])
   creatorId String
 
-  members User[]
+  members PlayingUser[]
 
   minutesUntilTimeout Int @default(60)
 
-  gameStates  GameState[]
-  gameActions GameAction[]
+  playingStates PlayingState[]
 
   preparationStates PreparationState[]
 
-  phase GamePhase @default(Waiting)
+  phase         GamePhase       @default(Waiting)
+  PlayingAction PlayingAction[]
 }
 
 model PreparationState {
@@ -146,8 +158,6 @@ model PreparationState {
 
   diamonds Int
   cells    PreparationCell[]
-
-  actions PreparationAction[]
 
   done Boolean @default(false)
 
@@ -171,72 +181,61 @@ model PreparationCell {
   @@id([q, r, stateId, gameId])
 }
 
-model PreparationAction {
-  createdAt DateTime @default(now())
-
+model PlayingState {
+  createdAt  DateTime @default(now())
   sequenceId Int
-  code       SupportedPreparationActions
-  payload    Json
 
-  state   PreparationState @relation(fields: [stateId, gameId], references: [index, gameId], onDelete: Cascade, onUpdate: Cascade)
-  stateId Int
-  gameId  String
+  game   Game   @relation(fields: [gameId], references: [id])
+  gameId String
 
-  @@id([sequenceId, stateId, gameId])
+  causedByAction   PlayingAction? @relation(fields: [causedByActionId], references: [id])
+  causedByActionId String?        @unique
+
+  players Player[]
+  cells   PlayingCell[]
+
+  @@id([sequenceId, gameId])
 }
 
-model GameState {
-  id      Int          @id
-  game    Game         @relation(fields: [gameId], references: [id])
-  gameId  String
-  players GamePlayer[]
-  cells   GameCell[]
-  actions GameAction[]
-}
+model Player {
+  index Int
 
-model GamePlayer {
-  index   Int
-  stateId Int
-
-  state GameState @relation(fields: [stateId], references: [id])
+  state           PlayingState @relation(fields: [stateSequenceId, gameId], references: [sequenceId, gameId])
+  stateSequenceId Int
+  gameId          String
 
   user   User   @relation(fields: [userId], references: [id])
   userId String
 
   diamonds             Int
   availableModeChanges Int
-  cells                GameCell[]
+  cells                PlayingCell[]
 
-  eliminationReason EliminationReason?
-
-  @@id([index, stateId])
+  @@id([index, stateSequenceId, gameId])
 }
 
-model GameCell {
-  q       Int
-  r       Int
-  stateId Int
-  state   GameState @relation(fields: [stateId], references: [id])
+model PlayingCell {
+  q               Int
+  r               Int
+  stateSequenceId Int
+  gameId          String
 
-  owner      GamePlayer? @relation(fields: [ownerIndex, stateId], references: [index, stateId])
+  state PlayingState @relation(fields: [stateSequenceId, gameId], references: [sequenceId, gameId])
+
+  owner      Player? @relation(fields: [ownerIndex, stateSequenceId, gameId], references: [index, stateSequenceId, gameId])
   ownerIndex Int?
 
   activeModeCode String
   units          Int
 
-  @@id([q, r, stateId])
+  @@id([q, r, stateSequenceId, gameId])
 }
 
-model GameAction {
-  sequenceId Int
-  code       String
-  payload    Json
-
-  nextState   GameState @relation(fields: [nextStateId], references: [id])
-  nextStateId Int
-
-  game   Game   @relation(fields: [gameId], references: [id])
-  gameId String
-
-  @@id([sequenceId, gameId])
+model PlayingAction {
+  id        String                  @id @default(cuid())
+  code      SupportedPlayingActions
+  payload   Json
+  nextState PlayingState?
+  Game      Game?                   @relation(fields: [gameId], references: [id])
+  gameId    String?
 }

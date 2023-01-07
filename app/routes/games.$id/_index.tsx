@@ -5,16 +5,13 @@ import { z } from "zod";
 import { requireUser } from "~/lib/auth/session.server";
 import { requireParam, validateForm } from "~/lib/validation.server";
 import GameView from "~/ui/components/game/GameView";
-import {
-  startPreparation,
-  transitionToNextGameState,
-} from "~/domain/game/game.server";
 import { CellModeIds } from "~/config/rules";
 import { ActionArgs, LoaderArgs, redirect } from "@remix-run/node";
 import { GameContextProvider } from "~/ui/context/GameContext";
 import { SelectedCellProvider } from "~/ui/context/SelectedCellContext";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { getGameState } from "~/game/game.server";
+import { transitionToPreparationState } from "~/game/preparing.server";
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const gameId = requireParam(params, "id");
@@ -40,7 +37,7 @@ const Schema = z.union([
       r: z.preprocess(Number, z.number()),
     }),
     cellModeId: z.enum(CellModeIds),
-    playerId: z.string().min(1),
+    userId: z.string().min(1),
   }),
   z.object({
     _intent: z.literal("buyUnit"),
@@ -48,7 +45,7 @@ const Schema = z.union([
       x: z.preprocess(Number, z.number()),
       y: z.preprocess(Number, z.number()),
     }),
-    playerId: z.string().min(1),
+    userId: z.string().min(1),
   }),
   z.object({
     _intent: z.literal("attackCell"),
@@ -60,15 +57,15 @@ const Schema = z.union([
       q: z.preprocess(Number, z.number()),
       r: z.preprocess(Number, z.number()),
     }),
-    playerId: z.string().min(1),
+    userId: z.string().min(1),
   }),
   z.object({
     _intent: z.literal("endTurn"),
-    playerId: z.string().min(1),
+    userId: z.string().min(1),
   }),
   z.object({
     _intent: z.literal("transitionToNextGameState"),
-    playerId: z.string().min(1),
+    userId: z.string().min(1),
   }),
 ]);
 export const action = async ({ request, params }: ActionArgs) => {
@@ -85,7 +82,7 @@ export const action = async ({ request, params }: ActionArgs) => {
   try {
     switch (result.data._intent) {
       case "startGame":
-        await startPreparation(gameId, user.id);
+        await transitionToPreparationState(user, gameId);
         break;
       case "changeCellMode":
         break;
@@ -96,7 +93,7 @@ export const action = async ({ request, params }: ActionArgs) => {
       case "endTurn":
         break;
       case "transitionToNextGameState":
-        await transitionToNextGameState(gameId, result.data.playerId);
+        break;
     }
     return redirect(`/games/${gameId}`);
   } catch (err) {

@@ -1,16 +1,14 @@
 import {
-  asMathGrid,
-  cellsToMathCells,
+  HexCell,
   VIEWBOX_HEIGHT,
   VIEWBOX_WIDTH,
   VIEWBOX_X,
   VIEWBOX_Y,
-} from "~/core/math";
-import { Cell } from "~/domain/map.server";
+} from "~/game/game";
 import CellPreview from "./CellPreview";
 
 type GamePreviewProps = {
-  cells: Cell[];
+  cells: HexCell[];
   className?: string;
   cellClassName?: string;
 };
@@ -20,7 +18,6 @@ export default function GamePreview({
   className,
   cellClassName,
 }: GamePreviewProps) {
-  const grid = asMathGrid(cellsToMathCells(cells));
   return (
     <svg
       className={className}
@@ -29,12 +26,8 @@ export default function GamePreview({
       preserveAspectRatio="xMidYMid"
     >
       <g>
-        {grid.map((cell) => (
-          <CellPreview
-            key={cell.toString()}
-            cell={cell}
-            className={cellClassName}
-          />
+        {cells.map((cell) => (
+          <CellPreview key={cell.id} cell={cell} className={cellClassName} />
         ))}
       </g>
     </svg>

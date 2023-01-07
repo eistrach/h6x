@@ -8,13 +8,18 @@ export type PreparationState = ExtractReturnType<typeof getPreparationState>;
 export const getPreparationState = async (gameId: string, user: User) => {
   const game = await prisma.game.findFirst({
     where: { id: gameId, phase: "Preparing" },
-    include: { members: true, preparationStates: { include: { cells: true } } },
+    include: {
+      members: {
+        include: { user: true },
+      },
+      preparationStates: { include: { cells: true } },
+    },
   });
   if (!game)
     throw Error(
       `Game '${gameId}' does not satifisy the filtering requirements`
     );
-  if (!game.members.find((m) => m.id === user.id))
+  if (!game.members.find((m) => m.userId === user.id))
     throw Error(`User '${user.id}' is not a member of game '${gameId}'`);
 
   const { preparationStates, ...rest } = game;
@@ -36,7 +41,7 @@ export const getPreparationState = async (gameId: string, user: User) => {
     members: game.members
       .map((m) => ({
         ...m,
-        index: getIndex(m.id),
+        index: getIndex(m.userId),
       }))
       .sort((a, b) => a.index - b.index),
     phase: "Preparing" as const,
@@ -59,9 +64,9 @@ export const transitionToPreparationState = async (
   if (game.phase !== "Waiting")
     throw Error(`Game '${gameId}' is not in the 'Waiting' state`);
 
-  const players = ranodomize(game.members).map((m, index) => ({
+  const players = randomize(game.members).map((m, index) => ({
     index,
-    userId: m.id,
+    userId: m.userId,
   }));
 
   const cells = initializeCells(game.map.tiles, players);
@@ -166,7 +171,7 @@ const initializeCells = (
   tiles: HexMapTile[],
   players: { index: number; userId: string }[]
 ) => {
-  const availableCells = ranodomize(tiles.filter((t) => t.type === "Player"));
+  const availableCells = randomize(tiles.filter((t) => t.type === "Player"));
 
   const playerCellCount = Math.floor(availableCells.length / players.length);
 
@@ -198,7 +203,7 @@ export const createPlayerCell = (
   };
 };
 
-const ranodomize = <T>(array: T[]) => {
+const randomize = <T>(array: T[]) => {
   const result = [...array];
   for (let i = result.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));

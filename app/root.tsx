@@ -15,7 +15,7 @@ import { getUser } from "./lib/auth/session.server";
 import clsx from "clsx";
 import AppUrlListener from "./ui/components/base/AppUrlListener";
 import React from "react";
-export { startCronjobs } from "./domain/cronjobs/index.server";
+export { startCronjobs } from "./cronjobs/index.server";
 
 let isMount = true;
 

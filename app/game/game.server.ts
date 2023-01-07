@@ -1,6 +1,7 @@
 import type { User } from "@prisma/client";
 import { prisma } from "~/lib/db.server";
 import { ExtractReturnType } from "~/lib/type-helpers";
+import { getPlayingState, PlayingState } from "./playing.server";
 import { getPreparationState, PreparationState } from "./preparing.server";
 
 export type Game = ExtractReturnType<typeof getGamesForUser>;
@@ -8,7 +9,10 @@ export type Game = ExtractReturnType<typeof getGamesForUser>;
 export const getGameById = async (id: string) => {
   return await prisma.game.findUnique({
     where: { id },
-    include: { members: true, map: { include: { tiles: true } } },
+    include: {
+      members: { include: { user: true } },
+      map: { include: { tiles: true } },
+    },
   });
 };
 
@@ -17,7 +21,7 @@ export const getGamesForUser = async (user: User) => {
     where: {
       members: {
         some: {
-          id: user.id,
+          userId: user.id,
         },
       },
     },
@@ -38,11 +42,13 @@ export const createNewGame = async (
       minutesUntilTimeout,
       mapId,
       members: {
-        connect: { id: user.id },
+        create: {
+          userId: user.id,
+        },
       },
     },
     include: {
-      members: true,
+      members: { include: { user: true } },
     },
   });
 };
@@ -57,7 +63,7 @@ export const joinGame = async (gameId: string, user: User) => {
     throw Error(`Game '${gameId}' was already started`);
   if (lobby.members.length >= 6) throw Error(`Game '${gameId}' is full`);
 
-  if (lobby.members.find((m) => m.id === user.id)) return lobby;
+  if (lobby.members.find((m) => m.userId === user.id)) return lobby;
 
   return await prisma.game.update({
     where: {
@@ -65,16 +71,17 @@ export const joinGame = async (gameId: string, user: User) => {
     },
     data: {
       updatedAt: new Date(),
-      members: { connect: { id: user.id } },
+      members: { create: { userId: user.id } },
     },
     include: {
-      members: true,
+      members: { include: { user: true } },
     },
   });
 };
 
 export type GameState =
   | PreparationState
+  | PlayingState
   | { phase: "Finished"; canTakeAction: false }
   | { phase: "Waiting"; canTakeAction: false };
 
@@ -95,7 +102,7 @@ export const getGameState = async (
     case "Preparing":
       return await getPreparationState(gameId, user);
     case "Playing":
-      throw Error("Not implemented");
+      return await getPlayingState(gameId, user);
     case "Finished":
       return {
         phase: "Finished",

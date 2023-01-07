@@ -1,22 +1,20 @@
-import { asMathCell, cellInGrid, MathCell, asMathGrid } from "~/core/math";
-import { Cell } from "./map.server";
+import { HexCell, HexGrid } from "~/game/game";
 
-export const validateCellConnections = (cells: Cell[]) => {
-  const gridCells = cells.map((cell) => asMathCell(cell.x, cell.y));
-  const grid = asMathGrid(gridCells);
-  const queue = [grid[0]];
-  const checkedCells = [] as MathCell[];
+export const validateCellConnections = (cells: HexCell[]) => {
+  const grid = HexGrid.fromCells(cells);
+  const queue = [cells[0]];
+  const checkedCells: HexCell[] = [];
 
   while (queue.length > 0) {
     const cell = queue.pop()!;
-    if (cellInGrid(cell, checkedCells)) {
+    if (checkedCells.some((c) => c.compare(cell))) {
       continue;
     }
 
     checkedCells.push(cell);
-    const neighbors = grid.neighborsOf(cell).filter((c) => !!c);
+    const neighbors = grid.neighborsOf(cell);
     queue.push(...neighbors);
   }
 
-  return checkedCells.length === gridCells.length;
+  return checkedCells.length === cells.length;
 };

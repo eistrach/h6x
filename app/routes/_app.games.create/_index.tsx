@@ -17,7 +17,7 @@ import {
 } from "react-snaplist-carousel";
 import { createNewGame } from "~/game/game.server";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
-import { getAllPublishedMaps } from "~/game/map.servert";
+import { getAllPublishedMaps } from "~/game/map.server";
 
 const Schema = z.object({
   mapId: z.string().min(1),
